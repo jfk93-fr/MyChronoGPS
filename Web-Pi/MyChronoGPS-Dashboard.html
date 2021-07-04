@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS DashBoard</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS-Dashboard.css">
+	<!--<link rel="stylesheet" href="./css/materialdesignicons.min.css">-->
+</head>
+<body>
+	<div class="w3-main">
+		<div id="dashboard">
+		    <span id="top"></span>
+			<div id="menu" class="w3-button">
+				<a href="#" style="text-decoration:none;" onClick="displayMenu();">Menu</a>
+			</div>
+			<div id="satellites">
+				<p id="nb-sats"><p>
+			</div>
+			<div id="temperature">
+				<p id="tempcpu"></p>
+			</div>
+			<div id="circuit">
+				<p id="NomCircuit"></p>
+			</div>
+			<!-- Leds -->
+			<!-- pas d'affichage des leds pour l'instant, on ne sait pas comment faire ! -->
+			<div id="LEDs" style="display:block">
+			    <!-- led notification d'amélioration -->
+				<div>
+					<div id="led-green" class="led-green-off"></div>
+				</div>
+			    <!-- led notification franchissement ligne -->
+				<div>
+					<div id="led-blue" class="led-blue-off"></div>
+				</div>
+			    <!-- led notification warning (in pitlane) -->
+				<div>
+					<div id="led-yellow" class="led-yellow-off"></div>
+				</div>
+			</div>
+			<!-- Tableau de Bord -->
+			<!--<div id="LCD" style="background:cyan; color:green; padding:8px 24px 8px 24px;">-->
+			<!--<div id="LCD" style="background:black; color:yellow; padding:8px 24px 8px 24px;">-->
+			<div id="LCD" style="background:black; color:white; padding:8px 24px 8px 24px;">
+				<div id="loading" style="display:none">
+					<div id="zone-info"></div>
+					<textarea id="clipboard" cols=50 style="display:none"></textarea>
+				</div>
+			    <div id="LD" style="display:none">
+					<div id="LD0"></div>
+					<div id="LD1"></div>
+				</div>
+			    <div id="LH" style="display:none">
+					<div id="LH0"></div>
+					<div id="LH1"></div>
+					<div id="LH2"></div>
+				</div>
+			    <div id="LS" style="display:none">
+					<div id="LS0"></div>
+					<div id="LS1"></div>
+					<div id="LS2"></div>
+					<div id="LS3"></div>
+				</div>
+			</div>
+			<!-- Menu -->
+			<div id="Menu" style="display:none;background:yellow; color:black; padding:8px 2px 8px 2px;">
+				<div id="poweroff" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btnpwroff" onclick="request_shutdown()"></button>
+					</span>
+					<span>
+					Arrêt complet (Shutdown)
+					</span>
+				</div>
+				<div id="reboot" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btnreboot" onclick="request_reboot()"></button>
+					</span>
+					<span>
+					Redémarrage complet (Reboot)
+					</span>
+				</div>
+				<div id="gpsstart" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btngpson" onclick="ajax_cmd('start_gps.py')"></button>
+					</span>
+					<span>
+					Démarrage MyChronoGPS
+					</span>
+				</div>
+				<div id="gpsstop" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btngpsoff" onclick="ajax_cmd('stop_gps.py')"></button>
+					</span>
+					<span>
+					Arrêt MyChronoGPS
+					</span>
+				</div>
+				<div id="gpsquest" class="linebtn">
+					<span>
+					<a href="#" class="w3-button btnmenu btngpsquest"></a>
+					</span>
+					<span>
+					Etat MyChronoGPS
+					</span>
+				</div>
+				<div id="gpsmenu" class="linebtn">
+					<span>
+					<a href="MyChronoGPS.html" class="w3-button w3-border w3-round">Menu</a>
+					</span>
+					<span>
+					Menu G&eacute;n&eacute;ral
+					</span>
+				</div>
+				<div id="info-cmd">
+				</div>
+			</div>
+
+			<!--
+			<div id="scroll_to_top">
+				<a href="#top" class="btntop"></a>
+			</div>
+			-->
+			<div id="div-refresh">
+				<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+			</div>
+		</div>
+	</div>
+
+	<script src="./js/ajax.js" type="text/javascript"></script>
+	<script src="./js/MyChronoGPS-Dashboard-ajax.js"></script>
+	<script src="./js/MyChronoGPS-Dashboard.js"></script>
+</body>
+</html>

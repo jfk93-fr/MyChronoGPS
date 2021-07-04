@@ -1,0 +1,362 @@
+
+#dashboard {
+  width: 480px;
+  height: 320px;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#menu {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  color:yellow;
+  background-color: grey;
+  padding:12px 16px;
+  vertical-align: middle;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+}
+
+#satellites {
+  position: absolute;
+  top: 0px;
+  left: 12%;
+  width: 8%;
+  vertical-align: middle;
+  text-align: center;
+  color:yellow;
+}
+
+#temperature {
+  position: absolute;
+  top: 0px;
+  left: 20%;
+  width: 5%;
+  vertical-align: middle;
+  text-align: center;
+  color:yellow;
+}
+
+#circuit {
+  position: absolute;
+  top: 0px;
+  left: 25%;
+  width: 35%;
+  vertical-align: middle;
+  text-align: center;
+  color:yellow;
+}
+
+#LEDs {
+  position: absolute;
+  top: 0px;
+  left: 60%;
+  width: 40%;
+  height: 50px;
+  height: 15%;
+}
+#led-orange{
+  position: absolute;
+  top: 13px;
+  left: 10%;
+}
+#led-yellow{
+  position: absolute;
+  top: 13px;
+  left: 10%;
+}
+#led-blue{
+  position: absolute;
+  top: 13px;
+  left: 38%;
+}
+#led-green{
+  position: absolute;
+  top: 13px;
+  left: 66%;
+}
+
+#LCD {
+  position: absolute;
+  top: 50px;
+  top: 15%;
+  width: 100%;
+  height: 270px;
+  height: 85%;
+  /*border: 3px solid #73AD21;*/
+  font-weight: bold;
+}
+#LD0 {
+  position: absolute;
+  top: 20%;
+  width:432px;
+  width:90%;
+  text-align:center;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LD1 {
+  position: absolute;
+  top: 55%;
+  width:432px;
+  width:90%;
+  text-align:center;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LH0 {
+  position: absolute;
+  top: 10%;
+  width:432px;
+  width:90%;
+  text-align:center;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LH1 {
+  position: absolute;
+  top: 26%;
+  width:432px;
+  width:90%;
+  text-align:center;
+  font-family: sans-serif;
+  font-size: 108px;
+}
+#LH2 {
+  position: absolute;
+  top: 75%;
+  width:432px;
+  width:90%;
+  text-align:center;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LS0 {
+  position: absolute;
+  top: 10%;
+  width:432px;
+  width:90%;
+  text-align:left;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LS1 {
+  position: absolute;
+  top: 30%;
+  width:432px;
+  width:90%;
+  text-align:left;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LS2 {
+  position: absolute;
+  top: 50%;
+  width:432px;
+  width:90%;
+  text-align:left;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+#LS3 {
+  position: absolute;
+  top: 70%;
+  width:432px;
+  width:90%;
+  text-align:left;
+  font-family: sans-serif;
+  font-size: 42px;
+}
+.txtleft {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  text-align:left;
+}
+.txtright {
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  text-align:right;
+}
+
+#loading {
+  position: absolute;
+  top: 10%;
+  width:432px;
+  width:90%;
+  text-align:left;
+  font-family: sans-serif;
+  font-size: 18px;
+}
+
+#scroll_to_top {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  top: 90%;
+  left: 90%;
+}
+#scroll_to_top.img {
+  width: 25px;
+}
+.btntop {
+	width: 25px;
+	height: 25px;
+	background-image: url(../img/arrow-up-bold.png) ; 
+	background-size: 25px 25px;
+	background-repeat: no-repeat;
+
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	background-color: inherit;
+	background-color: grey;
+	/*color: inherit;*/
+}
+
+#div-refresh {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  top: 90%;
+  left: 90%;
+}
+#refresh.img {
+  width: 36px;
+}
+.btnrefresh {
+	background-color: grey;
+	padding:12px 16px;
+	vertical-align: middle;
+	text-align: center;
+	border: none;
+	border-radius: 8px;
+
+
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/refresh.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	/*color: inherit;*/
+}
+
+
+#Menu {
+  position: absolute;
+  top: 50px;
+  top: 15%;
+  width: 100%;
+  height: 270px;
+  height: 85%;
+  /*border: 3px solid #73AD21;*/
+}
+
+#poweroff {
+	/*
+  position: absolute;
+  top: 2px;
+  left: 2px
+  color:yellow;
+  */
+  /*
+  background-color: grey;
+  padding:12px 16px;
+  vertical-align: middle;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+  */
+}
+.linebtn {
+  padding:2px 2px;
+}
+.btnmenu {
+	width: 36px;
+	height: 36px;
+	/**/
+	position: relative;
+	left: 0%;
+	top: 0%;
+	/**/
+	background-color: grey;
+	padding:12px 16px;
+	vertical-align: middle;
+	text-align: center;
+	border: none;
+	border-radius: 8px;
+	/*color: inherit;*/
+}
+.btnpwroff {
+	background-image: url(../img/power.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnreboot {
+	background-image: url(../img/restart.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btngpson {
+	background-image: url(../img/crosshairs-gps.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btngpsoff {
+	background-image: url(../img/crosshairs.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btngpsquest {
+	background-image: url(../img/crosshairs-question.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+
+#changescreen {
+  position: absolute;
+  top: 7px;
+  left: 16%;
+  width:36px;
+  height:36px;
+  color:yellow;
+}
+.button_fullscreen {
+	width: 36px;
+	height: 36px;
+	background-image: url(../img/fullscreen.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	background-color: inherit;
+	color: inherit;
+}
+
+.button_windowscreen {
+	width: 36px;
+	height: 36px;
+	background-image: url(../img/windowscreen.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	background-color: inherit;
+	color: inherit;
+}

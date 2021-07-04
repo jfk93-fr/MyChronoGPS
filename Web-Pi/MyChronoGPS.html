@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS - Version 1</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+</head>
+<!--<body onkeydown="ActionTouche(event)">-->
+<body>
+<div class="w3-main">
+	<div class="w3-container w3-row" id="zone-info">
+		<p></p>
+	</div>
+
+	<div class="wrapper w3-container header">
+		<h1>MyChronoGPS - Version 1</h1>
+		<p>Cet outil permet de gérer le fonctionnement de MyChronoGPS.</p>
+		<div class="w3-container">
+			<p>Contrôle du Chronomètre.</p>
+			<p>Contrôlez le Chrono et le GPS Online</p>
+			<div class="w3-row">
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Tableau de Bord</a></span>
+				<!--
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="#" onclick="openDashboard();" >Tableau de Bord</a></span>
+				-->
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Live.html" >Live Session</a></span>
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Cmd.html" >Commande au GPS</a></span>
+			</div>
+		</div>
+		<div class="w3-container">
+			<p>Analyse des données.</p>
+			<p>Recherchez les sessions, chargez les données et débutez leur analyse</p>
+			<div class="w3-row">
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Sessions.html" >Sessions</a></span>
+			</div>
+		</div>
+		<div class="w3-container">
+			<p>Mise à jour des paramètres.</p>
+			<p>Les paramètres contiennent des données relatives au fonctionnement de MyChronoGPS
+			et une base de données des circuits</p>
+			<div class="w3-row">
+				<span class="w3-col s3">Paramètres de base</span>
+				<span class="w3-col s3">Base de données des circuits</span>
+			</div>
+			<div class="w3-row">
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="#" >Param</a></span>
+				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Tracks.html" >Circuits</a></span>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<script>
+var windowObjectReference;
+var strWindowFeatures = "menubar=no,location=no,resizable=no,scrollbars=no,status=no,width=480,height=320";
+function openDashboard() {
+	windowObjectReference = window.open("MyChronoGPS-Dashboard.html", "Dashboard", strWindowFeatures);
+}
+</script>
+</html>
