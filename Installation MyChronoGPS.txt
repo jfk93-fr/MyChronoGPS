@@ -1,4 +1,4 @@
-création et installation d'une carte SD contenant MyChronoGPS
+Création et installation d'une carte SD contenant MyChronoGPS
 1 - récupérez une image raspian buster lite
 2 - écrire l'image sur la carte SD avec Win32DiskImager
 3 - écrire un fichier ssh vide sur la carte SD
