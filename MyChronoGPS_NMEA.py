@@ -272,8 +272,12 @@ class NmeaControl():
             self.packettime = self.nmeatime
             return
         self.gpstime = self.packettime
-        # we will calculate the local time and date
+
         logger.debug("["+str(self.nmeatime)+"/"+str(self.packettime)+"]")
+        if self.Freq == 0: # we will calculate the GPS pulse rate once
+            self.Freq = int(abs(1 / (float(self.nmeatime) - float(self.packettime))))
+        self.packettime = self.nmeatime
+        # we will calculate the local time and date
         JJ = int(self.gpsdate[0:2])
         MM = int(self.gpsdate[2:4])
         AA = int("20"+self.gpsdate[4:6])
@@ -286,15 +290,12 @@ class NmeaControl():
         self.latitude = degrees_to_decimal(self.gpslat,self.gpslatH)
         self.longitude = degrees_to_decimal(self.gpslon,self.gpslonH)
 
-        if self.Freq == 0: # we will calculate the GPS pulse rate once
-            self.Freq = int(abs(1 / (float(self.nmeatime) - float(self.packettime))))
-
         # we send the packet
         self.send()
         self.track(self.gpstrames) # sending frames to the tracker
         self.gpstrames = []
 
-        self.packettime = self.nmeatime
+        # self.packettime = self.nmeatime
         self.gpsrmcgga = 0
         self.gpscomplete = True;
         
