@@ -1,13 +1,12 @@
-{                                                                
+{
     "#": "Version : version du package (ajouté en suffixe des noms de programme)",
-    "Version": "1.16",
+    "Version": "1.17",
     "#": "ButtonCmd : nom du programme associé à la gestion des boutons",
     "ButtonCmd": "MyChronoGPS_BUTTON",
     "#": "ScreenCmd : nom du programme associé à l'affichage",
     "ScreenCmd": "MyChronoGPS_OLED",
     "ScreenCmd": "MyChronoGPS_Dummy",
     "#": "GPSCmd : nom du programme associé au GPS",
-    "GPSCmd": "MyChronoGPS_GPS",
     "GPSCmd": "MyChronoGPS_UBX",
     "#": "GPSRate : taux de rafraichissement des données du GPS (compris entre 1 & 10Hz, optimum 5Hz)",
 	"#": "optimum : NEO6M => 5; NEO8M => 10",

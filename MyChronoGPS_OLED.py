@@ -6,14 +6,13 @@
 #   control of the displays on an OLED screen 
 #   reads the named pipe DISPLAY, formats the message and displays it on the OLED screen
 #
-#   Version 1.16 :
+#   Since last versions :
 #       instead of using a pipe (DISPLAY) for the display, we write to a file in shared memory
 #
 ###########################################################################
-VERSION = "1.16"
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+# managed by git from VERSION 1.17
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 import time
@@ -33,9 +32,9 @@ RST = 0
 
 disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
 
-cmdgps =  "MyChronoGPS_OLED."+VERSION
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+cmdgps =  "MyChronoGPS_OLED"
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 pathlog = pathdata+'/log/'
 
 #######################################################################################

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # get_dashboard.py
-from MyChronoGPS_Version import Versions
-Version = Versions();
-dir = Version.pathdata+"/cache"
+from MyChronoGPS_Paths import Paths
+Path = Paths();
+dir = Path.pathdata+"/cache"
 import glob 
 import os
 import json

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from MyChronoGPS_Version import Versions
-Version = Versions();
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
-dira = Version.pathweb+"/userdata/"
-dirf = Version.pathdata
+dira = Path.pathweb+"/userdata/"
+dirf = Path.pathdata
 import glob 
 import os
 import json

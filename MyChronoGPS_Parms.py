@@ -10,11 +10,11 @@ import shlex
 
 class Parms(): # classe qui retient les informations paramètres
 
-    def __init__(self,vers):
-        fparmcache = vers.pathcache+'/PARMS'
+    def __init__(self,Path):
+        fparmcache = Path.pathcache+'/PARMS'
         try:
             if os.path.exists(fparmcache) == False:
-                fparams = vers.pathdata+'/parms/params.json'
+                fparams = Path.pathdata+'/parms/params.json'
                 command = 'cp '+fparams+' '+fparmcache
                 proc_retval = subprocess.check_output(shlex.split(command))
             

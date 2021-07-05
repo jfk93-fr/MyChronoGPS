@@ -9,13 +9,10 @@
 #   reads GPS pipe inputs (GPS directives)
 #   supports GPS commands (Rate 1 Hz to 10 Hz, Serial Rate 9600 baud - 115200 baud)
 #
-#   Version 1.16
-#
 ###########################################################################
-#VERSION = "1.16"
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+# managed by git from VERSION 1.17
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 
@@ -39,23 +36,23 @@ BUSY = 1
 ON = 1
 OFF = 0
 
-BAUDRATE = 9600
-PORT = '/dev/serial0'
+BAUDRATE = 9600 # default value, can be changed in parameters
+PORT = '/dev/serial0' # default value, can be changed in parameters
 
 NOEUD_KM = 1.852 # 1 nautical mile = 1852 m
 
-def get_baudrate(device):
-       command = 'stty -F {0}'.format(device)
-       try:
-           proc_retval = subprocess.check_output(shlex.split(command))
-           baudrate = int(proc_retval.split()[1])
-           return baudrate
-       except:
-           return -1
+# def get_baudrate(device):
+#        command = 'stty -F {0}'.format(device)
+#        try:
+#            proc_retval = subprocess.check_output(shlex.split(command))
+#            baudrate = int(proc_retval.split()[1])
+#            return baudrate
+#        except:
+#            return -1
 
-cmdgps =  "MyChronoGPS_UBX."+VERSION
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+cmdgps =  "MyChronoGPS_UBX"
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 pathlog = pathdata+'/log/'
 
 #######################################################################################
@@ -88,7 +85,7 @@ logger = get_logger(__name__)
 logger.setLevel(logging.INFO)
 logger.info('debut de '+cmdgps)
 #######################################################################################
-from MyChronoGPS_NMEA_1_16 import NmeaControl
+from MyChronoGPS_NMEA import NmeaControl
 from MyChronoGPS_Parms import Parms
             
 class GpsControl(threading.Thread):
@@ -100,7 +97,7 @@ class GpsControl(threading.Thread):
         global PORT
         global BAUDRATE
         threading.Thread.__init__(self)
-        self.parms = Parms(Version)
+        self.parms = Parms(Path)
         self.gpsport = PORT
         if "GPSPort" in self.parms.params:
             PORT = self.parms.params["GPSPort"]
@@ -146,7 +143,8 @@ class GpsControl(threading.Thread):
         self.commandInProgress = False
 
     def activateGPS(self):
-        if get_baudrate(PORT) < 0:
+        # if get_baudrate(PORT) < 0:
+        if self.nmea.get_baudrate(PORT) < 0:
             # vérifier le branchement du GPS
             logger.error("communication with the gps cannot be established. Check the gps connection.")
             self.stop()
@@ -250,7 +248,7 @@ class GpsCommand(threading.Thread):
         for mess in self.tmess:
             self.changeMessageOutput("0"+mess)
         
-        self.fifo = pathcmd+'/pipes/GPS' # le pipe GPS va être écrit par le programme principal de MyChronoGPS
+        self.fifo = pathcmd+'/pipes/GPS' # the GPS pipe contains the commands to pass to the GPS, it will be written by the main program of MyChronoGPS
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()

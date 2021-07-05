@@ -14,13 +14,12 @@
 #       lit les commandes envoyées dans le fichier fifo GPS et les traite
 #       seule la commande E (END, fin de traitement) est traitée, les autres sont ignorées
 #
-#   Version 1.16 : fonctionne avec MyChronoGPS.1.16.py
+# fonctionne avec MyChronoGPS.py
 #
 ###########################################################################
-#VERSION = "1.16"
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+# managed by git from VERSION 1.17
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 import time
@@ -47,9 +46,9 @@ PORT = "/dev/serial0"
 BAUDRATE = get_baudrate(PORT)
 
 
-cmdsimu =  "MyChronoGPS_Simulator."+VERSION
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+cmdsimu =  "MyChronoGPS_Simulator"
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 pathlog = pathdata+'/log/'
 
 #######################################################################################

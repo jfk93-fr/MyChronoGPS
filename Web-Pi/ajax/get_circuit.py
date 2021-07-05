@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from MyChronoGPS_Version import Versions
-Version = Versions();
-dir = Version.pathdata+"/tracks"
+from MyChronoGPS_Paths import Paths
+Path = Paths();
+dir = Path.pathdata+"/tracks"
 
 import glob 
 #import os.path

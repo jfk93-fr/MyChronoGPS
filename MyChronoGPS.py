@@ -5,12 +5,12 @@
 # MyChronoGPS
 #   automatic GPS stopwatch
 #
-#   Use with MyChronoGPS_GPS, MyChronoGPS_BUTTON and MyChronoGPS_OLED (or MyChronoGPS_LCD) programs
+#   Use with MyChronoGPS_GPS (or MyChronoGPS_UBX for u-blox GPS), MyChronoGPS_BUTTON and MyChronoGPS_OLED (or MyChronoGPS_LCD, or MyChronoGPS_Dummy) programs
 #
 # Main
 #   Thread GpsControl
-#       communicates via the GPS and NMEA pipes
-#       receives GPS data sent through the NMEA pipe by MyChronoGPS_GPS
+#       communicates via the GPS and GPSDATA pipes
+#       receives GPS data sent through the GPSDATA pipe by MyChronoGPS_GPS
 #       controls MyChronoGPS_GPS via commands sent through the GPS pipe
 #   Thread ButtonControl
 #       communicates via the BUTTON pipe and receives the actions of the buttons sent in the pipe by MyChronoGPS_BUTTON (Button_Id + press (PRESS or LONGPRESS))
@@ -18,6 +18,8 @@
 #       manages the actions on the LEDs (ON, OFF, NORMAL_FLASH, SLOW_FLASH, FAST_FLASH)
 #   Thread DisplayControl
 #       communicates via the DISPLAY pipe, sends messages to be displayed in the pipe, messages are retrieved and processed by the MyChronoGPS_LCD module
+#   Thread TrackingControl
+#       receives the NMEA frames contained in the GPSNMEA pipe and writes the trace file
 #   Class SessionControl
 #       manages the storage of session data
 #   Class AnalysisControl
@@ -25,16 +27,13 @@
 #   Class ChronoControl
 #       manages the stopwatch functions (start, stop, etc)
 #
-#   Version 1.16 : MyChronoGPS.1.16.py
+#   Since last versions :
 #       instead of using a pipe (DISPLAY) for the display, we write to a file in shared memory
 #
 ###########################################################################
-#VERSION = "1.16"
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
-
-print(str(Version))
+# managed by git from VERSION 1.17
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import traceback
 import os
@@ -61,17 +60,17 @@ import shlex
 running = True
 #####pathcmd = '/home/pi/projets/MyChronoGPS'
 #####pathdata = '/home/userdata'
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 #pathdata = '/media/pi/USERDATA'
 pathsimu = pathdata+'/simu/'
 pathlog = pathdata+'/log'
 pathcache = pathcmd+'/cache'
 
 cmdscreen = 'MyChronoGPS_LCD'
-cmdgps =  "MyChronoGPS_GPS."+VERSION
-cmdsimu =  "MyChronoGPS_SIMU."+VERSION
-cmdbutton =  "MyChronoGPS_BUTTON."+VERSION
+cmdgps =  "MyChronoGPS_GPS"
+cmdsimu =  "MyChronoGPS_SIMU"
+cmdbutton =  "MyChronoGPS_BUTTON"
 
 #######################################################################################
 # we will use the logger to replace print
@@ -79,7 +78,7 @@ cmdbutton =  "MyChronoGPS_BUTTON."+VERSION
 import logging
 from logging.handlers import TimedRotatingFileHandler
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(funcName)s — %(levelname)s — %(lineno)d — %(thread)d — %(message)s")
-LOG_FILE = pathlog+"/MyChronoGPS."+VERSION+".log"
+LOG_FILE = pathlog+"/MyChronoGPS.log"
 print(LOG_FILE)
 
 def get_console_handler():
@@ -100,7 +99,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-logger.setLevel(logging.INFO)
+# logger.setLevel(logging.INFO)
 logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
@@ -222,13 +221,13 @@ class GpsControl(threading.Thread):
         self.lcd = lcd
 
         self.gpsactiv = False
-        self.fifo = pathcmd+'/pipes/NMEA'
+        self.fifo = pathcmd+'/pipes/GPSDATA'
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()
             fileObj = os.path.exists(self.fifo)
         
-        self.gpscmd = pathcmd+'/pipes/GPS' # pipe to send directives to the GPS
+        self.gpscmd = pathcmd+'/pipes/GPSCMD' # pipe to send directives to the GPS
         
         self.gpsfix = self.INVALID
         self.gpsline = ""
@@ -287,7 +286,7 @@ class GpsControl(threading.Thread):
                 cpt = cpt + 1
                 time.sleep(0.01)
             self.gpsline = self.lire_fifo()
-            #logger.debug("gps frame:["+str(self.gpsline)+"]")
+            logger.debug("gps frame:["+str(self.gpsline)+"]")
             if str(self.gpsline).find("END") >= 0:
                 logger.info("end detected:["+str(self.gpsline)+"]")
                 self.__running = False
@@ -301,11 +300,11 @@ class GpsControl(threading.Thread):
         if self.gpsactiv == True:
             self.stop()
 
-        #jfk doit-on supprimer le pipe NMEA ici ?
+        #jfk doit-on supprimer le pipe GPSDATA ici ?
         #    ne devrait-on pas laisser le module GPS s'en occuper ?
         fileObj = os.path.exists(self.fifo)
         if fileObj == True:
-            logger.info("fifo NMEA is beeing removed")
+            logger.info("fifo GPSDATA is beeing removed")
             os.remove(self.fifo)
             
         logger.info("end of GpsControl Thread of main program")
@@ -330,6 +329,7 @@ class GpsControl(threading.Thread):
         
     def parse(self,sentence):
         self.buffstate = BUSY
+        logger.debug("buffstate:"+str(self.buffstate))
         self.gpsdict = json.loads(sentence) 
         self.prevlat = self.latitude # prevlat and prevlon are used to calculate the last travelled line segment
         self.prevlon = self.longitude
@@ -381,6 +381,7 @@ class GpsControl(threading.Thread):
         self.gpscomplete = True;
 
         self.buffstate = FREE
+        logger.debug("buffstate:"+str(self.buffstate))
         
     def clear_buff(self):
         cpt = 0
@@ -434,6 +435,63 @@ class GpsControl(threading.Thread):
         
     def get_gpstime(self):
         return self.gpstime
+        
+class TrackingControl(threading.Thread):
+
+    def __init__(self,chrono):
+        threading.Thread.__init__(self)
+        self.__running = False
+        self.gpsnmea = ""
+        self.fifo = pathcmd+'/pipes/GPSNMEA'
+        fileObj = os.path.exists(self.fifo)
+        if fileObj == False:
+            self.creer_fifo()
+            fileObj = os.path.exists(self.fifo)
+
+        self.track_mode = ON        
+        self.GpsTrackerMode = 0
+        # if "GpsTrackerMode" in self.parms.params:
+        #     self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
+        # if self.GpsTrackerMode != 1:
+        #     self.track_mode = OFF
+
+        logger.info("TrackingControl init complete")        
+
+    def run(self):
+        self.__running = True
+        while self.__running:
+            self.gpsnmea = self.lire_fifo()
+            if self.track_mode == ON:
+                # on va écrire la trace
+                logger.info(str(self.gpsnmea))
+            time.sleep(0.01)
+        logger.info("end of TrackingControl Thread of main program")
+        
+    def stop(self):
+        logger.info("tracking stop")
+        if self.__running == False:
+            return
+        self.__running = False
+
+    def creer_fifo(self):
+        logger.info("create fifo GPSNMEA")
+        try:
+            os.mkfifo(self.fifo)
+            os.chmod(self.fifo, 0o777)
+        except OSError:
+            logger.error("OSError")
+            pass
+
+    def lire_fifo(self):
+        retour = ""
+        try:
+            with open(self.fifo, 'r') as fifo:
+                retour = fifo.read()
+                fifo.close()
+        except:
+            logger.error("error detected in GPSControl - "+str(sys.exc_info()[0])+" "+str(sys.exc_info()[1]))
+            pass
+        return retour
 
 #class ButtonControl(threading.Thread):
 class MenuControl(threading.Thread):
@@ -701,7 +759,7 @@ class DisplayControl(threading.Thread):
         self.start_screen()
         
         self.displayBig = True
-        self.display("MyChronoGPS//"+"v "+VERSION+"//"+get_ipadr())
+        self.display("MyChronoGPS// //"+get_ipadr())
         self.displayBig = False
         time.sleep(5)
         self.clear()
@@ -998,7 +1056,7 @@ class DisplayControl(threading.Thread):
         #global cmdscreen
         self.clear()
         if "ScreenCmd" in parms.params:
-            cmdscreen = parms.params["ScreenCmd"]+"."+VERSION
+            cmdscreen = parms.params["ScreenCmd"]
         #cmdos = "python "+pathcmd+"/"+cmdscreen+".py > "+pathlog+"/"+cmdscreen+".log &"
         #cmdos = "python3 "+pathcmd+"/"+cmdscreen+".py &"
         cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
@@ -1326,8 +1384,8 @@ class SessionControl():
         self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
         
 class LiveSession(threading.Thread):
-    CLOSED = 0
-    OPEN = 1
+    # CLOSED = 0
+    # OPEN = 1
 
     def __init__(self,chrono):
         threading.Thread.__init__(self)
@@ -2429,11 +2487,7 @@ if __name__ == "__main__":
         #ipClass.start()
         
         # we start by reading the parameters
-        parms = Parms(Version)
-
-        if "Version" in parms.params:
-            VERSION = parms.params["Version"]
-        print("params:"+str(parms.params))
+        parms = Parms(Path)
 
         if "PitMaxSpeed" in parms.params:
             PitMaxSpeed = parms.params["PitMaxSpeed"]
@@ -2514,15 +2568,18 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
+        tracker = TrackingControl(chrono)
+        tracker.start()
+        
         prev_state = 0
         
         #we will launch the GPS or SIMU program
         # if the program is launched with arguments then sys.argv[1] contains the name of the file containing the NMEA frames to be simulated, we launch the simulator
         # or run the GPS program
         if "GPSCmd" in parms.params:
-            cmdgps = parms.params["GPSCmd"]+"."+VERSION
+            cmdgps = parms.params["GPSCmd"]
         if "SimuCmd" in parms.params:
-            cmdsimu = parms.params["SimuCmd"]+"."+VERSION
+            cmdsimu = parms.params["SimuCmd"]
         
         l = len(sys.argv)
         i = 0

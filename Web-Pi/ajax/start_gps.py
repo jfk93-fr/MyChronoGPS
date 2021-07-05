@@ -4,9 +4,8 @@
 # Il faut donner des droits en exécution sur ce fichier :
 # sudo chmod +x /usr/lib/cgi-bin/stop_gps.py
 
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 import time
@@ -16,10 +15,10 @@ import sys
 import subprocess
 import shlex
 
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 pathlog = pathdata+'/log'
-cmdgps =  "MyChronoGPS."+VERSION
+cmdgps =  "MyChronoGPS"
 #cmdos = "su - pi python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+"MyChronoGPS.log 2>&1 &"
 #cmdos = "python "+pathcmd+"/"+cmdgps+".py & "
 #/home/pi/projets/MyChronoGPS/MyChronoGPS.py > /home/pi/projets/MyChronoGPS/log/log.txt 2>&1 &
@@ -30,7 +29,7 @@ mydict = dict()
 # timestamp
 timestamp = format(time.time())
 
-mydict["version"] = VERSION
+# mydict["version"] = VERSION
 mydict["time"] = str(timestamp)
 mydict["cmd"] = str(cmdos)
 

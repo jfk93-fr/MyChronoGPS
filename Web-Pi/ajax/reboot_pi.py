@@ -4,9 +4,8 @@
 # Execution rights must be given to this file :
 # sudo chmod +x /usr/lib/cgi-bin/shutdown_pi.py
 
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 import time
@@ -16,17 +15,17 @@ import sys
 import subprocess
 import shlex
 
-pathcmd = Version.pathcmd
-pathdata = Version.pathdata
+pathcmd = Path.pathcmd
+pathdata = Path.pathdata
 pathlog = pathdata+'/log'
-cmdgps =  "MyChronoGPS."+VERSION
+cmdgps =  "MyChronoGPS"
 cmdos = "sudo reboot"
 
 # mydict represents the return of the ajax function
 mydict = dict()
 timestamp = format(time.time())
 
-mydict["version"] = VERSION
+# mydict["version"] = VERSION
 mydict["time"] = str(timestamp)
 mydict["cmd"] = str(cmdos)
 

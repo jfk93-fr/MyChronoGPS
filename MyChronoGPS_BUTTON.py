@@ -6,13 +6,9 @@
 #   controls the buttons associated with MyChronoGPS
 #   detects actions on buttons and writes in the BUTTON pipe, the button Id and the complete action (PRESS or LONGPRESS)
 #
-#   Version 1.16 : MyChronoGPS_BUTTON.1.16.py
-#
 ###########################################################################
-#VERSION = "1.16"
-from MyChronoGPS_Version import Versions
-Version = Versions();
-VERSION = Version.VERSION
+from MyChronoGPS_Paths import Paths
+Path = Paths();
 
 import os
 import wiringpi
@@ -64,7 +60,7 @@ OFF = 0
 
 #pathdata = '/home/userdata'
 #pathdata = '/media/pi/USERDATA'
-pathdata = Version.pathdata
+pathdata = Path.pathdata
 pathlog = pathdata+'/log'
 
 #######################################################################################
@@ -73,7 +69,7 @@ pathlog = pathdata+'/log'
 import logging
 from logging.handlers import TimedRotatingFileHandler
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(funcName)s — %(levelname)s — %(lineno)d — %(thread)d — %(message)s")
-LOG_FILE = pathlog+"/MyChronoGPS_BUTTON."+VERSION+".log"
+LOG_FILE = pathlog+"/MyChronoGPS_BUTTON.log"
 print(LOG_FILE)
 
 def get_console_handler():
@@ -189,7 +185,7 @@ if __name__ == "__main__":
     try:
         
         # we start by reading the parameters
-        parms = Parms(Version)
+        parms = Parms(Path)
         if "ButtonNumber" in parms.params:
             ButtonNumber = parms.params["ButtonNumber"]
         if "GpsChronoMode" in parms.params:

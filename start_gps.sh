@@ -2,7 +2,7 @@
 #
 # start_gps.sh
 #
-_MyChronoGPS=$(ps -ef | grep -c MyChronoGPS.1.16.py) || true
+_MyChronoGPS=$(ps -ef | grep -c MyChronoGPS.py) || true
 if [ "$_MyChronoGPS" ]
 then
     if [ "$_MyChronoGPS" != "1" ]
@@ -27,5 +27,5 @@ then
   fi
 fi
 
-su pi -c "/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS.1.16.py > /home/pi/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
+su pi -c "/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS.py > /home/pi/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
 exit 0
