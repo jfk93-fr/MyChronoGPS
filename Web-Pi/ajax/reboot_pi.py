@@ -46,6 +46,6 @@ except:
     mydict["return"] = 8
     raise
  
-print "Content-Type:application/json; charset=UTF-8\n"
+print ("Content-Type:application/json; charset=UTF-8\n")
 
 print(json.dumps(mydict))

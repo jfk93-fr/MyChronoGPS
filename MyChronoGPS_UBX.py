@@ -126,7 +126,7 @@ class GpsControl(threading.Thread):
         self.Freq = 0 # gps refresh rate
         self.gpsggatime = 0
         self.gpsrmctime = 0
-        self.gpstrames = []
+        # self.gpstrames = []
         
         #self.buffstate = FREE
         self.buffer = ""
@@ -182,30 +182,33 @@ class GpsControl(threading.Thread):
                 gpsline = self.serialGps.readline()
                 try:
                     self.gpsline = gpsline.decode()
+                    self.nmea.tracker.write(self.gpsline) # write sentence in trace file
                 except: # si la fonction decode n'a pas marché, c'est que le gps a envoyé une séquence en binaire
                     print(gpsline)
                     self.gspline = ""
-                #self.gpsline = self.serialGps.readline()
-                #if (self.commandInProgress) == True:
-                #    logger.info(str(self.gpsline))
-                #logger.debug(str(self.gpsline))
                 # is the frame valid ?
                 cksum = chksum_nmea(self.gpsline)
                 
                 if cksum != False:
-                    self.gpstrames.append(self.gpsline)
-                    self.nmea.parse(self.gpsline)
+                    # self.gpstrames.append(self.gpsline)
+                    self.nmea.parse(self.gpsline) # parse sentence to send to chrono
                 else:
                     logger.debug("bad checksum:"+self.gpsline)
                 self.gpscomplete = self.nmea.gpscomplete
             else:
                 logger.debug("wait for buffer:"+str(self.buffstate))
                 time.sleep(0.01)
+            logger.info("running:"+str(self.__running))
+
+        #
+        # self.nmea.remove_fifo()
+
         logger.info("end of GpsControl Thread of GPS program")
         
     def stop(self):
         self.gpsactiv = False
-        logger.debug("stop gps, activ:"+str(self.gpsactiv))
+        # logger.debug("stop gps, activ:"+str(self.gpsactiv))
+        logger.info("stop gps, activ:"+str(self.gpsactiv))
         #jfk
         self.__running = False
         
@@ -248,11 +251,13 @@ class GpsCommand(threading.Thread):
         for mess in self.tmess:
             self.changeMessageOutput("0"+mess)
         
-        self.fifo = pathcmd+'/pipes/GPS' # the GPS pipe contains the commands to pass to the GPS, it will be written by the main program of MyChronoGPS
+        self.fifo = pathcmd+'/pipes/GPSCMD' # the GPS pipe contains the commands to pass to the GPS, it will be written by the main program of MyChronoGPS
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()
             fileObj = os.path.exists(self.fifo)
+        else:
+            logger.info("fifo GPS already exists")
         
         print("GpsCommand init complete")
 
@@ -275,9 +280,14 @@ class GpsCommand(threading.Thread):
         while self.__running:
             self.lire_fifo()
             time.sleep(0.5) # wait            
+
+        self.gps.stop()
+        time.sleep(0.5) # wait            
+
         logger.info("end of GpsCommand Thread of GPS program")
 
     def lire_fifo(self):
+        logger.info("lire fifo GPS")
         with open(self.fifo, 'r') as fifo:
             message = fifo.read().strip()
         logger.info("message:["+message+"]")
@@ -298,9 +308,10 @@ class GpsCommand(threading.Thread):
             self.changeMessageOutput(texte)
 
         elif commande == "E": # End, GPS program shutdown
-            logger.debug("gps stop")
-            self.gps.stop()
-            self.stop()
+            logger.info("gps stop")
+            self.__running = False
+            # self.gps.stop()
+            # self.stop()
             
         else:
             logger.error("invalid command:["+str(commande)+"]")
@@ -514,8 +525,10 @@ if __name__ == "__main__":
             time.sleep(1)
 
         if gps != False:
+            logger.info("gps not False")
             gps.stop()
         if gpscmd != False:
+            logger.info("gpscmd not False")
             gpscmd.stop()
                 
     except KeyboardInterrupt:

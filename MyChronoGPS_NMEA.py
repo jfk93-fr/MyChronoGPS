@@ -33,12 +33,6 @@ OFF = 0
 
 NOEUD_KM = 1.852 # 1 nautical mile = 1852 m
 
-# def get_baudrate(device):
-#        command = 'stty -F {0}'.format(device)
-#        proc_retval = subprocess.check_output(shlex.split(command))
-#        baudrate = int(proc_retval.split()[1])
-#        return baudrate
-
 pathcmd = Path.pathcmd
 pathdata = Path.pathdata
 idlog =  "MyChronoGPS_NMEA"
@@ -92,7 +86,7 @@ class NmeaControl():
         self.latitude = 0
         self.longitude = 0
         self.Freq = 0 # gps refresh rate
-        self.gpstrames = []
+        # self.gpstrames = []
         self.gpscomplete = False
         self.gpsrmcgga = 0
         
@@ -155,13 +149,18 @@ class NmeaControl():
         except OSError:
             logger.error("OSError")
             pass
+
+    def remove_fifo(self):
+        fileObj = os.path.exists(self.fifo)
+        if fileObj == True:
+            logger.info("fifo GPSDATA is beeing removed")
+            os.remove(self.fifo)
         
     def parse(self,sentence):
         logger.debug("sentence to parse: "+str(sentence))
         if sentence == "":
             return
 
-        self.gpstrames.append(sentence)
         self.NMEA = sentence.split(",")
         # the first element starts with $, followed by 2 characters identifying the sender of the frame, followed by 3 characters identifying the frame
         talker_indicator = self.NMEA[0]
@@ -292,11 +291,10 @@ class NmeaControl():
 
         # we send the packet
         self.send()
-        self.track(self.gpstrames) # sending frames to the tracker
-        self.gpstrames = []
-
-        # self.packettime = self.nmeatime
         self.gpsrmcgga = 0
+        
+        # logger.debug("gpstrames:"+str(self.gpstrames))
+
         self.gpscomplete = True;
         
     def send(self):
@@ -338,18 +336,6 @@ class NmeaControl():
             self.track_mode = OFF
             pass
         self.write_busy = False
-            
-    def track(self,trames):
-        logger.debug("track_mode:"+str(self.track_mode))
-        if self.track_mode == OFF:
-            return
-        # logger.debug("track:"+str(trames))
-        self.tracker.write(trames)
-        return
-        
-    # def stop(self):
-    #     logger.info("stop NmeaControl")
-    #     # self.tracker.stop()
 
     def get_baudrate(self,device):
         command = 'stty -F {0}'.format(device)
@@ -360,54 +346,39 @@ class NmeaControl():
     class TrackerControl():
         CLOSED = 0
         OPEN = 1
+        OFF = 0
+        ON = 1
 
         def __init__(self,gps):
             self.gps = gps
-            self.trackfifo = pathcmd+'/pipes/GPSNMEA' # the GPSNMEA pipe contains the GPS data, it will be read by the Tracker program
-            fileObj = os.path.exists(self.trackfifo)
-            if fileObj == False:
-                self.creer_trackfifo()
+            self.tracking = ON
+            self.__current_state = self.CLOSED
             logger.info("TrackerControl init complete")
+    
+        def start(self):
+            if self.__current_state != self.OPEN:
+                self.fileDescriptor = open(pathtraces+'/traces-'+formatGpsDateTime(self.gps,format="FILE")+'.nmea', 'a')
+                self.__current_state = self.OPEN
+                logger.info("tracker file open")
+                        
+        def write(self,trames):
+            #logger.debug("tracking:"+str(self.tracking)+"ON:"+str(ON))
+            if self.tracking != ON:
+                return
+            if self.__current_state != self.OPEN:
+                self.start()
+            if self.__current_state == self.OPEN:
+                #logger.debug("trackable frames:["+str(trames)+"]")
+                #logger.info("vitesse:"+str(round(self.gps.gpsvitesse))+" "+str(self.gps.GpsTrackerMinSpeed))
+                self.fileDescriptor.write(str(trames))
+            else:
+                logger.info("unexcepted tracker file closed !")
             
-        def write(self,tab):
-            trames = tab
-            logger.debug("trackable frames:"+str(trames))
-            #logger.info("vitesse:"+str(round(self.gps.gpsvitesse))+" "+str(self.gps.GpsTrackerMinSpeed))
-            i = 0
-            line = ""
-            if self.gps.GpsTrackerMinSpeed > round(self.gps.gpsvitesse):
-                trames = ""
-            while i < len(trames):
-                line = str(trames[i])
-                i = i+1
-                # here, we can select the frames to be tracked
-                #if (self.gps.NMEA[0] == "$GPGGA" or self.gps.NMEA[0] == "$GPRMC"):
-                #if "GGA" in self.gps.NMEA[0] or "RMC" in self.gps.NMEA[0]:
-                if line.find("\r\n") < 0:
-                    line += "\r\n"
-
-                try:
-                    pipe = os.open(self.trackfifo, os.O_WRONLY, os.O_NONBLOCK)
-                    if True:
-                        os.write(pipe, str(buff+'\r\n').encode())
-                        os.close(pipe)
-                        logger.info(str(buff))
-                except OSError as err:
-                    logger.error("cannot use named pipe OS error: {0}".format(err))
-                    self.track_mode = OFF
-                    pass
-                                            
-                # self.fileDescriptor.write('{0:}'.format(line))
-
-        def creer_trackfifo(self):
-            try:
-                os.mkfifo(self.trackfifo)
-                os.chmod(self.trackfifo, 0o777)
-                logger.debug("fifo GPSNMEA is ready")
-            except OSError:
-                logger.error("OSError")
-                pass
-
+        def set_tracking(self,tracking_mode):
+            if tracking_mode == ON:
+                self.tracking = ON
+            elif tracking_mode == OFF:
+                self.tracking = OFF
 
 ##        
 ## technical procedures 

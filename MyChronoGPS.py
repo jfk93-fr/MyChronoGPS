@@ -48,7 +48,7 @@ import sys
 
 python_ver = sys.version
 python_num = python_ver[0:1]
-python_bin = "python"+python_num
+python_bin = "/usr/bin/python"+python_num
 
 from math import *
 
@@ -99,7 +99,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-# logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
@@ -266,7 +266,7 @@ class GpsControl(threading.Thread):
         logger.info("GpsControl init complete")
 
     def creer_fifo(self):
-        logger.info("create fifo NMEA")
+        logger.info("create fifo GPSDATA")
         try:
             os.mkfifo(self.fifo)
             os.chmod(self.fifo, 0o777)
@@ -302,14 +302,15 @@ class GpsControl(threading.Thread):
 
         #jfk doit-on supprimer le pipe GPSDATA ici ?
         #    ne devrait-on pas laisser le module GPS s'en occuper ?
-        fileObj = os.path.exists(self.fifo)
-        if fileObj == True:
-            logger.info("fifo GPSDATA is beeing removed")
-            os.remove(self.fifo)
+        # fileObj = os.path.exists(self.fifo)
+        # if fileObj == True:
+        #     logger.info("fifo GPSDATA is beeing removed")
+        #     os.remove(self.fifo)
             
         logger.info("end of GpsControl Thread of main program")
 
     def lire_fifo(self):
+        logger.debug("lire_fifo GPSDATA")
         retour = ""
         if len(self.buffer) > 0:
             if self.buffer[0] == "":
@@ -325,6 +326,7 @@ class GpsControl(threading.Thread):
                 pass
         if len(self.buffer) > 0:
             retour = self.buffer.pop(0)
+        logger.debug("GPSDATA lue")
         return retour
         
     def parse(self,sentence):
@@ -396,17 +398,20 @@ class GpsControl(threading.Thread):
         self.gpscomplete = False
         
     def stop(self):
-        logger.info("gps stop request "+str(self.gpsactiv))
+        logger.info("gps stop request:"+str(self.gpsactiv))
 
         if self.gpsactiv == False:
             logger.info(str(self.fifo)+" gps not activ")
             return
             
         is_pipe = os.path.exists(self.gpscmd)
+        logger.info("is_pipe:"+str(is_pipe))
         if is_pipe == True:
             try:
+                logger.info("try to open fifo GPS")
                 pipe = os.open(self.gpscmd, os.O_WRONLY, os.O_NONBLOCK)
                 if True:
+                    logger.info("write command E to fifo GPS")
                     os.write(pipe, "EEEEE\r\n".encode())
                     os.close(pipe)
                     logger.info("end gps command,pipe "+str(self.gpscmd)+" closed")
@@ -1749,6 +1754,8 @@ class ChronoControl():
         with open(self.track, 'w') as track: # the data is overwritten with more recent data
             track.write(line+"\r\n")
             track.close()
+        os.chmod(self.track, 0o777)
+
     
     def define_start_wcoord(self,lat1,lon1,lat2,lon2):
         # definition of the start-finish line according to the coordinates of the ends of the start-finish line
@@ -2568,8 +2575,8 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
-        tracker = TrackingControl(chrono)
-        tracker.start()
+        # tracker = TrackingControl(chrono)
+        # tracker.start()
         
         prev_state = 0
         
