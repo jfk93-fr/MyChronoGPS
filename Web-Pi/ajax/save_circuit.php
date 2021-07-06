@@ -29,29 +29,23 @@ foreach($_POST as $key => $value) {
 	$valArray = str_replace("]","",$valArray,$c2);
 	if ($c1+$c2 > 0) {
 		// la variable est entre crochets, il s'agit d'un tableau de valeurs séparées par des virgules
-		//$Tval = explode(",",$valArray);
 		$propertyval = explode(",",$valArray);
-		//$propertyval = $Tval;
 	}
 	$data[$key] = $propertyval;
 }
-//$m=microtime(true);
-//$uniq = trim(sprintf("%8x%05x\n",floor($m),($m-floor($m))*1000000));
-//var_dump($uniq);
 if (array_key_exists("IdCircuit",$_POST)) {
 	if ($data["IdCircuit"] == 0)
 		$data["IdCircuit"] = uniqid();
 }
-//var_dump($data);
-//header('Content-type: application/json; charset=UTF-8');
-$Track = json_encode($data,JSON_NUMERIC_CHECK);
+
+$Track = json_encode($data,JSON_NUMERIC_CHECK,JSON_PRETTY_PRINT);
+//$Track = json_encode($data,JSON_NUMERIC_CHECK);
 // on va transformer l'objet pour le rendre plus lisible
-$Track = str_replace(",",",\r\n",$Track);
+//$Track = str_replace(",",",\r\n",$Track);
 
 // l'objet Track est créé, on va l'écrire dans le fichier
 
 $filename = $dir.'/'.$trkname.'.trk';
-//var_dump($filename);
 
 $fichier=fopen($filename,"w+");
 if ($fichier == false) {
@@ -60,7 +54,6 @@ if ($fichier == false) {
 fputs($fichier,$Track);
 fclose($fichier);
 $mode = 775;
-//if (!chmod($filename, 0755))
 if (!chmod($filename, octdec($mode)))
 	die('problème changement droits d\'accès fichier '.$filename);
 
