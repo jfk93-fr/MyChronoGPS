@@ -44,6 +44,7 @@ network={
 5 – reconfigurer l'interface :
 $ sudo wpa_cli -i wlan0 reconfigure
 Maintenant, on peut se connecter via le WiFi en indiquant l'adresse IP du RPI dans le réseau WiFi (voir la box internet)
+
 Terminer la config du Raspberry
 Passer la commande :
 $ sudo raspi-config

@@ -1,0 +1,12 @@
+2021-07-06 20:15:40,979 — MyChronoGPS_NMEA — <module> — INFO — 70 — 1995860688 — start of MyChronoGPS_NMEA
+2021-07-06 20:15:40,982 — MyChronoGPS_NMEA — __init__ — INFO — 356 — 1995860688 — TrackerControl init complete
+2021-07-06 20:15:40,983 — MyChronoGPS_NMEA — __init__ — INFO — 132 — 1995860688 — track_mode=1
+2021-07-06 20:15:40,983 — MyChronoGPS_NMEA — __init__ — INFO — 140 — 1995860688 — precision=100000.0
+2021-07-06 20:15:40,984 — MyChronoGPS_NMEA — __init__ — INFO — 142 — 1995860688 — NmeaControl init complete
+2021-07-06 20:15:44,066 — MyChronoGPS_NMEA — start — INFO — 362 — 1984697440 — tracker file open
+2021-07-06 20:22:11,573 — MyChronoGPS_NMEA — <module> — INFO — 70 — 1996204752 — start of MyChronoGPS_NMEA
+2021-07-06 20:22:11,577 — MyChronoGPS_NMEA — __init__ — INFO — 356 — 1996204752 — TrackerControl init complete
+2021-07-06 20:22:11,578 — MyChronoGPS_NMEA — __init__ — INFO — 132 — 1996204752 — track_mode=1
+2021-07-06 20:22:11,579 — MyChronoGPS_NMEA — __init__ — INFO — 140 — 1996204752 — precision=100000.0
+2021-07-06 20:22:11,579 — MyChronoGPS_NMEA — __init__ — INFO — 142 — 1996204752 — NmeaControl init complete
+2021-07-06 20:22:14,624 — MyChronoGPS_NMEA — start — INFO — 362 — 1984988256 — tracker file open

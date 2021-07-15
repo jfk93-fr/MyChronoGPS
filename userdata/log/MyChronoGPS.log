@@ -1,0 +1,580 @@
+/home/pi/MyChronoGPS/log/MyChronoGPS.log
+2021-07-07 00:10:15,798 — __main__ — <module> — INFO — 103 — 1995455184 — MyChronoGPS starting
+2021-07-07 00:10:15,799 — __main__ — <module> — INFO — 104 — 1995455184 — running in /usr/bin/python3 version 3.7.3 (default, Jan 22 2021, 20:04:44) 
+[GCC 8.3.0]
+2021-07-07 00:10:16,610 — __main__ — <module> — INFO — 2473 — 1995455184 — waiting for button action !
+2021-07-07 00:10:16,625 — __main__ — <module> — INFO — 2505 — 1995455184 — GpsChronoMode:2
+2021-07-07 00:10:17,637 — __main__ — __init__ — INFO — 650 — 1995455184 — LedControl init complete
+2021-07-07 00:10:17,640 — __main__ — creer_fifo — INFO — 530 — 1995455184 — fifo BUTTON is ready
+2021-07-07 00:10:17,641 — __main__ — __init__ — INFO — 524 — 1995455184 — MenuControl init complete
+/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS_Dummy.py &
+verify if MyChronoGPS_Dummy started
+2021-07-07 00:10:25,161 — __main__ — __init__ — INFO — 775 — 1995455184 — DisplayControl init complete
+2021-07-07 00:10:25,164 — __main__ — creer_fifo — INFO — 269 — 1995455184 — create fifo GPSDATA
+2021-07-07 00:10:25,180 — __main__ — __init__ — INFO — 266 — 1995455184 — GpsControl init complete
+2021-07-07 00:10:26,188 — __main__ — __init__ — INFO — 650 — 1995455184 — LedControl init complete
+2021-07-07 00:10:26,189 — __main__ — __init__ — INFO — 1237 — 1995455184 — IlsControl init complete
+2021-07-07 00:10:26,190 — __main__ — run — INFO — 1242 — 1930425440 — IlsControl running
+2021-07-07 00:10:26,191 — __main__ — __init__ — INFO — 1676 — 1995455184 — init ChronoGPSControl led:16
+2021-07-07 00:10:27,198 — __main__ — __init__ — INFO — 650 — 1995455184 — LedControl init complete
+2021-07-07 00:10:27,199 — __main__ — __init__ — INFO — 1692 — 1995455184 — ChronoControl init complete
+2021-07-07 00:10:27,200 — __main__ — __init__ — INFO — 1409 — 1995455184 — LiveSession init complete
+2021-07-07 00:10:27,201 — __main__ — __init__ — INFO — 1174 — 1995455184 — IpControl init complete
+2021-07-07 00:10:27,202 — __main__ — __init__ — INFO — 1310 — 1995455184 — SessionControl init complete
+2021-07-07 00:10:27,203 — __main__ — __init__ — INFO — 1497 — 1995455184 — AnalysisControl init complete
+/home/pi/MyChronoGPS/log/MyChronoGPS_UBX.log
+2021-07-07 00:10:27,452 — __main__ — <module> — INFO — 86 — 1995815632 — debut de MyChronoGPS_UBX
+/home/pi/MyChronoGPS/log/MyChronoGPS_NMEA.log
+2021-07-07 00:10:27,464 — MyChronoGPS_NMEA — <module> — INFO — 70 — 1995815632 — start of MyChronoGPS_NMEA
+waiting for GPS !
+2021-07-07 00:10:27,469 — MyChronoGPS_NMEA — __init__ — INFO — 356 — 1995815632 — TrackerControl init complete
+2021-07-07 00:10:27,469 — MyChronoGPS_NMEA — __init__ — INFO — 132 — 1995815632 — track_mode=1
+2021-07-07 00:10:27,470 — MyChronoGPS_NMEA — __init__ — INFO — 140 — 1995815632 — precision=100000.0
+2021-07-07 00:10:27,470 — MyChronoGPS_NMEA — __init__ — INFO — 142 — 1995815632 — NmeaControl init complete
+2021-07-07 00:10:27,482 — __main__ — activateGPS — INFO — 162 — 1995815632 — communication with /dev/ttyACM0 established at 115200 bauds
+2021-07-07 00:10:27,483 — __main__ — __init__ — INFO — 140 — 1995815632 — GpsControl init complete
+2021-07-07 00:10:27,484 — __main__ — changeFreq — INFO — 360 — 1995815632 — send command Set Rate to GPS
+b'$GNRMC,221028.00,A,4856.80316,N,00229.88001,E,0.123,,060721,,,A*6C\r\n'
+2021-07-07 00:10:28,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,488 — __main__ — changeFreq — INFO — 365 — 1995815632 — send command query Rate to GPS
+0GSA
+2021-07-07 00:10:30,489 — __main__ — changeMessageOutput — INFO — 389 — 1995815632 — send command to GPS:[$PUBX,40,GSA,0,0,0,0,0,0*4E
+]
+b'$GNVTG,,T,,M,0.123,N,0.228,K,A*35\r\n'
+2021-07-07 00:10:30,495 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNGGA,221028.00,4856.80316,N,00229.88001,E,1,10,1.09,47.8,M,46.2,M,,*70\r\n'
+2021-07-07 00:10:30,501 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNGSA,A,3,07,30,05,09,13,14,18,,,,,,1.61,1.09,1.19*1D\r\n'
+2021-07-07 00:10:30,506 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNGSA,A,3,76,67,66,,,,,,,,,,1.61,1.09,1.19*1B\r\n'
+2021-07-07 00:10:30,512 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GPGSV,4,1,13,02,09,217,,05,59,286,21,07,40,057,42,08,00,057,*7A\r\n'
+2021-07-07 00:10:30,518 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GPGSV,4,2,13,09,09,096,09,11,11,209,17,13,46,280,29,14,26,146,15*71\r\n'
+2021-07-07 00:10:30,523 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GPGSV,4,3,13,15,15,284,22,18,10,330,21,20,65,231,,27,02,028,*75\r\n'
+2021-07-07 00:10:30,528 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GPGSV,4,4,13,30,77,096,32*46\r\n'
+2021-07-07 00:10:30,531 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GLGSV,3,1,10,66,44,109,31,67,72,343,22,68,22,309,,75,03,027,*6C\r\n'
+2021-07-07 00:10:30,537 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GLGSV,3,2,10,76,51,049,22,77,60,163,,78,11,195,20,82,00,249,*6A\r\n'
+2021-07-07 00:10:30,542 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GLGSV,3,3,10,83,16,289,,84,13,347,*65\r\n'
+2021-07-07 00:10:30,546 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNGLL,4856.80316,N,00229.88001,E,221028.00,A,A*77\r\n'
+2021-07-07 00:10:30,550 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,u-blox AG - www.u-blox.com*4E\r\n'
+2021-07-07 00:10:30,554 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,HW UBX-M8030 00080000*60\r\n'
+2021-07-07 00:10:30,558 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,ROM CORE 3.01 (107888)*2B\r\n'
+2021-07-07 00:10:30,561 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,FWVER=SPG 3.01*46\r\n'
+2021-07-07 00:10:30,564 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,PROTVER=18.00*11\r\n'
+2021-07-07 00:10:30,567 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,GPS;GLO;GAL;BDS*77\r\n'
+2021-07-07 00:10:30,571 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,SBAS;IMES;QZSS*49\r\n'
+2021-07-07 00:10:30,574 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,GNSS OTP=GPS;GLO*37\r\n'
+2021-07-07 00:10:30,577 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,LLC=FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFF-FFFFFFFD*2F\r\n'
+2021-07-07 00:10:30,582 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,ANTSUPERV=AC SD PDoS SR*3E\r\n'
+2021-07-07 00:10:30,586 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,ANTSTATUS=OK*25\r\n'
+2021-07-07 00:10:30,589 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNTXT,01,01,02,PF=3FF*4B\r\n'
+2021-07-07 00:10:30,591 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'\xb5b\x05\x01\x02\x00\x06\x08\x16?\xb5b\x06\x08\x06\x00\xc8\x00\x01\x00\x01\x00\xdej\xb5b\x05\x01\x02\x00\x06\x08\x16?$GNRMC,221029.00,A,4856.80310,N,00229.88010,E,0.050,,060721,,,A*6E\r\n'
+2021-07-07 00:10:30,598 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNVTG,,T,,M,0.050,N,0.092,K,A*33\r\n'
+2021-07-07 00:10:30,601 — __main__ — run — INFO — 201 — 1984599136 — running:True
+b'$GNGGA,221029.00,4856.80310,N,00229.88010,E,1,10,1.09,47.6,M,46.2,M,,*79\r\n'
+2021-07-07 00:10:30,607 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,614 — MyChronoGPS_NMEA — start — INFO — 362 — 1984599136 — tracker file open
+2021-07-07 00:10:30,615 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,619 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,624 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,629 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,633 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,636 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,641 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,649 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,653 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,659 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,662 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,667 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,672 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,675 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,681 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,686 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,691 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,693 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,698 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,702 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,705 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,708 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,713 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,716 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,721 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,725 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,728 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,733 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,737 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,742 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,744 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,749 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,753 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,756 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,759 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,765 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,769 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,776 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,782 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,787 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,793 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,800 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,807 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,810 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,817 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,823 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,828 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,833 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,840 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,852 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,857 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,862 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,868 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,872 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,877 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,879 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,884 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,888 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,891 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,895 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,900 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,902 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,907 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,911 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,915 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,919 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,924 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,928 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,931 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,935 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,939 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,942 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,946 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,951 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,954 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,959 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,963 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,966 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,970 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,975 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,980 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,982 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,986 — __main__ — run — INFO — 201 — 1984599136 — running:True
+0GSV
+2021-07-07 00:10:30,991 — __main__ — changeMessageOutput — INFO — 389 — 1995815632 — send command to GPS:[$PUBX,40,GSV,0,0,0,0,0,0*59
+]
+2021-07-07 00:10:30,991 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,995 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:30,999 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,006 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,009 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,015 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,020 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,024 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,029 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,034 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,039 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,041 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,055 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,059 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,065 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,068 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,074 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,079 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,084 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,089 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,092 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,097 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,102 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,106 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,110 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,115 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,119 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,124 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,129 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,134 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,139 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,142 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,147 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,152 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,156 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,161 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,223 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,248 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,256 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,448 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,454 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,459 — __main__ — run — INFO — 201 — 1984599136 — running:True
+0GLL
+2021-07-07 00:10:31,493 — __main__ — changeMessageOutput — INFO — 389 — 1995815632 — send command to GPS:[$PUBX,40,GLL,0,0,0,0,0,0*5C
+]
+2021-07-07 00:10:31,647 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,656 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,842 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:31,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+0VTG
+2021-07-07 00:10:31,995 — __main__ — changeMessageOutput — INFO — 389 — 1995815632 — send command to GPS:[$PUBX,40,VTG,0,0,0,0,0,0*5E
+]
+2021-07-07 00:10:32,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS_UBX.py &
+2021-07-07 00:10:32,215 — __main__ — __init__ — INFO — 2221 — 1995455184 — AcqControl init complete
+2021-07-07 00:10:32,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,252 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+0TXT
+2021-07-07 00:10:32,497 — __main__ — changeMessageOutput — INFO — 389 — 1995815632 — send command to GPS:[$PUBX,40,TXT,0,0,0,0,0,0*43
+]
+2021-07-07 00:10:32,501 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,647 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,652 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:32,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+GpsCommand init complete
+2021-07-07 00:10:32,999 — __main__ — lire_fifo — INFO — 290 — 1974465632 — lire fifo GPS
+2021-07-07 00:10:33,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,245 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,253 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,449 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,643 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,649 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:33,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,054 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,067 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,244 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,441 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,446 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,643 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,648 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,847 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:34,854 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,062 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,245 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,442 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,448 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,644 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,843 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:35,848 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,443 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,448 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,648 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,657 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,843 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:36,849 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,041 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,222 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,245 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,447 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,454 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,647 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,653 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,847 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:37,852 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,446 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,652 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:38,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,247 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,254 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,449 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,648 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,656 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:39,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,043 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,048 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,244 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,443 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,449 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,643 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,648 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:40,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,653 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,847 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:41,852 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,243 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,248 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,446 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:42,851 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,253 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,267 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,447 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,452 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,647 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,653 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,847 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:43,852 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,047 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,247 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,252 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,446 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:44,849 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,247 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,255 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,452 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:45,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,244 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,249 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,663 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,673 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,843 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:46,849 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,043 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,048 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,249 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,260 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,443 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:47,851 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,054 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,261 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:48,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,052 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,244 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:49,852 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,043 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,644 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,649 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,855 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:50,866 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,651 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,848 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:51,855 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,452 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,641 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,843 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:52,848 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,044 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,049 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,247 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,254 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,446 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,454 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,659 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:53,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,057 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,248 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,255 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,449 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,458 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:54,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,243 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,448 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,457 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,644 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,649 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,842 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:55,848 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,043 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,049 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,245 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,250 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,444 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,450 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,844 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:56,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,047 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,053 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,445 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,451 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,650 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,841 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:57,846 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,245 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,251 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,447 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,452 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,646 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,651 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,845 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:58,850 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,046 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,051 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,246 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,252 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,461 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,471 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,647 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,653 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,846 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:10:59,851 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,045 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,050 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,248 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,253 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,447 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,458 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,645 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,651 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,846 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,851 — __main__ — run — INFO — 201 — 1984599136 — running:True
+2021-07-07 00:11:00,910 — __main__ — run — INFO — 541 — 1972368480 — fifo_data:12
+
+2021-07-07 00:11:00,911 — __main__ — run — INFO — 546 — 1972368480 — previous state:2
+2021-07-07 00:11:00,911 — __main__ — run — INFO — 557 — 1972368480 — POWER_OFF
+2021-07-07 00:11:00,912 — __main__ — run — INFO — 572 — 1972368480 — running state:9
+2021-07-07 00:11:00,926 — __main__ — stop — INFO — 401 — 1995455184 — gps stop request:True
+2021-07-07 00:11:00,926 — __main__ — stop — INFO — 408 — 1995455184 — is_pipe:True
+2021-07-07 00:11:00,927 — __main__ — stop — INFO — 411 — 1995455184 — try to open fifo GPS
+2021-07-07 00:11:00,927 — __main__ — stop — INFO — 414 — 1995455184 — write command E to fifo GPS
+2021-07-07 00:11:00,928 — __main__ — stop — INFO — 417 — 1995455184 — end gps command,pipe /home/pi/MyChronoGPS/pipes/GPSCMD closed
+2021-07-07 00:11:00,928 — __main__ — lire_fifo — INFO — 293 — 1974465632 — message:[EEEEE]
+2021-07-07 00:11:00,928 — __main__ — stop — INFO — 1446 — 1995455184 — session live stop
+2021-07-07 00:11:00,928 — __main__ — lire_fifo — INFO — 295 — 1974465632 — commande:[E]
+2021-07-07 00:11:00,929 — __main__ — lire_fifo — INFO — 311 — 1974465632 — gps stop
+2021-07-07 00:11:00,929 — __main__ — run — INFO — 291 — 1951396960 — end detected:[END
+]
+2021-07-07 00:11:00,950 — __main__ — run — INFO — 299 — 1951396960 — stop GpsControl Thread
+2021-07-07 00:11:00,951 — __main__ — run — INFO — 310 — 1951396960 — end of GpsControl Thread of main program
+2021-07-07 00:11:00,968 — __main__ — run — INFO — 698 — 1919939680 — end of LedControl Thread of main program
+2021-07-07 00:11:01,023 — __main__ — run — INFO — 698 — 1982571616 — end of LedControl Thread of main program
+2021-07-07 00:11:01,112 — __main__ — run — INFO — 599 — 1972368480 — end of MenuControl Thread of main program
+2021-07-07 00:11:01,253 — __main__ — run — INFO — 1443 — 1909453920 — end of LiveSession Thread of main program
+2021-07-07 00:11:01,630 — __main__ — stop — INFO — 211 — 1974465632 — stop gps, activ:False
+2021-07-07 00:11:02,032 — __main__ — <module> — INFO — 528 — 1995815632 — gps not False
+2021-07-07 00:11:02,033 — __main__ — stop — INFO — 211 — 1995815632 — stop gps, activ:False
+2021-07-07 00:11:02,033 — __main__ — <module> — INFO — 531 — 1995815632 — gpscmd not False
+2021-07-07 00:11:02,034 — __main__ — stop — INFO — 211 — 1995815632 — stop gps, activ:False
+2021-07-07 00:11:02,132 — __main__ — run — INFO — 287 — 1974465632 — end of GpsCommand Thread of GPS program
+2021-07-07 00:11:06,336 — __main__ — stop — INFO — 1277 — 1995455184 — ils stop request True
+2021-07-07 00:11:06,337 — __main__ — <module> — INFO — 2802 — 1995455184 — END of main program MyChronoGPS
+2021-07-07 00:11:06,341 — __main__ — stop — INFO — 1277 — 1930425440 — ils stop request False
+2021-07-07 00:11:06,342 — __main__ — stop — INFO — 1280 — 1930425440 — ils not activ
+2021-07-07 00:11:06,342 — __main__ — run — INFO — 1274 — 1930425440 — end of IlsControl Thread of main program
+2021-07-07 00:11:06,369 — __main__ — run — INFO — 698 — 1940911200 — end of LedControl Thread of main program
+2021-07-07 00:11:07,530 — __main__ — run — INFO — 1189 — 1901061216 — end of IpControl Thread of main program
+2021-07-07 00:11:10,248 — __main__ — run — INFO — 2293 — 1892668512 — AcqControl ended
+2021-07-07 00:11:12,643 — __main__ — run — INFO — 935 — 1961882720 — end of DisplayControl Thread of main program
+2021-07-07 00:11:12,643 — __main__ — run — INFO — 935 — 1961882720 — end of DisplayControl Thread of main program

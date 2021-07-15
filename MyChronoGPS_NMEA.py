@@ -172,7 +172,7 @@ class NmeaControl():
         self.idsender = talker_indicator[1:3]
         self.idtrame = talker_indicator[3:6]
         
-        self.getTimeNmea() # we will search for a time in the frame
+        self.getTimeNmea() # we look for a time in the plot
         
         # we see if the time has changed with respect to the time of the package
         logger.debug("times nmea/packet:"+str(self.nmeatime)+"/"+str(self.packettime))
