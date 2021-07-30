@@ -166,8 +166,8 @@ class NmeaControl():
         talker_indicator = self.NMEA[0]
         if str(talker_indicator)[0:1] != '$':
             print(("no talker indicator ("+str(talker_indicator)+")"))
-            logger.setLevel(logging.DEBUG)
-            logger.debug(str(self.NMEA))
+            # logger.setLevel(logging.DEBUG)
+            # logger.debug(str(self.NMEA))
             return
         self.idsender = talker_indicator[1:3]
         self.idtrame = talker_indicator[3:6]
@@ -325,6 +325,11 @@ class NmeaControl():
         while self.write_busy == True:
             time.sleep(0.1)
         self.write_busy = True
+        
+        # try:
+        #     buffer = self.read()
+        # except:
+        #     pass
 
         try:
             pipe = os.open(self.fifo, os.O_WRONLY, os.O_NONBLOCK)
@@ -336,6 +341,17 @@ class NmeaControl():
             self.track_mode = OFF
             pass
         self.write_busy = False
+        
+    def read(self):
+        rbuff = ""
+        try:
+            logger.info("try to read GPSDATA fifo")
+            with open(self.fifo, 'r') as fifo:
+                rbuff = fifo.read()
+                fifo.close()
+        except:
+            pass
+        return rbuff
 
     def get_baudrate(self,device):
         command = 'stty -F {0}'.format(device)

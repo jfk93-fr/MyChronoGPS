@@ -201,7 +201,7 @@ class GpsControl(threading.Thread):
             logger.info("running:"+str(self.__running))
 
         #
-        # self.nmea.remove_fifo()
+        self.nmea.remove_fifo()
 
         logger.info("end of GpsControl Thread of GPS program")
         
@@ -211,6 +211,8 @@ class GpsControl(threading.Thread):
         logger.info("stop gps, activ:"+str(self.gpsactiv))
         #jfk
         self.__running = False
+        buffer = self.nmea.read()
+        print(str(buffer))
         
     def disable(self):
         self.buffstate = BUSY
@@ -269,10 +271,16 @@ class GpsCommand(threading.Thread):
             while trial == False:
                 time.sleep(0.5)
                 trial = os.path.exists(self.fifo)
-            logger.debug("fifo GPS is ready")
+            logger.debug("fifo GPSCMD is ready")
         except OSError:
             logger.error("OSError")
             pass
+
+    def remove_fifo(self):
+        fileObj = os.path.exists(self.fifo)
+        if fileObj == True:
+            logger.info("fifo GPSCMD is beeing removed")
+            os.remove(self.fifo)
         
     def run(self):
         self.__running = True
@@ -284,10 +292,12 @@ class GpsCommand(threading.Thread):
         self.gps.stop()
         time.sleep(0.5) # wait            
 
+        self.remove_fifo()
+        
         logger.info("end of GpsCommand Thread of GPS program")
 
     def lire_fifo(self):
-        logger.info("lire fifo GPS")
+        logger.info("lire fifo GPSCMD")
         with open(self.fifo, 'r') as fifo:
             message = fifo.read().strip()
         logger.info("message:["+message+"]")
@@ -524,12 +534,12 @@ if __name__ == "__main__":
         while gps.gpsactiv:
             time.sleep(1)
 
-        if gps != False:
-            logger.info("gps not False")
-            gps.stop()
-        if gpscmd != False:
-            logger.info("gpscmd not False")
-            gpscmd.stop()
+        # if gps != False:
+        #     logger.info("gps not False")
+        #     gps.stop()
+        # if gpscmd != False:
+        #     logger.info("gpscmd not False")
+        #     gpscmd.stop()
                 
     except KeyboardInterrupt:
         print("User Cancelled (Ctrl C)")
@@ -546,8 +556,8 @@ if __name__ == "__main__":
             gpscmd.stop()
         raise
         
-    finally:
-        if gps != False:
-            gps.stop()
-        if gpscmd != False:
-            gpscmd.stop()
+    # finally:
+    #     if gps != False:
+    #         gps.stop()
+    #     if gpscmd != False:
+    #         gpscmd.stop()
