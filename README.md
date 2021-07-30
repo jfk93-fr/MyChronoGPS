@@ -1,2 +1,2 @@
-# MyChronoGPS Version "1.16"
+# MyChronoGPS Version "1.17"
 GPS stopwatch
