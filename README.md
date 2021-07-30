@@ -1,2 +1,2 @@
 # MyChronoGPS Version "1.17"
-GPS stopwatch
+GPS stopwatch with Raspberry PI
