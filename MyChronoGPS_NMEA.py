@@ -121,6 +121,7 @@ class NmeaControl():
             self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
         if self.GpsTrackerMode != 1:
             self.track_mode = OFF
+        logger.info("GpsTrackerMode="+str(self.GpsTrackerMode))
         # # "GpsTrackerEcoMode : fréquence d'acquisition du tracker. 0=OFF (acquisition=fréquence GPS), 1=ON(1 acquisition/seconde)"
         # self.GpsTrackerEcoMode = 0
         # if "GpsTrackerEcoMode" in self.parms.params:
@@ -372,20 +373,21 @@ class NmeaControl():
             logger.info("TrackerControl init complete")
     
         def start(self):
+            # if self.gps.gpstime == 0:
+            #     return
             if self.__current_state != self.OPEN:
-                self.fileDescriptor = open(pathtraces+'/traces-'+formatGpsDateTime(self.gps,format="FILE")+'.nmea', 'a')
+                # self.fileDescriptor = open(pathtraces+'/traces-'+formatGpsDateTime(self.gps,format="FILE")+'.nmea', 'a')
+                self.fileDescriptor = open(pathtraces+'/traces-'+formatDateTime(format="FILE")+'.nmea', 'a')
                 self.__current_state = self.OPEN
                 logger.info("tracker file open")
                         
         def write(self,trames):
-            #logger.debug("tracking:"+str(self.tracking)+"ON:"+str(ON))
             if self.tracking != ON:
                 return
             if self.__current_state != self.OPEN:
                 self.start()
             if self.__current_state == self.OPEN:
-                #logger.debug("trackable frames:["+str(trames)+"]")
-                #logger.info("vitesse:"+str(round(self.gps.gpsvitesse))+" "+str(self.gps.GpsTrackerMinSpeed))
+                # logger.info(str(trames))
                 self.fileDescriptor.write(str(trames))
             else:
                 logger.info("unexcepted tracker file closed !")
@@ -414,20 +416,9 @@ def degrees_to_decimal(data, hemisphere):
     except:
         return 0.0
 
-def formatGpsDateTime(gps,format=""):
-    # receives a gps object and returns a date and time string from gpsdate and gpstime
-    timestr = str(gps.gpstime)
-    hh = timestr[0:2]
-    mm = timestr[2:4]
-    ss = timestr[4:6]
-    datestr = str(gps.gpsdate)
-    JJ = datestr[0:2]
-    MM = datestr[2:4]
-    AA = datestr[4:6]
-    dt = JJ+"/"+MM+'/'+AA+" "+hh+":"+mm
-    
-    odt = datetime(int("20"+AA),int(MM),int(JJ),int(hh),int(mm),int(ss))
-    
+def formatDateTime(format=""):
+    datenow = datetime.now()
+    dt = datenow.strftime('%d/%m/%y %H:%M')
     if format == "FILE":
-        dt = "20"+AA+MM+JJ+hh+mm+ss
+        dt = datenow.strftime('%Y%m%d%H%M%S')
     return dt

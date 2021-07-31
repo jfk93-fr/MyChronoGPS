@@ -2662,7 +2662,7 @@ if __name__ == "__main__":
                                         else:
                                             if acq == False:
                                                 # if the GPS point acquisition thread is not started, it is started
-                                                acq = AcqControl(chrono)
+                                                acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
                                     if acq != False:

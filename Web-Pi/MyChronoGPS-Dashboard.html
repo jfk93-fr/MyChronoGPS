@@ -67,22 +67,6 @@
 			</div>
 			<!-- Menu -->
 			<div id="Menu" style="display:none;background:yellow; color:black; padding:8px 2px 8px 2px;">
-				<div id="poweroff" class="linebtn">
-					<span>
-					<button type="button" class="w3-button btnmenu btnpwroff" onclick="request_shutdown()"></button>
-					</span>
-					<span>
-					Arrêt complet (Shutdown)
-					</span>
-				</div>
-				<div id="reboot" class="linebtn">
-					<span>
-					<button type="button" class="w3-button btnmenu btnreboot" onclick="request_reboot()"></button>
-					</span>
-					<span>
-					Redémarrage complet (Reboot)
-					</span>
-				</div>
 				<div id="gpsstart" class="linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btngpson" onclick="ajax_cmd('start_gps.py')"></button>
@@ -105,6 +89,22 @@
 					</span>
 					<span>
 					Etat MyChronoGPS
+					</span>
+				</div>
+				<div id="poweroff" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btnpwroff" onclick="request_shutdown()"></button>
+					</span>
+					<span>
+					Arrêt complet (Shutdown)
+					</span>
+				</div>
+				<div id="reboot" class="linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btnreboot" onclick="request_reboot()"></button>
+					</span>
+					<span>
+					Redémarrage complet (Reboot)
 					</span>
 				</div>
 				<div id="gpsmenu" class="linebtn">

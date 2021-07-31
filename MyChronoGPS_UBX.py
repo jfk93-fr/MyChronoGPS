@@ -180,12 +180,21 @@ class GpsControl(threading.Thread):
             if self.buffstate == FREE:
                 #self.gpsline = str(self.serialGps.readline().decode('UTF-8'))
                 gpsline = self.serialGps.readline()
+                # print(gpsline)
+                self.gpsline = str(gpsline)
+                # print(self.gpsline)
+
                 try:
                     self.gpsline = gpsline.decode()
-                    self.nmea.tracker.write(self.gpsline) # write sentence in trace file
+                    # self.nmea.tracker.write(self.gpsline) # write sentence in trace file
                 except: # si la fonction decode n'a pas marché, c'est que le gps a envoyé une séquence en binaire
-                    print(gpsline)
-                    self.gspline = ""
+                    logger.info("decode failed")
+                    # chkdata = gpsline.split("\r\n")
+                    # logger.info("chkdata:"+str(chkdata[0]))
+                    self.gspline = str(gpsline)
+                
+                self.nmea.tracker.write(self.gpsline) # write sentence in trace file
+
                 # is the frame valid ?
                 cksum = chksum_nmea(self.gpsline)
                 
@@ -198,7 +207,7 @@ class GpsControl(threading.Thread):
             else:
                 logger.debug("wait for buffer:"+str(self.buffstate))
                 time.sleep(0.01)
-            logger.info("running:"+str(self.__running))
+            # logger.info("running:"+str(self.__running))
 
         #
         self.nmea.remove_fifo()
@@ -412,6 +421,7 @@ class GpsCommand(threading.Thread):
 ########################
 import re    
 def chksum_nmea(sentence):
+    # print(sentence)
     if sentence.find('*') < 0:
         return False
     if sentence[0:1] != '$':
@@ -493,24 +503,24 @@ def degrees_to_decimal(data, hemisphere):
     except:
         return ""
 
-def formatGpsDateTime(gps,format=""):
-    # receives a gps object and returns a date and time string from gpsdate and gpstime
-    timestr = str(gps.gpstime)
-    hh = timestr[0:2]
-    mm = timestr[2:4]
-    ss = timestr[4:6]
-    datestr = str(gps.gpsdate)
-    JJ = datestr[0:2]
-    MM = datestr[2:4]
-    AA = datestr[4:6]
-    dt = JJ+"/"+MM+'/'+AA+" "+hh+":"+mm
-    
-    odt = datetime(int("20"+AA),int(MM),int(JJ),int(hh),int(mm),int(ss))
-    
-    if format == "FILE":
-        dt = "20"+AA+MM+JJ+hh+mm+ss
-
-    return dt
+# def formatGpsDateTime(gps,format=""):
+#     # receives a gps object and returns a date and time string from gpsdate and gpstime
+#     timestr = str(gps.gpstime)
+#     hh = timestr[0:2]
+#     mm = timestr[2:4]
+#     ss = timestr[4:6]
+#     datestr = str(gps.gpsdate)
+#     JJ = datestr[0:2]
+#     MM = datestr[2:4]
+#     AA = datestr[4:6]
+#     dt = JJ+"/"+MM+'/'+AA+" "+hh+":"+mm
+#     
+#     # odt = datetime(int("20"+AA),int(MM),int(JJ),int(hh),int(mm),int(ss))
+#     
+#     if format == "FILE":
+#         dt = "20"+AA+MM+JJ+hh+mm+ss
+# 
+#     return dt
 
 
 ###########################

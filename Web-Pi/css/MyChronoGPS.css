@@ -49,7 +49,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 .led-box {
   height: 30px;
   width: 25%;
-  margin: 10px 0;
+  /*margin: 10px 0;*/
+  margin: 6px 0;
   float: left;
 }
 
@@ -61,11 +62,11 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-red {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #F00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 3px 18px;
   -webkit-animation: blinkRed 0.5s infinite;
   -moz-animation: blinkRed 0.5s infinite;
   -ms-animation: blinkRed 0.5s infinite;
@@ -101,48 +102,48 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-red-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #F00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 3px 18px;
 }
 
 .led-red-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #A00;
   border-radius: 50%;
 }
 
 .led-red-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #F00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 3px 18px;
   animation: blinkRed 1s infinite;
 }
 
 .led-red-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #F00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 3px 18px;
   animation: blinkRed 0.5s infinite;
 }
 
 .led-red-blitz-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #F00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 3px 18px;
   animation: blinkRed 0.15s infinite;
 }
 
@@ -154,11 +155,11 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-yellow {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF0;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 3px 18px;
   -webkit-animation: blinkYellow 1s infinite;
   -moz-animation: blinkYellow 1s infinite;
   -ms-animation: blinkYellow 1s infinite;
@@ -194,38 +195,38 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-yellow-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF0;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 3px 18px;
 }
 
 .led-yellow-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #AA0;
   border-radius: 50%;
 }
 
 .led-yellow-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF0;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 3px 18px;
   animation: blinkYellow 1s infinite;
 }
 
 .led-yellow-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF0;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 3px 18px;
   animation: blinkYellow 0.5s infinite;
 }
 
@@ -237,11 +238,11 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-orange {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FFF;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FFF 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FFF 0 3px 18px;
   -webkit-animation: blinkorange 1s infinite;
   -moz-animation: blinkorange 1s infinite;
   -ms-animation: blinkorange 1s infinite;
@@ -277,38 +278,38 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-orange-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF7A00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 3px 18px;
 }
 
 .led-orange-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #AA0;
   border-radius: 50%;
 }
 
 .led-orange-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF7A00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 3px 18px;
   animation: blinkorange 1s infinite;
 }
 
 .led-orange-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #FF7A00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #FF5722 0 -1px 9px, #FF7A00 0 3px 18px;
   animation: blinkorange 0.5s infinite;
 }
 
@@ -320,57 +321,57 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-green {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #ABFF00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 3px 18px;
 }
 
 .led-green-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #00FF00;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 3px 18px;
 }
 
 .led-green-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #009900;
   border-radius: 50%;
 }
 
 .led-green-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #009900;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 3px 18px;
   animation: blinkGreen 1s infinite;
 }
 
 .led-green-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #009900;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 3px 18px;
   animation: blinkGreen 0.5s infinite;
 }
 
 .led-green-blitz-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #009900;
   border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 3px 18px;
   animation: blinkGreen 0.15s infinite;
 }
 @keyframes blinkGreen {
@@ -380,8 +381,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 }
 .led-turquoise {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #24E0FF;
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
@@ -389,8 +390,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-turquoise-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   /*background-color: #0000FF;*/
   background-color: #00FFFF;
   border-radius: 50%;
@@ -399,16 +400,16 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-turquoise-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #00B3B3;
   border-radius: 50%;
 }
 
 .led-turquoise-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   /*background-color: #0000FF;*/
   background-color: #00FFFF;
   border-radius: 50%;
@@ -418,8 +419,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-turquoise-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   /*background-color: #0000FF;*/
   background-color: #00FFFF;
   border-radius: 50%;
@@ -435,8 +436,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-blue {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #24E0FF;
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
@@ -444,8 +445,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-blue-on {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   /*background-color: #0000FF;*/
   background-color: #4D4DFF;
   border-radius: 50%;
@@ -454,16 +455,16 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-blue-off {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #0000B3;
   border-radius: 50%;
 }
 
 .led-blue-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #4D4DFF;
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
@@ -472,8 +473,8 @@ html, body, h1, h2, h3, h4, h5, h6 {
 
 .led-blue-fast-blink {
   margin: 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   background-color: #4D4DFF;
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
