@@ -140,6 +140,9 @@ class NmeaControl():
              self.precis = pow(10,self.CoordsPrecision)
         logger.info("precision="+str(self.precis))
         
+        self.prevsentence = ""
+        self.sentence = ""
+        
         logger.info("NmeaControl init complete")
 
     def creer_fifo(self):
@@ -181,6 +184,7 @@ class NmeaControl():
             if float(self.nmeatime) > 0: # does the current frame have time
                 if float(self.packettime) > 0: # is there a time associated with the package
                     if self.nmeatime != self.packettime:
+                        self.sentence = sentence
                         self.createPacket()
                     else:
                         self.gpscomplete = False
@@ -239,6 +243,7 @@ class NmeaControl():
                         print("Unexpected error - ", sys.exc_info()[0], sys.exc_info()[1])                    
                         self.gpsfix = self.INVALID
                 self.gpsdate = self.NMEA[9]
+        self.prevsentence = self.sentence
         
     def getTimeNmea(self):
         self.nmeatime = 0
@@ -270,7 +275,15 @@ class NmeaControl():
         if self.gpsrmcgga < 2: # the data is not complete, the package is not created
             self.gpsrmcgga = 0
             self.packettime = self.nmeatime
+            # self.prevsentence = self.sentence
             return
+            
+        # trace of packet frames
+        # logger.info(self.prevsentence)
+        # logger.info(self.sentence)
+        # self.tracker.write(self.prevsentence)
+        # self.tracker.write(self.sentence)
+        
         self.gpstime = self.packettime
 
         logger.debug("["+str(self.nmeatime)+"/"+str(self.packettime)+"]")
@@ -326,11 +339,6 @@ class NmeaControl():
         while self.write_busy == True:
             time.sleep(0.1)
         self.write_busy = True
-        
-        # try:
-        #     buffer = self.read()
-        # except:
-        #     pass
 
         try:
             pipe = os.open(self.fifo, os.O_WRONLY, os.O_NONBLOCK)
@@ -373,8 +381,6 @@ class NmeaControl():
             logger.info("TrackerControl init complete")
     
         def start(self):
-            # if self.gps.gpstime == 0:
-            #     return
             if self.__current_state != self.OPEN:
                 # self.fileDescriptor = open(pathtraces+'/traces-'+formatGpsDateTime(self.gps,format="FILE")+'.nmea', 'a')
                 self.fileDescriptor = open(pathtraces+'/traces-'+formatDateTime(format="FILE")+'.nmea', 'a')
