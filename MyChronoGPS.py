@@ -18,7 +18,7 @@
 #       manages the actions on the LEDs (ON, OFF, NORMAL_FLASH, SLOW_FLASH, FAST_FLASH)
 #   Thread DisplayControl
 #       communicates via the DISPLAY pipe, sends messages to be displayed in the pipe, messages are retrieved and processed by the MyChronoGPS_LCD module
-#   Thread TrackingControl
+#   Thread TrackingControl (not operational)
 #       receives the NMEA frames contained in the GPSNMEA pipe and writes the trace file
 #   Class SessionControl
 #       manages the storage of session data
@@ -26,9 +26,6 @@
 #       manages the storage of gps points at sessions for analysis purposes
 #   Class ChronoControl
 #       manages the stopwatch functions (start, stop, etc)
-#
-#   Since last versions :
-#       instead of using a pipe (DISPLAY) for the display, we write to a file in shared memory
 #
 ###########################################################################
 # managed by git from VERSION 1.17
@@ -440,63 +437,63 @@ class GpsControl(threading.Thread):
         
     def get_gpstime(self):
         return self.gpstime
-        
-class TrackingControl(threading.Thread):
-
-    def __init__(self,chrono):
-        threading.Thread.__init__(self)
-        self.__running = False
-        self.gpsnmea = ""
-        self.fifo = pathcmd+'/pipes/GPSNMEA'
-        fileObj = os.path.exists(self.fifo)
-        if fileObj == False:
-            self.creer_fifo()
-            fileObj = os.path.exists(self.fifo)
-
-        self.track_mode = ON        
-        self.GpsTrackerMode = 0
-        # if "GpsTrackerMode" in self.parms.params:
-        #     self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
-        # if self.GpsTrackerMode != 1:
-        #     self.track_mode = OFF
-
-        logger.info("TrackingControl init complete")        
-
-    def run(self):
-        self.__running = True
-        while self.__running:
-            self.gpsnmea = self.lire_fifo()
-            if self.track_mode == ON:
-                # on va écrire la trace
-                logger.info(str(self.gpsnmea))
-            time.sleep(0.01)
-        logger.info("end of TrackingControl Thread of main program")
-        
-    def stop(self):
-        logger.info("tracking stop")
-        if self.__running == False:
-            return
-        self.__running = False
-
-    def creer_fifo(self):
-        logger.info("create fifo GPSNMEA")
-        try:
-            os.mkfifo(self.fifo)
-            os.chmod(self.fifo, 0o777)
-        except OSError:
-            logger.error("OSError")
-            pass
-
-    def lire_fifo(self):
-        retour = ""
-        try:
-            with open(self.fifo, 'r') as fifo:
-                retour = fifo.read()
-                fifo.close()
-        except:
-            logger.error("error detected in GPSControl - "+str(sys.exc_info()[0])+" "+str(sys.exc_info()[1]))
-            pass
-        return retour
+#         
+# class TrackingControl(threading.Thread):
+# 
+#     def __init__(self,chrono):
+#         threading.Thread.__init__(self)
+#         self.__running = False
+#         self.gpsnmea = ""
+#         self.fifo = pathcmd+'/pipes/GPSNMEA'
+#         fileObj = os.path.exists(self.fifo)
+#         if fileObj == False:
+#             self.creer_fifo()
+#             fileObj = os.path.exists(self.fifo)
+# 
+#         self.track_mode = ON        
+#         self.GpsTrackerMode = 0
+#         # if "GpsTrackerMode" in self.parms.params:
+#         #     self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
+#         # if self.GpsTrackerMode != 1:
+#         #     self.track_mode = OFF
+# 
+#         logger.info("TrackingControl init complete")        
+# 
+#     def run(self):
+#         self.__running = True
+#         while self.__running:
+#             self.gpsnmea = self.lire_fifo()
+#             if self.track_mode == ON:
+#                 # on va écrire la trace
+#                 logger.info(str(self.gpsnmea))
+#             time.sleep(0.01)
+#         logger.info("end of TrackingControl Thread of main program")
+#         
+#     def stop(self):
+#         logger.info("tracking stop")
+#         if self.__running == False:
+#             return
+#         self.__running = False
+# 
+#     def creer_fifo(self):
+#         logger.info("create fifo GPSNMEA")
+#         try:
+#             os.mkfifo(self.fifo)
+#             os.chmod(self.fifo, 0o777)
+#         except OSError:
+#             logger.error("OSError")
+#             pass
+# 
+#     def lire_fifo(self):
+#         retour = ""
+#         try:
+#             with open(self.fifo, 'r') as fifo:
+#                 retour = fifo.read()
+#                 fifo.close()
+#         except:
+#             logger.error("error detected in GPSControl - "+str(sys.exc_info()[0])+" "+str(sys.exc_info()[1]))
+#             pass
+#         return retour
 
 #class ButtonControl(threading.Thread):
 class MenuControl(threading.Thread):
@@ -1744,6 +1741,20 @@ class ChronoControl():
         self.start_line = True
         self.circuit = ""
         self.intline = []
+        
+    def getLineWithCap(self,lat,lon,cap):
+        # get coords of the line according to the coordinates of the middle of the line passed in parameter and the heading
+        self.capline = self.ChronoData()
+        self.capline.lat = lat
+        self.capline.lon = lon
+        self.capline.cap = cap
+        self.capline.coords = []
+        self.capline.draw(TrackWidth); # we take the whole width of the track
+        self.capline.coords[0] = self.capline.coord1.lat
+        self.capline.coords[1] = self.capline.coord1.lon
+        self.capline.coords[2] = self.capline.coord2.lat
+        self.capline.coords[3] = self.capline.coord2.lon
+
 
     def create_sfTrack(self):
         line = '{"date":"'+str(formatGpsDate(self.gps))+'"'
@@ -2104,22 +2115,35 @@ class ChronoControl():
                             LatFL = float(circuits[track]["LatFL"])
                             LonFL = float(circuits[track]["LonFL"])
                             CapFL = float(circuits[track]["CapFL"])
+                            
+                            self.getLineWithCap(LatFL, LonFL, CapFL)
+                            lat1 = self.capline.coords[0]
+                            lon1 = self.capline.coords[1]
+                            lat2 = self.capline.coords[2]
+                            lon2 = self.capline.coords[3]
+                            
                     distcir = distanceGPS(gps.latitude, gps.longitude, LatFL, LonFL)
-                    #if distcir < TrackProximity: # we are within x m of the circuit read in parameter
-                    #    if distcir < neardist: # we found an even closer circuit
-                    #        neardist = distcir
+                    # logger.info('distance circuit:'+str(distcir)+' '+str(self.neardist)+' '+str(TrackProximity))
 
                     if distcir < self.neardist: # we found an even closer circuit
                         self.neartrack = circuits[track]["NomCircuit"]
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
                             
-                            if WithCoords == True:
+                            # on va regarder si on a coupé la ligne de départ du circuit à proximité
+                            # was the start/finish line cut ?
+                            cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
+                            logger.info('is prox track cut:'+str(cut))
+                            if cut == True:
                                 self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                            else:
-                                self.define_start_wcap(LatFL, LonFL, CapFL)
-                            self.circuit = circuits[track]
+                                self.circuit = circuits[track]
                             
+                            # if WithCoords == True:
+                            #     self.define_start_wcoord(lat1, lon1, lat2, lon2)
+                            # else:
+                            #     self.define_start_wcap(LatFL, LonFL, CapFL)
+                            # self.circuit = circuits[track]
+                           
                 if self.start_line == True: # here we have just defined the start-finish line
                     # then we'll get the other intermediate lines and pitlane
                     # is the pitlane defined ?
@@ -2472,6 +2496,13 @@ def get_baudrate(device):
 started = False    
 logger.info("waiting for button action !")
 
+#
+##############################################
+#                                            #
+#     M A I N   P R O G R A M                #
+#                                            #
+##############################################
+#
 if __name__ == "__main__":
     try:
         led1 = False
@@ -2490,9 +2521,6 @@ if __name__ == "__main__":
 
         running = True
 
-        #ipClass = IpControl()
-        #ipClass.start()
-        
         # we start by reading the parameters
         parms = Parms(Path)
 
@@ -2533,15 +2561,9 @@ if __name__ == "__main__":
         led1 = LedControl(LED1_GPIO_PIN) # LED 1 (yellow) is associated to many processes
         led1.start()
 
-        #button1 = ButtonControl(BUTTON1_ID, led1) # main button associated with led 1
-        #button1.start()
         menu = MenuControl(led1) # led 1 associated with main button
         menu.start()
         last_state = 1
-
-        # le conttrôle du gps est déplacé un peu plus loin
-        #gps = GpsControl()
-        #gps.start()
         
         # before starting the screen control, we will look for the CharacterSize parameter
         if "CharacterSize" in parms.params:
@@ -2552,7 +2574,7 @@ if __name__ == "__main__":
 
         lcd.set_display_time()
 
-        # le contrôle du gps est déplacé ici
+        #
         gps = GpsControl(lcd)
         gps.start()
         
@@ -2575,6 +2597,7 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
+        #jfk: si on déporte la gestion du Tracker dans le programme principal, çà commencera ici
         # tracker = TrackingControl(chrono)
         # tracker.start()
         
@@ -2597,7 +2620,8 @@ if __name__ == "__main__":
             fnamesimu = sys.argv[1]
         if fnamesimu != "": # we run a simulation
             #cmdos = "python "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" > "+pathlog+"/"+cmdsimu+".log &"
-            cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py &"
+            #cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py &"
+            cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" &"
         else:
             #cmdos = "python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+cmdgps+".log &"
             cmdos = python_bin+" "+pathcmd+"/"+cmdgps+".py &"
@@ -2645,7 +2669,8 @@ if __name__ == "__main__":
                         if GpsChronoMode == 2:  # fully automatic operation
                             if (current_state != RUNNING): # we don't time
                                 if current_state == STOP:
-                                    if chrono.circuit != False and chrono.circuit != "":
+                                    #if chrono.circuit != False and chrono.circuit != "":
+                                    if chrono.circuit == True and chrono.circuit != "":
                                         distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
                                         if distcir < TrackProximity: # we are near the circuit
                                             if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
@@ -2654,7 +2679,8 @@ if __name__ == "__main__":
                                                 menu.running_state = READY
                                                 chrono.begin()
                                     else: # we will try to automatically determine a start/finish line
-                                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
+                                        #if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
+                                        if chrono.start_line == True: # the line is determined, the stopwatch is started                                  
                                             #button1.button_state = READY
                                             #running_state = READY
                                             menu.running_state = READY
@@ -2665,18 +2691,22 @@ if __name__ == "__main__":
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
-                                    if acq != False:
+                                    #if acq != False:
+                                    if acq == True:
                                         # if the GPS point acquisition thread is running, it is stopped
-                                        if acq.active != False:
+                                        #if acq.active != False:
+                                        if acq.active == True:
                                             acq.stop()
                                     if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                                        if chrono.circuit != False:
+                                        #if chrono.circuit != False:
+                                        if chrono.circuit == True:
                                             #button1.button_state = RUNNING
                                             #running_state = READY
                                             menu.running_state = RUNNING
                     
                     if GpsChronoMode == 0: # manual operation
-                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
+                        #if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
+                        if chrono.start_line == True: # the line is determined, the stopwatch is started                                  
                             if (current_state != RUNNING): # we don't time
                                 menu.running_state = RUNNING
                                 chrono.start()
@@ -2691,7 +2721,8 @@ if __name__ == "__main__":
                                 #running_state = STOP
                                 menu.running_state = STOP
                                 current_state = STOP
-                                if chrono.circuit != False:
+                                #if chrono.circuit != False:
+                                if chrono.circuit == True:
                                     logger.info("distance circuit:"+str(distcir)+"/"+str(TrackProximity))
                                     chrono.circuit = False # the circuit object is deleted
                                     chrono.start_line = False # the start line is cleared
