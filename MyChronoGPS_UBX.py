@@ -193,7 +193,7 @@ class GpsControl(threading.Thread):
                     # logger.info("chkdata:"+str(chkdata[0]))
                     self.gspline = str(gpsline)
                 
-                # self.nmea.tracker.write(self.gpsline) # write sentence in trace file
+                self.nmea.tracker.write(self.gpsline) # write sentence in trace file
 
                 # is the frame valid ?
                 cksum = chksum_nmea(self.gpsline)
@@ -201,8 +201,6 @@ class GpsControl(threading.Thread):
                 if cksum != False:
                     # self.gpstrames.append(self.gpsline)
                     self.nmea.parse(self.gpsline) # parse sentence to send to chrono
-                    # traces only valid frames
-                    self.nmea.tracker.write(self.gpsline) # write sentence in trace file
                 else:
                     logger.debug("bad checksum:"+self.gpsline)
                 self.gpscomplete = self.nmea.gpscomplete
