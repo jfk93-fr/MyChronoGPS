@@ -2267,6 +2267,7 @@ class AcqControl(threading.Thread):
                         dist = 0
                     else:
                         dist = distanceGPS(self.lat, self.lon, self.gps.latitude, self.gps.longitude)
+                        logger.info("Acq dist:"+str(dist)+" lat:"+str(self.lat)+"lon:"str(self.lon)+" gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
                     if self.max == False:
                         if dist > self.pgpsmax["dist"]:
                             # we're moving away
@@ -2281,6 +2282,8 @@ class AcqControl(threading.Thread):
                                 # we are getting closer for the first time
                                 self.max = True;
                                 self.chrono.lcd.set_display_sysmsg("Line Def//Started",lcd.DISPLAY,2)
+                                logger.info("Line Def Started:"+str(dist))
+                                logger.info(str(self.pgpsmax))
                     else:
                         if dist < self.pgpsmin["dist"]:
                             # we are getting closer
@@ -2300,6 +2303,7 @@ class AcqControl(threading.Thread):
             else:
                 logger.info("AcqControl time limit reached")
                 self.__running = False
+        logger.info(str(self.pgpsmin))
         # the acquisition time is over, we will draw the line from the calculated coordinates
         # instead of drawing the line, we could indicate that we are ready to draw it
         self.chrono.define_start_wcap(self.pgpsmin["lat"],self.pgpsmin["lon"],self.pgpsmin["cap"])
@@ -2314,6 +2318,7 @@ class AcqControl(threading.Thread):
         self.chrono.nblap = 1 # we start with the first lap
         
         self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
+        logger.info("Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
         self.active = False;
         logger.info("AcqControl ended")
                 
@@ -2670,8 +2675,7 @@ if __name__ == "__main__":
                         if GpsChronoMode == 2:  # fully automatic operation
                             if (current_state != RUNNING): # we don't time
                                 if current_state == STOP:
-                                    #if chrono.circuit != False and chrono.circuit != "":
-                                    if chrono.circuit == True and chrono.circuit != "":
+                                    if chrono.circuit != False and chrono.circuit != "":
                                         distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
                                         if distcir < TrackProximity: # we are near the circuit
                                             if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
@@ -2680,8 +2684,7 @@ if __name__ == "__main__":
                                                 menu.running_state = READY
                                                 chrono.begin()
                                     else: # we will try to automatically determine a start/finish line
-                                        #if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
-                                        if chrono.start_line == True: # the line is determined, the stopwatch is started                                  
+                                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
                                             #button1.button_state = READY
                                             #running_state = READY
                                             menu.running_state = READY
@@ -2692,22 +2695,18 @@ if __name__ == "__main__":
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
-                                    #if acq != False:
-                                    if acq == True:
+                                    if acq != False:
                                         # if the GPS point acquisition thread is running, it is stopped
-                                        #if acq.active != False:
-                                        if acq.active == True:
+                                        if acq.active != False:
                                             acq.stop()
                                     if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                                        #if chrono.circuit != False:
-                                        if chrono.circuit == True:
+                                        if chrono.circuit != False:
                                             #button1.button_state = RUNNING
                                             #running_state = READY
                                             menu.running_state = RUNNING
                     
                     if GpsChronoMode == 0: # manual operation
-                        #if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
-                        if chrono.start_line == True: # the line is determined, the stopwatch is started                                  
+                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
                             if (current_state != RUNNING): # we don't time
                                 menu.running_state = RUNNING
                                 chrono.start()
@@ -2722,8 +2721,7 @@ if __name__ == "__main__":
                                 #running_state = STOP
                                 menu.running_state = STOP
                                 current_state = STOP
-                                #if chrono.circuit != False:
-                                if chrono.circuit == True:
+                                if chrono.circuit != False:
                                     logger.info("distance circuit:"+str(distcir)+"/"+str(TrackProximity))
                                     chrono.circuit = False # the circuit object is deleted
                                     chrono.start_line = False # the start line is cleared
