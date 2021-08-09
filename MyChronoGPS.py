@@ -1453,7 +1453,10 @@ class LiveSession(threading.Thread):
         self.Line += ',"altitude":'+str(round(self.gps.gpsaltitude,2))
         self.Line += ',"cap":'+str(round(self.gps.gpscap,2))
         self.Line += ',"lap":'+str(self.chrono.nblap)
-        self.Line += ',"neartrk":["'+self.chrono.neartrack+'",'+str(round(self.chrono.neardist))+']'
+        if self.chrono.dD > 0:
+            self.Line += ',"neartrk":["'+self.chrono.neartrack+'",'+str(round(self.chrono.dD))+']'
+        else:
+            self.Line += ',"neartrk":["'+self.chrono.neartrack+'",'+str(round(self.chrono.neardist))+']'
         self.Line += '}]'
         #logger.debug("***"+str(self.Line)+"***")
 
@@ -1700,6 +1703,8 @@ class ChronoControl():
         
         self.neardist = 999999
         self.neartrack = ""
+
+        self.dD = 0
         
     def begin(self):
         self.chrono_begin = True
@@ -2267,7 +2272,7 @@ class AcqControl(threading.Thread):
                         dist = 0
                     else:
                         dist = distanceGPS(self.lat, self.lon, self.gps.latitude, self.gps.longitude)
-                        logger.info("Acq dist:"+str(dist)+" lat:"+str(self.lat)+"lon:"str(self.lon)+" gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
+                        logger.info("Acq dist:"+str(dist)+" lat:"+str(self.lat)+"lon:"+str(self.lon)+" gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
                     if self.max == False:
                         if dist > self.pgpsmax["dist"]:
                             # we're moving away
