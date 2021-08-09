@@ -1,0 +1,100 @@
+/home/pi/MyChronoGPS/log/MyChronoGPS.log
+2021-08-07 14:23:03,753 — __main__ — <module> — INFO — 100 — 1996016336 — MyChronoGPS starting
+2021-08-07 14:23:03,754 — __main__ — <module> — INFO — 101 — 1996016336 — running in /usr/bin/python3 version 3.7.3 (default, Jan 22 2021, 20:04:44) 
+[GCC 8.3.0]
+2021-08-07 14:23:04,911 — __main__ — <module> — INFO — 2498 — 1996016336 — waiting for button action !
+2021-08-07 14:23:04,941 — __main__ — <module> — INFO — 2534 — 1996016336 — GpsChronoMode:2
+2021-08-07 14:23:05,982 — __main__ — __init__ — INFO — 647 — 1996016336 — LedControl init complete
+2021-08-07 14:23:05,985 — __main__ — creer_fifo — INFO — 527 — 1996016336 — fifo BUTTON is ready
+2021-08-07 14:23:05,986 — __main__ — __init__ — INFO — 521 — 1996016336 — MenuControl init complete
+/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS_Dummy.py &
+verify if MyChronoGPS_Dummy started
+2021-08-07 14:23:13,507 — __main__ — __init__ — INFO — 772 — 1996016336 — DisplayControl init complete
+2021-08-07 14:23:13,511 — __main__ — creer_fifo — INFO — 266 — 1996016336 — create fifo GPSDATA
+2021-08-07 14:23:13,535 — __main__ — __init__ — INFO — 263 — 1996016336 — GpsControl init complete
+2021-08-07 14:23:14,547 — __main__ — __init__ — INFO — 647 — 1996016336 — LedControl init complete
+2021-08-07 14:23:14,549 — __main__ — __init__ — INFO — 1234 — 1996016336 — IlsControl init complete
+2021-08-07 14:23:14,551 — __main__ — run — INFO — 1239 — 1931474016 — IlsControl running
+2021-08-07 14:23:14,552 — __main__ — __init__ — INFO — 1673 — 1996016336 — init ChronoGPSControl led:16
+2021-08-07 14:23:15,561 — __main__ — __init__ — INFO — 647 — 1996016336 — LedControl init complete
+2021-08-07 14:23:15,563 — __main__ — __init__ — INFO — 1689 — 1996016336 — ChronoControl init complete
+2021-08-07 14:23:15,569 — __main__ — __init__ — INFO — 1406 — 1996016336 — LiveSession init complete
+2021-08-07 14:23:15,578 — __main__ — __init__ — INFO — 1171 — 1996016336 — IpControl init complete
+2021-08-07 14:23:15,581 — __main__ — __init__ — INFO — 1307 — 1996016336 — SessionControl init complete
+2021-08-07 14:23:15,582 — __main__ — __init__ — INFO — 1494 — 1996016336 — AnalysisControl init complete
+/home/pi/MyChronoGPS/log/MyChronoGPS_UBX.log
+2021-08-07 14:23:16,111 — __main__ — <module> — INFO — 86 — 1995733712 — debut de MyChronoGPS_UBX
+/home/pi/MyChronoGPS/log/MyChronoGPS_NMEA.log
+2021-08-07 14:23:16,123 — MyChronoGPS_NMEA — <module> — INFO — 70 — 1995733712 — start of MyChronoGPS_NMEA
+waiting for GPS !
+2021-08-07 14:23:16,130 — MyChronoGPS_NMEA — __init__ — INFO — 381 — 1995733712 — TrackerControl init complete
+2021-08-07 14:23:16,131 — MyChronoGPS_NMEA — __init__ — INFO — 124 — 1995733712 — GpsTrackerMode=1
+2021-08-07 14:23:16,131 — MyChronoGPS_NMEA — __init__ — INFO — 133 — 1995733712 — track_mode=1
+2021-08-07 14:23:16,132 — MyChronoGPS_NMEA — __init__ — INFO — 141 — 1995733712 — precision=100000.0
+2021-08-07 14:23:16,133 — MyChronoGPS_NMEA — __init__ — INFO — 146 — 1995733712 — NmeaControl init complete
+2021-08-07 14:23:16,151 — __main__ — activateGPS — INFO — 162 — 1995733712 — communication with /dev/ttyACM0 established at 115200 bauds
+2021-08-07 14:23:16,152 — __main__ — __init__ — INFO — 140 — 1995733712 — GpsControl init complete
+2021-08-07 14:23:16,155 — __main__ — changeFreq — INFO — 381 — 1995733712 — send command Set Rate to GPS
+2021-08-07 14:23:16,978 — MyChronoGPS_NMEA — start — INFO — 388 — 1984570464 — tracker file open
+2021-08-07 14:23:19,160 — __main__ — changeFreq — INFO — 386 — 1995733712 — send command query Rate to GPS
+0GSA
+2021-08-07 14:23:19,161 — __main__ — changeMessageOutput — INFO — 410 — 1995733712 — send command to GPS:[$PUBX,40,GSA,0,0,0,0,0,0*4E
+]
+2021-08-07 14:23:19,330 — __main__ — run — INFO — 191 — 1984570464 — decode failed
+0GSV
+2021-08-07 14:23:19,663 — __main__ — changeMessageOutput — INFO — 410 — 1995733712 — send command to GPS:[$PUBX,40,GSV,0,0,0,0,0,0*59
+]
+0GLL
+2021-08-07 14:23:20,166 — __main__ — changeMessageOutput — INFO — 410 — 1995733712 — send command to GPS:[$PUBX,40,GLL,0,0,0,0,0,0*5C
+]
+/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS_UBX.py &
+2021-08-07 14:23:20,600 — __main__ — __init__ — INFO — 2246 — 1996016336 — AcqControl init complete
+0VTG
+2021-08-07 14:23:20,668 — __main__ — changeMessageOutput — INFO — 410 — 1995733712 — send command to GPS:[$PUBX,40,VTG,0,0,0,0,0,0*5E
+]
+0TXT
+2021-08-07 14:23:21,172 — __main__ — changeMessageOutput — INFO — 410 — 1995733712 — send command to GPS:[$PUBX,40,TXT,0,0,0,0,0,0*43
+]
+GpsCommand init complete
+2021-08-07 14:23:21,676 — __main__ — lire_fifo — INFO — 311 — 1974465632 — lire fifo GPSCMD
+2021-08-07 14:28:00,856 — __main__ — run — INFO — 2301 — 1893717088 — AcqControl time limit reached
+2021-08-07 14:28:03,866 — __main__ — run — INFO — 2318 — 1893717088 — AcqControl ended
+2021-08-07 14:36:16,764 — __main__ — run — INFO — 538 — 1973417056 — fifo_data:12
+
+2021-08-07 14:36:16,766 — __main__ — run — INFO — 543 — 1973417056 — previous state:2
+2021-08-07 14:36:16,767 — __main__ — run — INFO — 554 — 1973417056 — POWER_OFF
+2021-08-07 14:36:16,768 — __main__ — run — INFO — 569 — 1973417056 — running state:9
+2021-08-07 14:36:16,780 — __main__ — stop — INFO — 398 — 1996016336 — gps stop request:True
+2021-08-07 14:36:16,782 — __main__ — stop — INFO — 405 — 1996016336 — is_pipe:True
+2021-08-07 14:36:16,783 — __main__ — stop — INFO — 408 — 1996016336 — try to open fifo GPS
+2021-08-07 14:36:16,785 — __main__ — stop — INFO — 411 — 1996016336 — write command E to fifo GPS
+2021-08-07 14:36:16,786 — __main__ — stop — INFO — 414 — 1996016336 — end gps command,pipe /home/pi/MyChronoGPS/pipes/GPSCMD closed
+2021-08-07 14:36:16,786 — __main__ — lire_fifo — INFO — 314 — 1974465632 — message:[EEEEE]
+2021-08-07 14:36:16,787 — __main__ — lire_fifo — INFO — 316 — 1974465632 — commande:[E]
+2021-08-07 14:36:16,788 — __main__ — run — INFO — 288 — 1952445536 — end detected:[END
+]
+2021-08-07 14:36:16,788 — __main__ — lire_fifo — INFO — 332 — 1974465632 — gps stop
+2021-08-07 14:36:16,789 — __main__ — stop — INFO — 1443 — 1996016336 — session live stop
+2021-08-07 14:36:16,809 — __main__ — run — INFO — 296 — 1952445536 — stop GpsControl Thread
+2021-08-07 14:36:16,811 — __main__ — run — INFO — 307 — 1952445536 — end of GpsControl Thread of main program
+2021-08-07 14:36:16,841 — __main__ — run — INFO — 695 — 1920988256 — end of LedControl Thread of main program
+2021-08-07 14:36:16,843 — __main__ — run — INFO — 695 — 1983132768 — end of LedControl Thread of main program
+2021-08-07 14:36:16,970 — __main__ — run — INFO — 596 — 1973417056 — end of MenuControl Thread of main program
+2021-08-07 14:36:17,212 — __main__ — run — INFO — 1440 — 1910502496 — end of LiveSession Thread of main program
+2021-08-07 14:36:17,490 — __main__ — stop — INFO — 222 — 1974465632 — stop gps, activ:False
+2021-08-07 14:36:17,491 — MyChronoGPS_NMEA — read — INFO — 357 — 1974465632 — try to read GPSDATA fifo
+2021-08-07 14:36:17,493 — MyChronoGPS_NMEA — remove_fifo — INFO — 160 — 1984570464 — fifo GPSDATA is beeing removed
+{"l": 48.937156, "L": 2.4562988333333333, "v": 0.079636, "ns": 12, "a": 38.6, "c": 0.0, "d": "070821", "t": "135530.60"}
+
+2021-08-07 14:36:17,496 — __main__ — run — INFO — 217 — 1984570464 — end of GpsControl Thread of GPS program
+2021-08-07 14:36:17,996 — __main__ — remove_fifo — INFO — 293 — 1974465632 — fifo GPSCMD is beeing removed
+2021-08-07 14:36:17,997 — __main__ — run — INFO — 308 — 1974465632 — end of GpsCommand Thread of GPS program
+2021-08-07 14:36:22,198 — __main__ — stop — INFO — 1274 — 1996016336 — ils stop request True
+2021-08-07 14:36:22,200 — __main__ — <module> — INFO — 2834 — 1996016336 — END of main program MyChronoGPS
+2021-08-07 14:36:22,207 — __main__ — stop — INFO — 1274 — 1931474016 — ils stop request False
+2021-08-07 14:36:22,208 — __main__ — stop — INFO — 1277 — 1931474016 — ils not activ
+2021-08-07 14:36:22,209 — __main__ — run — INFO — 1271 — 1931474016 — end of IlsControl Thread of main program
+2021-08-07 14:36:22,235 — __main__ — run — INFO — 695 — 1941959776 — end of LedControl Thread of main program
+2021-08-07 14:36:23,563 — __main__ — run — INFO — 1186 — 1902109792 — end of IpControl Thread of main program
+2021-08-07 14:36:27,904 — __main__ — run — INFO — 932 — 1962931296 — end of DisplayControl Thread of main program
+2021-08-07 14:36:27,904 — __main__ — run — INFO — 932 — 1962931296 — end of DisplayControl Thread of main program

@@ -1,3 +1,4 @@
-userdata/log/*.log
+userdata/log/.
 userdata/analysis/.
-.log
+userdata/traces/.
+userdata/sessions/.
