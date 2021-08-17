@@ -550,20 +550,26 @@ if __name__ == "__main__":
         # if gpscmd != False:
         #     logger.info("gpscmd not False")
         #     gpscmd.stop()
+        if gps != False:
+            gps.stop()
+            gps.join()
+        if gpscmd != False:
+            gpscmd.stop()
+            gpscmd.join()
                 
     except KeyboardInterrupt:
         print("User Cancelled (Ctrl C)")
         if gps != False:
-            gps.stop()
+            gps.join()
         if gpscmd != False:
-            gpscmd.stop()
+            gpscmd.join()
             
     except:
         print("Unexpected error - ", sys.exc_info()[0], sys.exc_info()[1])
         if gps != False:
-            gps.stop()
+            gps.join()
         if gpscmd != False:
-            gpscmd.stop()
+            gpscmd.join()
         raise
         
     # finally:
