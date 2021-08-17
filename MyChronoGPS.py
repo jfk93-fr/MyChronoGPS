@@ -2488,6 +2488,19 @@ def get_ps():
             if ".py" in chaine:
                 M.append(chaine)
     return len(M)
+
+def get_module(moduleName):
+    command = 'ps -ef '
+    logger.info(command)
+    proc_retval = subprocess.check_output(shlex.split(command))
+    ps = str(proc_retval.strip().decode())
+    Tps = ps.split('\n')
+    for chaine in Tps:
+        logger.info(chaine)
+        if moduleName in chaine:
+            if ".py" in chaine:
+                return chaine
+    return False
     
 def get_ipadr():
     global ipClass
@@ -2632,17 +2645,22 @@ if __name__ == "__main__":
         if fnamesimu != "": # we run a simulation
             #cmdos = "python "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" > "+pathlog+"/"+cmdsimu+".log &"
             #cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py &"
+            module = cmdsimu
             cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" &"
         else:
+            module = cmdgps
             #cmdos = "python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+cmdgps+".log &"
             cmdos = python_bin+" "+pathcmd+"/"+cmdgps+".py &"
         print(cmdos)
+        isModule = get_module(module)
+        logger.info(str(isModule))
         
-        try:
-            os.system(cmdos)
-        except:
-            running = False
-        time.sleep(5)
+        if isModule == False:
+            try:
+                os.system(cmdos)
+            except:
+                running = False
+            time.sleep(5)
 
         #dbg = 0
         while running:
