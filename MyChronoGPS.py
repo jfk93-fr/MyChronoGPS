@@ -2776,79 +2776,79 @@ if __name__ == "__main__":
         chrono.terminate() # arrête proprement la classe ChronoControl
         #
         if menu != False:
-            menu.stop()
+            menu.join()
         if gps != False:
             if gps.gpsactiv == True:
-                gps.stop()
+                gps.join()
         if tracker != False:
-            tracker.stop()
+            tracker.join()
         if fsession != False:
-            fsession.stop()
+            fsession.join()
         if fanalys != False:
-            fanalys.stop()
+            fanalys.join()
         if flive != False:
-            flive.stop()
+            flive.join()
         if led1 != False:
-            led1.stop()
+            led1.join()
         if lcd != False:
-            lcd.stop()
+            lcd.join()
         if ipClass != False:
-            ipClass.stop()
+            ipClass.join()
         if acq != False:
-            acq.stop()
+            acq.join()
         if ils != False:
-            ils.stop()
+            ils.join()
                 
     except KeyboardInterrupt:
         logger.info("User Cancelled (Ctrl C)")
         if menu != False:
-            menu.stop()
+            menu.join()
         if gps != False:
-            gps.stop()
+            gps.join()
         if lcd != False:
-            lcd.stop()
+            lcd.join()
         if led1 != False:
-            led1.stop()
+            led1.join()
         if tracker != False:
-            tracker.stop()
+            tracker.join()
         if fsession != False:
-            fsession.stop()
+            fsession.join()
         if fanalys != False:
-            fanalys.stop()
+            fanalys.join()
         if flive != False:
-            flive.stop()
+            flive.join()
         if ipClass != False:
-            ipClass.stop()
+            ipClass.join()
         if acq != False:
-            acq.stop()
+            acq.join()
         if ils != False:
-            ils.stop()
+            ils.join()
             
     except:
         print(traceback.print_exc())
         print("Unexpected error - ", str(sys.exc_info()))
         if menu != False:
-            menu.stop()
+            menu.join()
         if gps != False:
-            gps.stop()
+            gps.join()
         if lcd != False:
-            lcd.stop()
+            lcd.join()
         if led1 != False:
-            led1.stop()
+            led1.join()
         if tracker != False:
-            tracker.stop()
+            tracker.join()
         if fsession != False:
-            fsession.stop()
+            fsession.join()
         if fanalys != False:
-            fanalys.stop()
+            fanalys.join()
         if flive != False:
-            flive.stop()
+            flive.join()
         if ipClass != False:
-            ipClass.stop()
+            ipClass.join()
         if acq != False:
-            acq.stop()
+            acq.join()
         if ils != False:
-            ils.stop()
+            ils.join()
         raise
         
     finally:
