@@ -178,6 +178,7 @@ function initMap() {
 	if (NewCircuit) {
 		thisCircuit = new Object();
 		thisCircuit.Zoom = 15;
+		thisCircuit.PitMaxSpeed = 50; // vitesse maxi autorisée dans la voie des stands (défaut)
 		if (LatLngCircuit) {
 			var LatLng = LatLngCircuit.split(",");
 			thisCircuit.Latitude = LatLng[0];
@@ -204,6 +205,8 @@ function initMap() {
 	}
 	else {
 		thisCircuit = Circuit.circuit;
+		if (!thisCircuit.PitMaxSpeed)
+			thisCircuit.PitMaxSpeed = 50; // vitesse maxi autorisée dans la voie des stands (défaut)
 	}
 	
 	if (!thisCircuit.Latcenter)
@@ -319,6 +322,8 @@ function normalizeCircuit() {
 		thisCircuit.LongCircuit = thisCircuit.LongCircuit * 1;
 	if (thisCircuit.Zoom)
 		thisCircuit.Zoom = thisCircuit.Zoom * 1;
+	if (thisCircuit.PitMaxSpeed)
+		thisCircuit.PitMaxSpeed = thisCircuit.PitMaxSpeed * 1;
 	/* FL en lat1,lon1 / lat2,lon2 */
 	if (thisCircuit.FL) {
 		thisCircuit.FL[0] = thisCircuit.FL[0] * 1;
@@ -514,6 +519,12 @@ function showData() {
 	el = document.getElementById("Zoom");
 	if (thisCircuit.Zoom) {
 		el.value = thisCircuit.Zoom;
+	}
+	else el.style.display = 'none';
+
+	el = document.getElementById("PitMaxSpeed");
+	if (thisCircuit.PitMaxSpeed) {
+		el.value = thisCircuit.PitMaxSpeed;
 	}
 	else el.style.display = 'none';
 
@@ -844,6 +855,10 @@ function createNewTrack() {
 	if (el)
 		if (isNaN(el.value) == false)
 			Track.Zoom = el.value*1;
+	el = document.getElementById("PitMaxSpeed");
+	if (el)
+		if (isNaN(el.value) == false)
+			Track.PitMaxSpeed = el.value*1;
 
 	Track.FL = new Array()
 	el = document.getElementById("FLLat1");
@@ -1105,7 +1120,12 @@ function upLoadCircuitAjax(proc)
 					if (el)
 						el.innerHTML = "fichier piste sauvegard&eacute;";
 				}
-				catch(e) {dataReturn = this.responseText;}
+				catch(e) {
+							dataReturn = this.responseText;
+							var el = document.getElementById("zone-info");
+							if (el)
+								el.innerHTML = dataReturn;
+						}
 			}
 			else 
 			{

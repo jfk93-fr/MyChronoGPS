@@ -173,7 +173,10 @@ $ groups pi # vérifie l'abonnement de l'utilisateur aux groupes
 		js
 		
 8 – donner les droits sur le répertoire MyChronoGPS
-pi@raspberrypi:~ $ sudo chmod -R u+wx,g+wx,o+wx /home/pi/projets/MyChronoGPS
+pi@raspberrypi:~ $ sudo chmod -R u+wx,g+wx,o+wx /home/pi/MyChronoGPS
+
+9 - changer le propriétaire du dossier tracks
+pi@raspberrypi:~ $ sudo chown www-data:www-data /home/pi/MyChronoGPS/tracks
 
 =============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
@@ -213,17 +216,17 @@ sh /home/pi/MyChronoGPS/start_gps.sh
 
 **************************
 Dans la version 1.15 de MyChronoGPS, les échanges avec l'écran se font via des fichiers en mémoire partagée à la place des named pipes.
-S'il n'existe pas, créer un dossier cache dans le dossier /home/pi/projets/MyChronoGPS et donner les droits en écriture au groupe www-data :
-$ sudo mkdir /home/pi/projets/MyChronoGPS/cache
-$ sudo chown www-data:www-data /home/pi/projets/MyChronoGPS/cache
+S'il n'existe pas, créer un dossier cache dans le dossier /home/pi/MyChronoGPS et donner les droits en écriture au groupe www-data :
+$ sudo mkdir /home/pi/MyChronoGPS/cache
+$ sudo chown www-data:www-data /home/pi/MyChronoGPS/cache
 
 Monter le dossier en tant que mémoire partagée :
-$ sudo mount -t tmpfs -o size=1M,mode=0777 tmpfs /home/pi/projets/MyChronoGPS/cache
+$ sudo mount -t tmpfs -o size=1M,mode=0777 tmpfs /home/pi/MyChronoGPS/cache
 
 Monter la zone mémoire au reboot :
 $ sudo nano /etc/fstab
 Ajouter une ligne au fichier :
-$ tmpfs /home/pi/projets/MyChronoGPS/cache size=2M,mode=0777 0 0
+$ tmpfs /home/pi/MyChronoGPS/cache size=2M,mode=0777 0 0
 
 Lancer le tableau de bord au démarrage du pi :
 Créer le dossier lxsession pour le pi :

@@ -15,11 +15,11 @@ def listdirectory(path):
     l = glob.glob(path+'/*') 
     for i in l: 
         if os.path.isdir(i): fichier.extend(listdirectory(i)) 
-        else: fichier.append(i) 
+        else: fichier.append(i)
     return fichier
 
 circuits = []
-listfic = listdirectory(dir)
+listfic = sorted(listdirectory(dir))
 for fic in listfic:
     statinfo = os.stat(fic)
     if statinfo.st_size > 0:

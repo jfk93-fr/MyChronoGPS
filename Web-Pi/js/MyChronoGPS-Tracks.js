@@ -16,8 +16,8 @@ var tab_marker=new Array();
 
 var NewCircuit = false;
 
-var icon_image_on="Icones/finish-bleu.png";
-var icon_image_off="Icones/finish-noir.png";
+var icon_image_on="Icones/finish-rouge.png";
+var icon_image_off="Icones/finish-bleu.png";
 
 var icon_image=icon_image_off;
 var zoom = 6; // zoom initial pour afficher la France dans la map
@@ -186,16 +186,94 @@ function addTracks(mousePt) {
 }
 
 function markCircuit() {
+	var listeHTML = '';
 	for (var i=0; i < Circuit.circuits.length; i++) {
 		console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
 		var dist = distanceGPS(lat,lng,Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude);
-		icon_image = icon_image_on;
+		icon_image = icon_image_off;
 		//if (dist > rayon)
 		//	icon_image = icon_image_off;
 		console.log(Circuit.circuits[i].NomCircuit+' est situé à '+dist);
 		createMarker(Circuit.circuits[i]);
+		// remplissage de la liste des circuits
+		IdCircuit  = Circuit.circuits[i].IdCircuit;
+		NomCircuit  = Circuit.circuits[i].NomCircuit;
+		LongCircuit  = Circuit.circuits[i].Longueur;
+		LogoCircuit  = Circuit.circuits[i].Logo;
+		URLCircuit  = Circuit.circuits[i].URL;
+		Adresse = Circuit.circuits[i].Adresse;
+		CodePostal = Circuit.circuits[i].CodePostal;
+		Ville = Circuit.circuits[i].Ville;
+		LatitudeDestination = Circuit.circuits[i].Latitude;
+		LongitudeDestination = Circuit.circuits[i].Longitude;
+		LatitudeCenter = Circuit.circuits[i].Latcenter;
+		LongitudeCenter = Circuit.circuits[i].Loncenter;
+		ZoomCenter = Circuit.circuits[i].Zoom;
+		TopSaison = Circuit.circuits[i].TopSaison;
+		TopNom = Circuit.circuits[i].TopNom;
+		TopPrenom = Circuit.circuits[i].TopPrenom;
+		TopTime = Circuit.circuits[i].TopTime;
+		LatFL = Circuit.circuits[i].LatFL;
+		LonFL = Circuit.circuits[i].LonFL;
+		LatInt1 = Circuit.circuits[i].LatInt1;
+		LonInt1 = Circuit.circuits[i].LonInt1;
+		LatInt2 = Circuit.circuits[i].LatInt2;
+		LonInt2 = Circuit.circuits[i].LonInt2;
+		LatInt3 = Circuit.circuits[i].LatInt3;
+		LonInt3 = Circuit.circuits[i].LonInt3;
+
+		listeHTML += '<li><a'+
+						' href="#"'+
+						' id="lien_circuit'+IdCircuit+'"' +
+						' onmouseover="changeMarker(\''+IdCircuit+'\',1);" onmouseout="changeMarker(\''+IdCircuit+'\',0);"'+
+						' onclick="showInfoMarker(\''+IdCircuit+'\');"'+
+						'>'+NomCircuit+'</a></li>';
+
+		info_circuit ='<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
+		'	<table align="center">' +
+		'		<tr>' +
+		'			<td colspan="2" align="center">'+
+		'       <a href="./Circuit.html?idcir='+IdCircuit+'" target="_blank">'+NomCircuit+'</a></td>' +
+		'		</tr>' +
+		'		<tr>' +
+		'			<td colspan="2" align="center">'+LongCircuit+' m</td>' +
+		'		</tr>' +
+		'		<tr>' +
+		'			<td colspan="2" align="center">Record: '+TopSaison+' '+TopPrenom+' '+TopNom+'</td>' +
+		'		</tr>' +
+		'		<tr>' +
+		'			<td colspan="2" align="center">'+TopTime+'</td>' +
+		'		</tr>' +
+		'		<tr>' +
+		'			<td colspan="2" align="center">'+
+		'       <a href="'+URLCircuit+'" target="_blank"><img src="../Include/'+LogoCircuit+'"></a></td>' +
+		'		</tr>' +
+		'	</table>' +
+		'</div>';
 	}
+	document.getElementById("liste_circuits").innerHTML = listeHTML;
 }
+function changeMarker(circuit,onoff)
+{
+	var img_icon;
+	if (onoff == 0) {img_icon = icon_image_off;}
+	else {img_icon = icon_image_on;}
+  var marker = tab_marker[circuit]['marker'];
+	marker.setOptions({
+		icon:img_icon
+	});
+}
+function showInfoMarker(circuit)
+{
+  var marker = tab_marker[circuit]['marker'];
+  tab_marker[circuit]['bulle'].open(map, marker);
+  /*
+	marker.setOptions({
+		icon:img_icon
+	});
+  */
+}
+
 function createMarker(circuit,newlat,newlon)
 {
 	var drag = false;
