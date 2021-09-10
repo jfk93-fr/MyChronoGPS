@@ -762,7 +762,7 @@ class DisplayControl(threading.Thread):
         
         self.displayBig = True
         #self.display("MyChronoGPS// //"+get_ipadr())
-        self.display("MyChronoGPS Ver "+str(Version)+"// //"+get_ipadr())
+        self.display("MyChronoGPS// //V-"+str(Version))
         self.displayBig = False
         time.sleep(5)
         self.clear()
