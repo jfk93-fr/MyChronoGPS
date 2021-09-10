@@ -228,29 +228,6 @@ function markCircuit() {
 						' onmouseover="changeMarker(\''+IdCircuit+'\',1);" onmouseout="changeMarker(\''+IdCircuit+'\',0);"'+
 						' onclick="showInfoMarker(\''+IdCircuit+'\');"'+
 						'>'+NomCircuit+'</a></li>';
-
-		info_circuit ='<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
-		'	<table align="center">' +
-		'		<tr>' +
-		'			<td colspan="2" align="center">'+
-		//'       <a href="./Circuit.html?idcir='+IdCircuit+'" target="_blank">'+NomCircuit+'</a></td>' +
-		'       <a href="./Circuit.html?idcir='+IdCircuit+'">'+NomCircuit+'</a></td>' +
-		'		</tr>' +
-		'		<tr>' +
-		'			<td colspan="2" align="center">'+LongCircuit+' m</td>' +
-		'		</tr>' +
-		'		<tr>' +
-		'			<td colspan="2" align="center">Record: '+TopSaison+' '+TopPrenom+' '+TopNom+'</td>' +
-		'		</tr>' +
-		'		<tr>' +
-		'			<td colspan="2" align="center">'+TopTime+'</td>' +
-		'		</tr>' +
-		'		<tr>' +
-		'			<td colspan="2" align="center">'+
-		'       <a href="'+URLCircuit+'" target="_blank"><img src="../Include/'+LogoCircuit+'"></a></td>' +
-		'		</tr>' +
-		'	</table>' +
-		'</div>';
 	}
 	document.getElementById("liste_circuits").innerHTML = listeHTML;
 }
