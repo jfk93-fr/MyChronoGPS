@@ -233,7 +233,8 @@ function markCircuit() {
 		'	<table align="center">' +
 		'		<tr>' +
 		'			<td colspan="2" align="center">'+
-		'       <a href="./Circuit.html?idcir='+IdCircuit+'" target="_blank">'+NomCircuit+'</a></td>' +
+		//'       <a href="./Circuit.html?idcir='+IdCircuit+'" target="_blank">'+NomCircuit+'</a></td>' +
+		'       <a href="./Circuit.html?idcir='+IdCircuit+'">'+NomCircuit+'</a></td>' +
 		'		</tr>' +
 		'		<tr>' +
 		'			<td colspan="2" align="center">'+LongCircuit+' m</td>' +
@@ -295,18 +296,29 @@ function createMarker(circuit,newlat,newlon)
 					dragable: drag,
  					anchorPoint:new google.maps.Point(0, 0),
 				  });
+
+	var page='MyChronoGPS-DesignTrack.html';
+	var url = '';
+	if (circuit.NomCircuit != "Nouveau Circuit") {
+		url = 'id='+circuit.NomCircuit;
+	}
+	else {
+		console.log("on va demander l'affichage d'un nouveau circuit");
+		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
+	}
+
 	var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
 				'	<table align="center">' +
 				'		<tr>' +
 				'			<td colspan="2" align="center">'+
-				'				<a href="#" onclick="showCircuit(\''+circuit.NomCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
+				//'				<a href="#" onclick="showCircuit(\''+circuit.NomCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
+				'       		<a href="'+page+'?'+url+'">'+circuit.NomCircuit+'</a></td>' +
 				'		</tr>' +
 				'		<tr>' +
 				'			<td colspan="2" align="center">'+circuit.LongCircuit+' m</td>' +
 				'		</tr>' +
 				'	</table>' +
 				'</div>';
-
  	
 	tab_marker[circuit.IdCircuit]=new Array();
 	tab_marker[circuit.IdCircuit]['marker']=marker;
