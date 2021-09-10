@@ -761,7 +761,8 @@ class DisplayControl(threading.Thread):
         self.start_screen()
         
         self.displayBig = True
-        self.display("MyChronoGPS// //"+get_ipadr())
+        #self.display("MyChronoGPS// //"+get_ipadr())
+        self.display("MyChronoGPS Ver "+str(Version)+"// //"+get_ipadr())
         self.displayBig = False
         time.sleep(5)
         self.clear()
@@ -2547,6 +2548,18 @@ if __name__ == "__main__":
 
         # we start by reading the parameters
         parms = Parms(Path)
+
+        # we start by reading the version
+        Version = ""
+        fversion = pathcmd+'/VERSION'
+        try:
+            with open(fversion, 'r') as fversion:
+                Version = fversion.read()
+                fversion.close()
+        except:
+            logger.error("error detected in tryring read Version - "+str(sys.exc_info()[0])+" "+str(sys.exc_info()[1]))
+            pass
+        logger.info("Version:"+str(Version))
 
         if "PitMaxSpeed" in parms.params:
             PitMaxSpeed = parms.params["PitMaxSpeed"]
