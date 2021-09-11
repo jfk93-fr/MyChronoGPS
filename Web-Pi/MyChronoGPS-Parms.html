@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS Parms</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+</head>
+<body>
+<div class="w3-main">
+	<div class="w3-container w3-row">
+		<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+		<div class="w3-col l9">
+			<h1>MyChronoGPS - Paramètres</h1>
+		</div>
+		<div>
+			<a class="w3-button w3-border w3-round" href="#"  onClick="copyParms();" >Copy</a>
+			<span id="zone-info"></span>&nbsp;
+			<textarea id="clipboard" cols=50 style="display:none"></textarea>
+		</div>
+	</div>
+	<div class="w3-container w3-row">
+		<div id="parmslist" class="w3-col">
+			<div id="liste_params"></div>
+		</div>		
+	</div>
+	<!-- -->
+	<script src="./js/parse_url.js" type="text/javascript"></script>
+	<script src="./js/ajax.js" type="text/javascript"></script>
+	<script src="./js/MyChronoGPS-Parms.js"></script>
+<!-- -->
+</div>
+</body>
+</html>

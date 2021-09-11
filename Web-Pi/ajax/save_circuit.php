@@ -38,7 +38,7 @@ if (array_key_exists("IdCircuit",$_POST)) {
 		$data["IdCircuit"] = uniqid();
 }
 
-$Track = json_encode($data,JSON_NUMERIC_CHECK,JSON_PRETTY_PRINT);
+$Track = json_encode($data,JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
 //$Track = json_encode($data,JSON_NUMERIC_CHECK);
 // on va transformer l'objet pour le rendre plus lisible
 //$Track = str_replace(",",",\r\n",$Track);

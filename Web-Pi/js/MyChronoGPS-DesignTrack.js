@@ -787,13 +787,13 @@ function copyTrack() {
 	// on copy tous les input et on crée le fichier JSON de la piste
 	createNewTrack();
 	
-	var json = JSON.stringify(Track);
-	console.log(json);
-	var arrayToString = JSON.stringify(Object.assign({}, Track));  // convert array to string
-	console.log(JSON.stringify(arrayToString));
-    var stringToJsonObject = JSON.parse(arrayToString);  // convert string to json object
-
-    console.log(stringToJsonObject);
+	var json = JSON.stringify(Track, null, '\t');
+	//console.log(json);
+	//var arrayToString = JSON.stringify(Object.assign({}, Track));  // convert array to string
+	//console.log(JSON.stringify(arrayToString));
+    //var stringToJsonObject = JSON.parse(arrayToString);  // convert string to json object
+	//
+    //console.log(stringToJsonObject);
 
 	//console.log(JSON.stringify(Object.assign({},Track)));
 	var z_extract = document.getElementById("clipboard")

@@ -178,6 +178,9 @@ pi@raspberrypi:~ $ sudo chmod -R u+wx,g+wx,o+wx /home/pi/MyChronoGPS
 9 - changer le propriétaire du dossier tracks
 pi@raspberrypi:~ $ sudo chown www-data:www-data /home/pi/MyChronoGPS/tracks
 
+10 - changer le propriétaire du dossier parms
+pi@raspberrypi:~ $ sudo chown www-data:www-data /home/pi/MyChronoGPS/parms
+
 =============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
 
