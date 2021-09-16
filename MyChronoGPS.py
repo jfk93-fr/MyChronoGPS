@@ -2546,10 +2546,9 @@ if __name__ == "__main__":
 
         running = True
 
-        # we start by reading the parameters
+        # we start by reading the parameters ...
         parms = Parms(Path)
-
-        # we start by reading the version
+        # we continue by reading the version
         Version = ""
         fversion = pathcmd+'/VERSION'
         try:
