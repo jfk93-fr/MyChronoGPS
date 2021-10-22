@@ -2,8 +2,8 @@
 # coding: utf8
 ###########################################################################
 #
-# MyChronoGPS
-#   automatic GPS stopwatch
+# MyChronoGPSLite
+#   automatic GPS stopwatch (Lite Version)
 #
 #   Use with MyChronoGPS_GPS (or MyChronoGPS_UBX for u-blox GPS), MyChronoGPS_BUTTON and MyChronoGPS_OLED (or MyChronoGPS_LCD, or MyChronoGPS_Dummy) programs
 #
@@ -18,8 +18,6 @@
 #       manages the actions on the LEDs (ON, OFF, NORMAL_FLASH, SLOW_FLASH, FAST_FLASH)
 #   Thread DisplayControl
 #       communicates via the DISPLAY pipe, sends messages to be displayed in the pipe, messages are retrieved and processed by the MyChronoGPS_LCD module
-#   Thread TrackingControl (not operational)
-#       receives the NMEA frames contained in the GPSNMEA pipe and writes the trace file
 #   Class SessionControl
 #       manages the storage of session data
 #   Class AnalysisControl
@@ -28,7 +26,6 @@
 #       manages the stopwatch functions (start, stop, etc)
 #
 ###########################################################################
-# managed by git from VERSION 1.17
 from MyChronoGPS_Paths import Paths
 Path = Paths();
 
@@ -55,18 +52,14 @@ import subprocess
 import shlex
 
 running = True
-#####pathcmd = '/home/pi/projets/MyChronoGPS'
-#####pathdata = '/home/userdata'
 pathcmd = Path.pathcmd
 pathdata = Path.pathdata
-#pathdata = '/media/pi/USERDATA'
 pathsimu = pathdata+'/simu/'
 pathlog = pathdata+'/log'
 pathcache = pathcmd+'/cache'
 
 cmdscreen = 'MyChronoGPS_LCD'
 cmdgps =  "MyChronoGPS_GPS"
-cmdsimu =  "MyChronoGPS_SIMU"
 cmdbutton =  "MyChronoGPS_BUTTON"
 
 #######################################################################################
@@ -143,7 +136,6 @@ NORMAL_CHARACTER = 1 # write on 2 lines
 BIG_CHARACTER = 2 # write larger on 1 line
 SMALL_CHARACTER = 3 # write smaller on 3 lines in scroll mode
 CharacterSize = NORMAL_CHARACTER # possibility of character size
-GpsChronoMode = 2 # default stopwatch mode: automatic
 
 
 NOEUD_KM = 1.852 # 1 nautical mile = 1852 m
@@ -579,20 +571,6 @@ class MenuControl(threading.Thread):
                 if self.menu_state == MENU_ON:
                     self.menu_up()
 
-            # # gestion de l'affichage de la LED principale en fonction de l'état du menu
-            # if self.running_state == STOP or self.running_state == POWER_OFF: # stop
-            #     if (self.__led != LED_OFF):
-            #         self.led.set_led_off()
-            #         self.__led = LED_OFF
-            # elif self.running_state == READY: # ready: the LED flashes
-            #     if (self.__led != LED_FLASH):
-            #         self.led.set_led_flash()
-            #         self.__led = LED_FLASH
-            # else: # last case : run
-            #     if (self.__led != LED_ON):
-            #         self.led.set_led_on()
-            #         self.__led = LED_ON
-
             time.sleep(0.2)
 
         logger.info("end of MenuControl Thread of main program")
@@ -655,9 +633,6 @@ class LedControl(threading.Thread):
         nbc = 0 # cycle counter
         chronoflash = 0 # to count down the flashing time
         while self.__running:
-            #jfk
-            #logger.setLevel(logging.DEBUG)
-            #logger.debug('LED Status('+str(self.gpio_pin)+'):'+str(self.__led))
             if self.__led != self.__last_state:
                 if self.__led == LED_ON:
                     io.digitalWrite(self.gpio_pin,1)
@@ -895,7 +870,6 @@ class DisplayControl(threading.Thread):
                                     self.buff1 = "WARNING!"
                                     self.buff2 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)
                                     # here, we will make the yellow LED flash quickly
-                                    # jfk
                                     self.main_led.set_led_fast_flash()
                             else:
                                 if CharacterSize == BIG_CHARACTER:
@@ -2104,140 +2078,132 @@ class ChronoControl():
 
     def auto_start_line(self):
         if self.start_line == False:
-            if GpsChronoMode == 0:
-                # on détermine la ligne de départ-arrivée sur le point actuel
-                self.getGpsData();
-                self.define_start_wcap(self.gps_latitude,self.gps_longitude,self.gps_gpscap)
-                # creation of the self-defined track
-                self.create_sfTrack()
-                self.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
-            if GpsChronoMode > 0:
-                self.neardist = 999999
-                self.neartrack = ""
-                logger.debug("circuit:"+str(type(circuits)))
-                for track in circuits:
-                    LatFL = 0
-                    LonFL = 0
-                    WithCoords = False
-                    if "FL" in circuits[track]:
-                        # FL is defined as the latitude and longitude of the two points on either side of the line
-                        LatFL = float(circuits[track]["FL"][0])
-                        LonFL = float(circuits[track]["FL"][1])
-                        lat1 = LatFL
-                        lon1 = LonFL
-                        lat2 = float(circuits[track]["FL"][2])
-                        lon2 = float(circuits[track]["FL"][3])
-                        WithCoords = True
-                    elif "LatFL" in circuits[track]:
-                        if circuits[track]["LatFL"] != "":
-                            LatFL = float(circuits[track]["LatFL"])
-                            LonFL = float(circuits[track]["LonFL"])
-                            CapFL = float(circuits[track]["CapFL"])
-                            
-                            self.getLineWithCap(LatFL, LonFL, CapFL)
-                            lat1 = self.capline.coords[0]
-                            lon1 = self.capline.coords[1]
-                            lat2 = self.capline.coords[2]
-                            lon2 = self.capline.coords[3]
-                            
-                    distcir = distanceGPS(gps.latitude, gps.longitude, LatFL, LonFL)
-                    # logger.info('distance circuit:'+str(distcir)+' '+str(self.neardist)+' '+str(TrackProximity))
+            self.neardist = 999999
+            self.neartrack = ""
+            logger.debug("circuit:"+str(type(circuits)))
+            for track in circuits:
+                LatFL = 0
+                LonFL = 0
+                WithCoords = False
+                if "FL" in circuits[track]:
+                    # FL is defined as the latitude and longitude of the two points on either side of the line
+                    LatFL = float(circuits[track]["FL"][0])
+                    LonFL = float(circuits[track]["FL"][1])
+                    lat1 = LatFL
+                    lon1 = LonFL
+                    lat2 = float(circuits[track]["FL"][2])
+                    lon2 = float(circuits[track]["FL"][3])
+                    WithCoords = True
+                elif "LatFL" in circuits[track]:
+                    if circuits[track]["LatFL"] != "":
+                        LatFL = float(circuits[track]["LatFL"])
+                        LonFL = float(circuits[track]["LonFL"])
+                        CapFL = float(circuits[track]["CapFL"])
+                        
+                        self.getLineWithCap(LatFL, LonFL, CapFL)
+                        lat1 = self.capline.coords[0]
+                        lon1 = self.capline.coords[1]
+                        lat2 = self.capline.coords[2]
+                        lon2 = self.capline.coords[3]
+                        
+                distcir = distanceGPS(gps.latitude, gps.longitude, LatFL, LonFL)
+                # logger.info('distance circuit:'+str(distcir)+' '+str(self.neardist)+' '+str(TrackProximity))
 
-                    if distcir < self.neardist: # we found an even closer circuit
-                        self.neartrack = circuits[track]["NomCircuit"]
-                        self.neardist = distcir
-                        if distcir < TrackProximity: # we are within x m of the circuit read in parameter
-                            
-                            # on va regarder si on a coupé la ligne de départ du circuit à proximité
-                            # was the start/finish line cut ?
-                            cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
-                            logger.info('is prox track cut:'+str(cut))
-                            if cut == True:
-                                self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
-                                # self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                                # self.circuit = circuits[track]
-                            
-                            if WithCoords == True:
-                                self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                            else:
-                                self.define_start_wcap(LatFL, LonFL, CapFL)
-                            self.circuit = circuits[track]
-                           
-                if self.start_line == True: # here we have just defined the start-finish line
-                    # then we'll get the other intermediate lines and pitlane
-                    # is the pitlane defined ?
-                    self.pitin = False
-                    self.pitout = False
-                    if "PitIn" in self.circuit:
+                if distcir < self.neardist: # we found an even closer circuit
+                    self.neartrack = circuits[track]["NomCircuit"]
+                    self.neardist = distcir
+                    if distcir < TrackProximity: # we are within x m of the circuit read in parameter
+                        
+                        # on va regarder si on a coupé la ligne de départ du circuit à proximité
+                        # was the start/finish line cut ?
+                        cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
+                        logger.info('is prox track cut:'+str(cut))
+                        if cut == True:
+                            self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
+                            # self.define_start_wcoord(lat1, lon1, lat2, lon2)
+                            # self.circuit = circuits[track]
+                        
+                        if WithCoords == True:
+                            self.define_start_wcoord(lat1, lon1, lat2, lon2)
+                        else:
+                            self.define_start_wcap(LatFL, LonFL, CapFL)
+                        self.circuit = circuits[track]
+                       
+            if self.start_line == True: # here we have just defined the start-finish line
+                # then we'll get the other intermediate lines and pitlane
+                # is the pitlane defined ?
+                self.pitin = False
+                self.pitout = False
+                if "PitIn" in self.circuit:
+                    self.pitin = self.ChronoData()
+                    # PitIn1 is defined in latitude, longitude of the 2 points on either side of the line
+                    self.pitin.lat1 = float(self.circuit["PitIn"][0])
+                    self.pitin.lon1 = float(self.circuit["PitIn"][1])
+                    self.pitin.lat2 = float(self.circuit["PitIn"][2])
+                    self.pitin.lon2 = float(self.circuit["PitIn"][3])
+                elif "LatPitIn" in self.circuit:
+                    if self.circuit["LatPitIn"] != "":
                         self.pitin = self.ChronoData()
-                        # PitIn1 is defined in latitude, longitude of the 2 points on either side of the line
-                        self.pitin.lat1 = float(self.circuit["PitIn"][0])
-                        self.pitin.lon1 = float(self.circuit["PitIn"][1])
-                        self.pitin.lat2 = float(self.circuit["PitIn"][2])
-                        self.pitin.lon2 = float(self.circuit["PitIn"][3])
-                    elif "LatPitIn" in self.circuit:
-                        if self.circuit["LatPitIn"] != "":
-                            self.pitin = self.ChronoData()
-                            
-                            self.pitin.lat = float(self.circuit["LatPitIn"])
-                            self.pitin.lon = float(self.circuit["LonPitIn"])
-                            self.pitin.cap = float(self.circuit["CapPitIn"])
-                            self.pitin.draw();
-                            self.pitin.lat1 = self.pitin.coord1.lat
-                            self.pitin.lon1 = self.pitin.coord1.lon
-                            self.pitin.lat2 = self.pitin.coord2.lat
-                            self.pitin.lon2 = self.pitin.coord2.lon
-                    if "PitOut" in self.circuit:
+                        
+                        self.pitin.lat = float(self.circuit["LatPitIn"])
+                        self.pitin.lon = float(self.circuit["LonPitIn"])
+                        self.pitin.cap = float(self.circuit["CapPitIn"])
+                        self.pitin.draw();
+                        self.pitin.lat1 = self.pitin.coord1.lat
+                        self.pitin.lon1 = self.pitin.coord1.lon
+                        self.pitin.lat2 = self.pitin.coord2.lat
+                        self.pitin.lon2 = self.pitin.coord2.lon
+                if "PitOut" in self.circuit:
+                    self.pitout = self.ChronoData()
+                    # PitOut1 is defined in latitude, longitude of the 2 points on either side of the line
+                    self.pitout.lat1 = float(self.circuit["PitOut"][0])
+                    self.pitout.lon1 = float(self.circuit["PitOut"][1])
+                    self.pitout.lat2 = float(self.circuit["PitOut"][2])
+                    self.pitout.lon2 = float(self.circuit["PitOut"][3])
+                elif "LatPitOut" in self.circuit:
+                    if self.circuit["LatPitOut"] != "":
                         self.pitout = self.ChronoData()
-                        # PitOut1 is defined in latitude, longitude of the 2 points on either side of the line
-                        self.pitout.lat1 = float(self.circuit["PitOut"][0])
-                        self.pitout.lon1 = float(self.circuit["PitOut"][1])
-                        self.pitout.lat2 = float(self.circuit["PitOut"][2])
-                        self.pitout.lon2 = float(self.circuit["PitOut"][3])
-                    elif "LatPitOut" in self.circuit:
-                        if self.circuit["LatPitOut"] != "":
-                            self.pitout = self.ChronoData()
-                            
-                            self.pitout.lat = float(self.circuit["LatPitOut"])
-                            self.pitout.lon = float(self.circuit["LonPitOut"])
-                            self.pitout.cap = float(self.circuit["CapPitOut"])
-                            self.pitout.draw();
-                            self.pitout.lat1 = self.pitout.coord1.lat
-                            self.pitout.lon1 = self.pitout.coord1.lon
-                            self.pitout.lat2 = self.pitout.coord2.lat
-                            self.pitout.lon2 = self.pitout.coord2.lon
-                    if self.pitout == False:
-                        self.pitin = False # pitin without pitout we remove pitin
-                    
-                    self.intline = []
-                    nbint = 3 # number of intermediate lines
-                    i = 0
-                    ni = 0 # intermediate line number
-                    while i < nbint:
-                        ni = ni+1
-                        if "Int"+str(ni) in self.circuit:
+                        
+                        self.pitout.lat = float(self.circuit["LatPitOut"])
+                        self.pitout.lon = float(self.circuit["LonPitOut"])
+                        self.pitout.cap = float(self.circuit["CapPitOut"])
+                        self.pitout.draw();
+                        self.pitout.lat1 = self.pitout.coord1.lat
+                        self.pitout.lon1 = self.pitout.coord1.lon
+                        self.pitout.lat2 = self.pitout.coord2.lat
+                        self.pitout.lon2 = self.pitout.coord2.lon
+                if self.pitout == False:
+                    self.pitin = False # pitin without pitout we remove pitin
+                
+                self.intline = []
+                nbint = 3 # number of intermediate lines
+                i = 0
+                ni = 0 # intermediate line number
+                while i < nbint:
+                    ni = ni+1
+                    if "Int"+str(ni) in self.circuit:
+                        self.intline.append("")
+                        self.intline[i] = self.ChronoData()
+                        # Int1 is defined in latitude, longitude of the 2 points on either side of the line
+                        self.intline[i].lat1 = float(self.circuit["Int"+str(ni)][0])
+                        self.intline[i].lon1 = float(self.circuit["Int"+str(ni)][1])
+                        self.intline[i].lat2 = float(self.circuit["Int"+str(ni)][2])
+                        self.intline[i].lon2 = float(self.circuit["Int"+str(ni)][3])
+                    elif "LatInt"+str(ni) in self.circuit:
+                        if self.circuit["LatInt"+str(ni)] != "":
                             self.intline.append("")
                             self.intline[i] = self.ChronoData()
-                            # Int1 is defined in latitude, longitude of the 2 points on either side of the line
-                            self.intline[i].lat1 = float(self.circuit["Int"+str(ni)][0])
-                            self.intline[i].lon1 = float(self.circuit["Int"+str(ni)][1])
-                            self.intline[i].lat2 = float(self.circuit["Int"+str(ni)][2])
-                            self.intline[i].lon2 = float(self.circuit["Int"+str(ni)][3])
-                        elif "LatInt"+str(ni) in self.circuit:
-                            if self.circuit["LatInt"+str(ni)] != "":
-                                self.intline.append("")
-                                self.intline[i] = self.ChronoData()
-                                
-                                self.intline[i].lat = float(self.circuit["LatInt"+str(ni)])
-                                self.intline[i].lon = float(self.circuit["LonInt"+str(ni)])
-                                self.intline[i].cap = float(self.circuit["CapInt"+str(ni)])
-                                self.intline[i].draw();
-                                self.intline[i].lat1 = self.intline[i].coord1.lat
-                                self.intline[i].lon1 = self.intline[i].coord1.lon
-                                self.intline[i].lat2 = self.intline[i].coord2.lat
-                                self.intline[i].lon2 = self.intline[i].coord2.lon
-                        
-                        i = i+1
+                            
+                            self.intline[i].lat = float(self.circuit["LatInt"+str(ni)])
+                            self.intline[i].lon = float(self.circuit["LonInt"+str(ni)])
+                            self.intline[i].cap = float(self.circuit["CapInt"+str(ni)])
+                            self.intline[i].draw();
+                            self.intline[i].lat1 = self.intline[i].coord1.lat
+                            self.intline[i].lon1 = self.intline[i].coord1.lon
+                            self.intline[i].lat2 = self.intline[i].coord2.lat
+                            self.intline[i].lon2 = self.intline[i].coord2.lon
+                    
+                    i = i+1
 
 class AcqControl(threading.Thread):
 
@@ -2504,12 +2470,12 @@ def get_ps():
 
 def get_module(moduleName):
     command = 'ps -ef '
-    #logger.info(command)
+    logger.info(command)
     proc_retval = subprocess.check_output(shlex.split(command))
     ps = str(proc_retval.strip().decode())
     Tps = ps.split('\n')
     for chaine in Tps:
-        #logger.info(chaine)
+        logger.info(chaine)
         if moduleName in chaine:
             if ".py" in chaine:
                 return chaine
@@ -2576,9 +2542,6 @@ if __name__ == "__main__":
             PitMaxSpeed = parms.params["PitMaxSpeed"]
         if "TrackWidth" in parms.params:
             TrackWidth = parms.params["TrackWidth"]
-        if "GpsChronoMode" in parms.params:
-            GpsChronoMode = parms.params["GpsChronoMode"]
-        logger.info("GpsChronoMode:"+str(GpsChronoMode))
         if "TrackProximity" in parms.params:
             TrackProximity = parms.params["TrackProximity"]
         if "TrackAcqTime" in parms.params:
@@ -2592,25 +2555,23 @@ if __name__ == "__main__":
         if "UseStopwatchDisplayByILS" in parms.params:
             UseStopwatchDisplayByILS = parms.params["UseStopwatchDisplayByILS"]
         if "LiveSessionMode" in parms.params:
-            LiveSessionMode = parms.params["LiveSessionMode"]
-            
+            LiveSessionMode = parms.params["LiveSessionMode"]            
 
-        if GpsChronoMode > 0:
-            # we will read the tracks
-            dirtracks = pathdata+"/tracks"
-            dirlist = os.listdir(dirtracks)
-            circuits = {}
-            i = 0
-            for el in dirlist:
-                TFD = open(dirtracks+"/"+el, 'r')
-                if TrackPref != False:
-                    Num = el.split('track-')
-                    Num = Num[1].split(TrackExt)
-                else:
-                    Num = el.split(TrackExt)
-                Id = Num[0]
-                circuits[Id] = json.loads(TFD.read())
-                TFD.close()
+        # we will read the tracks
+        dirtracks = pathdata+"/tracks"
+        dirlist = os.listdir(dirtracks)
+        circuits = {}
+        i = 0
+        for el in dirlist:
+            TFD = open(dirtracks+"/"+el, 'r')
+            if TrackPref != False:
+                Num = el.split('track-')
+                Num = Num[1].split(TrackExt)
+            else:
+                Num = el.split(TrackExt)
+            Id = Num[0]
+            circuits[Id] = json.loads(TFD.read())
+            TFD.close()
 
         led1 = LedControl(LED1_GPIO_PIN) # LED 1 (yellow) is associated to many processes
         led1.start()
@@ -2664,25 +2625,9 @@ if __name__ == "__main__":
         # or run the GPS program
         if "GPSCmd" in parms.params:
             cmdgps = parms.params["GPSCmd"]
-        if "SimuCmd" in parms.params:
-            cmdsimu = parms.params["SimuCmd"]
         
-        l = len(sys.argv)
-        i = 0
-        while i < l:
-            i = i + 1
-        fnamesimu = ""
-        if l >= 2:
-            fnamesimu = sys.argv[1]
-        if fnamesimu != "": # we run a simulation
-            #cmdos = "python "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" > "+pathlog+"/"+cmdsimu+".log &"
-            #cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py &"
-            module = cmdsimu
-            cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" &"
-        else:
-            module = cmdgps
-            #cmdos = "python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+cmdgps+".log &"
-            cmdos = python_bin+" "+pathcmd+"/"+cmdgps+".py &"
+        module = cmdgps
+        cmdos = python_bin+" "+pathcmd+"/"+cmdgps+".py &"
         print(cmdos)
         isModule = get_module(module)
         logger.info(str(isModule))
@@ -2694,15 +2639,8 @@ if __name__ == "__main__":
                 running = False
             time.sleep(5)
 
-        #dbg = 0
         while running:
-            #current_state = button1.get_state()
-            #current_state = running_state
             current_state = menu.get_state()
-            #if dbg > 100:
-            #    dbg = 0
-            #    print("current_state:"+str(current_state))
-            #dbg = dbg+1
             
             if current_state != prev_state:
                 prev_state = current_state
@@ -2712,7 +2650,6 @@ if __name__ == "__main__":
                 last_state = current_state
                 if current_state == STOP:
                     led1.set_led_fast_flash(3)
-                    #logger.debug('chrono stop')
                     chrono.stop()
                     lcd.set_display_time()
                 elif current_state == READY:
@@ -2721,50 +2658,41 @@ if __name__ == "__main__":
                 elif current_state == RUNNING:
                     chrono.start()
                     lcd.set_display_chrono(chrono)
-                    #fsession.start() #jfk
 
             if (gps.gpscomplete == True):
                 if (gps.gpsfix == gps.VALID):
-                    if GpsChronoMode > 0: # automatic or semi-automatic operation
-                        chrono.auto_start_line()
-                        if GpsChronoMode == 2:  # fully automatic operation
-                            if (current_state != RUNNING): # we don't time
-                                if current_state == STOP:
-                                    if chrono.circuit != False and chrono.circuit != "":
-                                        distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
-                                        if distcir < TrackProximity: # we are near the circuit
-                                            if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                                                #button1.button_state = READY
-                                                #running_state = READY
-                                                menu.running_state = READY
-                                                chrono.begin()
-                                    else: # we will try to automatically determine a start/finish line
-                                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
-                                            #button1.button_state = READY
-                                            #running_state = READY
-                                            menu.running_state = READY
-                                            chrono.begin()
-                                        else:
-                                            if acq == False:
-                                                # if the GPS point acquisition thread is not started, it is started
-                                                acq = AcqControl(chrono) # automatic definition of the start-finish line
-                                                acq.start()
-                                else:
-                                    if acq != False:
-                                        # if the GPS point acquisition thread is running, it is stopped
-                                        if acq.active != False:
-                                            acq.stop()
+                    chrono.auto_start_line()
+                    if (current_state != RUNNING): # we don't time
+                        if current_state == STOP:
+                            if chrono.circuit != False and chrono.circuit != "":
+                                distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
+                                if distcir < TrackProximity: # we are near the circuit
                                     if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                                        if chrono.circuit != False:
-                                            #button1.button_state = RUNNING
-                                            #running_state = READY
-                                            menu.running_state = RUNNING
-                    
-                    if GpsChronoMode == 0: # manual operation
-                        if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
-                            if (current_state != RUNNING): # we don't time
-                                menu.running_state = RUNNING
-                                chrono.start()
+                                        #button1.button_state = READY
+                                        #running_state = READY
+                                        menu.running_state = READY
+                                        chrono.begin()
+                            else: # we will try to automatically determine a start/finish line
+                                if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
+                                    #button1.button_state = READY
+                                    #running_state = READY
+                                    menu.running_state = READY
+                                    chrono.begin()
+                                else:
+                                    if acq == False:
+                                        # if the GPS point acquisition thread is not started, it is started
+                                        acq = AcqControl(chrono) # automatic definition of the start-finish line
+                                        acq.start()
+                        else:
+                            if acq != False:
+                                # if the GPS point acquisition thread is running, it is stopped
+                                if acq.active != False:
+                                    acq.stop()
+                            if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
+                                if chrono.circuit != False:
+                                    #button1.button_state = RUNNING
+                                    #running_state = READY
+                                    menu.running_state = RUNNING
 
                     if (current_state == RUNNING): # we are timing it
                         chrono.compute()

@@ -63,5 +63,9 @@
 	"CoordsPrecision": 5,
 	"#ComputeModeEco": "activation de mode Eco pour les cacluls de chronos. 0=OFF (mode normal), 1=ON (mode Eco)",
 	"ComputeModeEco": 0,
+	"#UseStopwatchDisplayByILS": "utilisation de l'affichage d'un chronomètre par ILS. 0=NO, 1=YES",
+	"UseStopwatchDisplayByILS": 0,
+	"#LiveSessionMode": "traitement des infos 'LIVE' . 0=NO, 1=YES",
+	"LiveSessionMode": 1,
 	"#": "End of Parms"
 }

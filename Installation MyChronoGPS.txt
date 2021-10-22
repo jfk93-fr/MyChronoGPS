@@ -116,7 +116,7 @@ $ sudo nano /etc/lighttpd/conf-available/15-fastcgi-php.conf
 # /usr/share/doc/lighttpd/fastcgi.txt.gz
 # http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi
 
-## Start an FastCGI server for php (needs the php5-cgi package)
+## Start an FastCGI server for php (needs the php7-cgi package)
 fastcgi.server += ( ".php" =>
         ((
                 "socket" => "/var/run/php/php7.3-fpm.sock",
