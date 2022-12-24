@@ -2147,21 +2147,20 @@ class ChronoControl():
                         self.neartrack = circuits[track]["NomCircuit"]
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
-                            
                             # on va regarder si on a coupé la ligne de départ du circuit à proximité
                             # was the start/finish line cut ?
                             cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
                             logger.info('is prox track cut:'+str(cut))
                             if cut == True:
                                 self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
-                                # self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                                # self.circuit = circuits[track]
-                            
-                            if WithCoords == True:
                                 self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                            else:
-                                self.define_start_wcap(LatFL, LonFL, CapFL)
-                            self.circuit = circuits[track]
+                                self.circuit = circuits[track]
+                            
+                            #if WithCoords == True:
+                            #    self.define_start_wcoord(lat1, lon1, lat2, lon2)
+                            #else:
+                            #    self.define_start_wcap(LatFL, LonFL, CapFL)
+                            #self.circuit = circuits[track]
                            
                 if self.start_line == True: # here we have just defined the start-finish line
                     # then we'll get the other intermediate lines and pitlane
