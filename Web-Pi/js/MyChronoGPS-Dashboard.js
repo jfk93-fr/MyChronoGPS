@@ -489,7 +489,41 @@ function isInfosReady()
 	circuit = retour.circuit;
 	distcircuit = retour.distcircuit;
 
-	document.getElementById("nb-sats").innerHTML = 'sat '+nbsats;
+	var el = document.getElementById("nb-sats");
+	el.innerHTML = 'sat '+nbsats;
+	
+	//el.style.display="none";
+	var el = document.getElementById("signal-container");
+	el.style.display="block";
+	var ebar1 = document.getElementById("sbar1");
+	var ebar2 = document.getElementById("sbar2");
+	var ebar3 = document.getElementById("sbar3");
+	var ebar4 = document.getElementById("sbar4");
+	var ebar5 = document.getElementById("sbar5");
+	ebar1.style.height="0%";
+	ebar2.style.height="0%";
+	ebar3.style.height="0%";
+	ebar4.style.height="0%";
+	ebar5.style.height="0%";
+	if (nbsats > 0) {
+		 ebar1.style.height="20%";
+	}
+	if (nbsats > 3) {
+		 ebar2.style.height="40%";
+	}
+	if (nbsats > 5) {
+		 ebar3.style.height="60%";
+	}
+	if (nbsats > 7) {
+		 ebar4.style.height="80%";
+	}
+	if (nbsats > 9) {
+		 ebar5.style.height="100%";
+	}
+	//signal.className = 'signal-container';
+
+	
+	
 	document.getElementById("tempcpu").innerHTML = tempcpu+'°';
 	document.getElementById("NomCircuit").innerHTML = circuit+"("+distcircuit+"m)";
 	

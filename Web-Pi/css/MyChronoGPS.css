@@ -575,3 +575,22 @@ html, body, h1, h2, h3, h4, h5, h6 {
   border-radius: 50%;
   box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #d62600 0 -1px 9px, #cc0000 0 2px 12px;
 }
+.signal-container{
+  width: 25px;
+  height: 25px;
+  position: relative;
+}
+.signal-barcontainer{
+  background-color: grey;
+  position: relative;
+  width: 5px;
+  height: 20px;
+  float: left;
+}
+.signal-bar{
+  background-color: cyan;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
