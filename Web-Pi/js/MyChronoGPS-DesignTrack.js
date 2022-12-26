@@ -205,6 +205,12 @@ function initMap() {
 	}
 	else {
 		thisCircuit = Circuit.circuit;
+		if (!thisCircuit.Latitude)
+			thisCircuit.Latitude = thisCircuit.FL[0];
+		if (!thisCircuit.Longitude)
+			thisCircuit.Longitude = thisCircuit.FL[1];
+		if (!thisCircuit.Zoom)
+			thisCircuit.Zoom = 16; // zoom par défaut
 		if (!thisCircuit.PitMaxSpeed)
 			thisCircuit.PitMaxSpeed = 50; // vitesse maxi autorisée dans la voie des stands (défaut)
 	}
