@@ -1112,6 +1112,9 @@ class DisplayControl(threading.Thread):
             pass
            
     def stop(self):
+        if self.__running != True:
+            logger.info("DisplayControl already stopped")
+            return
         self.clear()
         time.sleep(0.4)
         self.display("LCD turn off")
@@ -1122,7 +1125,12 @@ class DisplayControl(threading.Thread):
         self.write("X") # demande d'arrêt du programme d'affichage
         time.sleep(2)
 
+        #self.set_display_sysmsg("End of//MyChronoGPS//Bye",self.DISPLAY,1)
+        #self.set_display_sysmsg("DisplayControl//init complete",self.DISPLAY,1)
+        self.display("End of//MyChronoGPS//Bye")
+        
         self.__running = False
+        logger.info("lcd stop")
             
     def set_display_time(self):
         self.display_mode = self.DATE_TIME    
@@ -1306,6 +1314,7 @@ class SessionControl():
     def __init__(self,chrono):
         self.chrono = chrono
         self.Line1 = False       
+        self.line = False       
         self.__current_state = self.CLOSED
         logger.info("SessionControl init complete")
         self.best_time = False
@@ -1333,6 +1342,7 @@ class SessionControl():
             line += str(chrono.startline.lon)+";"
             line += str(chrono.startline.cap)+";"
             self.Line1 = line
+            self.line = line
             # we will populate the list of sessions of the ChronoControl class
             self.chrono.dsess = ({"time":temps,"best":0,"tblaps":[]}) #time = heure de début de sessions #best = numéro du meilleur tour #tblaps = liste des chronos 
             
@@ -1346,6 +1356,14 @@ class SessionControl():
             self.chrono.tbsessions.append(self.chrono.dsess)
             self.best_time = False
             self.best = 0
+            self.Line1 = self.line # pour écrire la ligne 1 quand on démarrera une autre session
+        
+        
+    def close(self):
+        if self.__current_state != self.CLOSED:
+            self.fileDescriptor.close()
+            self.__current_state = self.CLOSED
+            logger.info("session file closed")
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
@@ -1355,6 +1373,7 @@ class SessionControl():
             logger.info("session file open")
             if self.Line1 != False:
                 self.write(self.Line1)
+                self.Line1 = False # pour prévenir de ne pas réécrire la ligne 1 
             # we will populate the list of sessions of the ChronoControl class
             temps = formatGpsTime(self.chrono.gps)
             self.chrono.dsess = ({"time":temps,"best":0,"tblaps":[]}) #time = session start time #best = best lap number #tblaps = time list
@@ -1950,7 +1969,7 @@ class ChronoControl():
                             if (len(self.intline)) > 0:
                                self.temps_secteurs.append(self.temps_inter)
                             
-                            # here we will write the gain or loss compared to the best round
+                            # here we will write the gain or loss compared to the best lap
                             if self.best_lap == timedelta(seconds=0):
                                self.best_lap = self.temps_tour
                             else:
@@ -1969,6 +1988,7 @@ class ChronoControl():
                             # we write in the sessions file
                             if self.nblap > 0:
                                 fsession.write()
+                                fsession.close() # on ferme le fichier pour ne pas perdre l'information en cas de coupure de courant
     
                             if (len(self.intline)) > 0:
                                self.temps_secteurs = [] # the times of the sectors are erased
@@ -2150,11 +2170,12 @@ class ChronoControl():
                             # on va regarder si on a coupé la ligne de départ du circuit à proximité
                             # was the start/finish line cut ?
                             cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
-                            logger.info('is prox track cut:'+str(cut))
+                            #logger.info('is prox track cut:'+str(cut))
                             if cut == True:
                                 self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
                                 self.define_start_wcoord(lat1, lon1, lat2, lon2)
                                 self.circuit = circuits[track]
+                                self.start_line = True
                             
                             #if WithCoords == True:
                             #    self.define_start_wcoord(lat1, lon1, lat2, lon2)
@@ -2163,6 +2184,9 @@ class ChronoControl():
                             #self.circuit = circuits[track]
                            
                 if self.start_line == True: # here we have just defined the start-finish line
+                    # si la définition automatique de la ligne est en cours, on l'arrête
+                    if acq == False:
+                       acq.stop()                  
                     # then we'll get the other intermediate lines and pitlane
                     # is the pitlane defined ?
                     self.pitin = False
@@ -2340,6 +2364,9 @@ class AcqControl(threading.Thread):
         logger.info("AcqControl ended")
                 
     def stop(self):
+        if self.__running != True:
+            logger.info("AcqControl already stopped")
+            return
         self.__running = False
     
 
@@ -2592,6 +2619,7 @@ if __name__ == "__main__":
             UseStopwatchDisplayByILS = parms.params["UseStopwatchDisplayByILS"]
         if "LiveSessionMode" in parms.params:
             LiveSessionMode = parms.params["LiveSessionMode"]
+        #logger.info("LiveSessionMode:"+str(LiveSessionMode))
             
 
         if GpsChronoMode > 0:
@@ -2641,6 +2669,7 @@ if __name__ == "__main__":
             chrono.ils.set_chrono(chrono)
         
         #jfk: peut-être à lancer si paramètre live = on ?
+        logger.info("LiveSessionMode:"+str(LiveSessionMode))
         if LiveSessionMode != 0:
             flive = LiveSession(chrono)
             flive.start()
@@ -2808,27 +2837,39 @@ if __name__ == "__main__":
         #
         if menu != False:
             menu.stop()
+            menu.join()
         if gps != False:
             if gps.gpsactiv == True:
                 gps.stop()
+            gps.join()
         if tracker != False:
             tracker.stop()
+            tracker.join()
         if fsession != False:
             fsession.stop()
+            #fsession.join()
         if fanalys != False:
             fanalys.stop()
+            #fanalys.join()
         if flive != False:
             flive.stop()
+            flive.join()
         if led1 != False:
             led1.stop()
+            led1.join()
         if lcd != False:
             lcd.stop()
+            logger.info("main lcd stop")
+            lcd.join()
         if ipClass != False:
             ipClass.stop()
+            ipClass.join()
         if acq != False:
             acq.stop()
+            acq.join()
         if ils != False:
             ils.stop()
+            ils.join()
                 
     except KeyboardInterrupt:
         logger.info("User Cancelled (Ctrl C)")
