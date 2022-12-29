@@ -1320,7 +1320,7 @@ class SessionControl():
         self.best_time = False
         self.best = 0
 
-    def start(self):
+    def start_session(self):
         #if self.__current_state != self.OPEN:
         if self.Line1 == False:
             # we write the coordinates of the FL and the Intermediaries
@@ -1518,7 +1518,7 @@ class AnalysisControl():
         self.Line = False
         logger.info("AnalysisControl init complete")
 
-    def start(self):
+    def start_analysis(self):
         if self.__current_state != self.OPEN:
             self.filename = pathdata+'/analysis/analysis-'+self.chrono.fileTime+'.json'
             self.fileDescriptor = open(self.filename, 'w')
@@ -1566,7 +1566,7 @@ class AnalysisControl():
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
-            self.start()
+            self.start_session()
         if self.__current_state == self.OPEN:
             line += "\r\n"
             #self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
@@ -1809,7 +1809,7 @@ class ChronoControl():
         self.circuit = ""
         self.intline = []
         
-    def start(self):
+    def start_chrono(self):
         if self.chrono_begin != True:
             # the stopwatch is started for the first time
             self.begin()
@@ -1988,7 +1988,7 @@ class ChronoControl():
                             # we write in the sessions file
                             if self.nblap > 0:
                                 fsession.write()
-                                fsession.close() # on ferme le fichier pour ne pas perdre l'information en cas de coupure de courant
+                                #fsession.close() # on ferme le fichier pour ne pas perdre l'information en cas de coupure de courant
     
                             if (len(self.intline)) > 0:
                                self.temps_secteurs = [] # the times of the sectors are erased
@@ -2175,7 +2175,7 @@ class ChronoControl():
                                 self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
                                 self.define_start_wcoord(lat1, lon1, lat2, lon2)
                                 self.circuit = circuits[track]
-                                self.start_line = True
+                                #self.start_line = True
                             
                             #if WithCoords == True:
                             #    self.define_start_wcoord(lat1, lon1, lat2, lon2)
@@ -2185,7 +2185,7 @@ class ChronoControl():
                            
                 if self.start_line == True: # here we have just defined the start-finish line
                     # si la définition automatique de la ligne est en cours, on l'arrête
-                    if acq == False:
+                    if acq != False:
                        acq.stop()                  
                     # then we'll get the other intermediate lines and pitlane
                     # is the pitlane defined ?
@@ -2353,7 +2353,7 @@ class AcqControl(threading.Thread):
         
         # we have just crossed the line that has just been defined  !
         self.chrono.dD = 0 # no need for distance correction
-        self.chrono.start()
+        self.chrono.start_chrono()
         time.sleep(3)
         self.chrono.chronoStartTime = self.chrono.getTime(self.pgpsmin["time"])
         self.chrono.nblap = 1 # we start with the first lap
@@ -2747,7 +2747,7 @@ if __name__ == "__main__":
                     chrono.begin()
                     lcd.set_display_ready()
                 elif current_state == RUNNING:
-                    chrono.start()
+                    chrono.start_chrono()
                     lcd.set_display_chrono(chrono)
                     #fsession.start() #jfk
 
@@ -2792,7 +2792,7 @@ if __name__ == "__main__":
                         if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
                             if (current_state != RUNNING): # we don't time
                                 menu.running_state = RUNNING
-                                chrono.start()
+                                chrono.start_chrono()
 
                     if (current_state == RUNNING): # we are timing it
                         chrono.compute()

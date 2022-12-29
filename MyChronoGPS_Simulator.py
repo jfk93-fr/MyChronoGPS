@@ -109,6 +109,7 @@ class SimuControl(threading.Thread):
         fname = "traces-20201108145155.nmea"
         if lg >= 2:
             fname = sys.argv[1]
+        logger.info("args: "+str(sys.argv))
         self.freq = 10 # par défaut, on va simuler à 10 Hz
         if lg >= 3:
             self.freq = int(sys.argv[2])
