@@ -30,7 +30,7 @@
 #   Version 1.12 : MyChronoGPS.1.12.py + MyChronoGPS_LCD (ou MyChronoGPS_OLED) + MyChronoGPS_GPS (ou MyChronoGPS_SIMU ou MyChronoGPS_SIMUR)
 #
 ###########################################################################
-VERSION = "1.12"
+VERSION = "1.13"
 import os
 import time
 import threading
@@ -43,9 +43,9 @@ ON = 1
 OFF = 0
 
 print(sys.argv)
-pathcmd = '/home/pi/projets/MyChronoGPS'
+pathcmd = '/home/pi/MyChronoGPS'
 cmdsimu =  "MyChronoGPS_SIMU."+VERSION
-pathdata = '/home/userdata'
+pathdata = '/home/pi/MyChronoGPS'
 pathlog = pathdata+'/log/'
 
 #######################################################################################
@@ -75,10 +75,10 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-logger.setLevel(logging.INFO)
+#logger.setLevel(logging.INFO)
 logger.info('debut de '+cmdsimu)
 #######################################################################################
-from MyChronoGPS_NMEA_1_12 import NmeaControl
+from MyChronoGPS_NMEA import NmeaControl
 
 class SimuControl(threading.Thread):
     INVALID = 0
@@ -102,7 +102,7 @@ class SimuControl(threading.Thread):
         #self.fichier = open(self.path+fname,'r')
         self.fichier = open(fname,'r')
         lines = self.fichier.read() # on lit le fichier en totalité
-        self.lines = lines.split('\r\n') # le fichier est transformé en une liste
+        self.lines = lines.split('\n') # le fichier est transformé en une liste
         self.nblines = len(self.lines)
         self.currentline = 0 # pointeur sur la ligne en cours de traitement
         self.nmea = NmeaControl() # appel de la classe NmeaControl
@@ -120,33 +120,63 @@ class SimuControl(threading.Thread):
     def run(self):
         self.__running = True
         while self.__running:
-            self.gpsline = str(self.readline())
-            self.nmea.parse(self.gpsline)
-            time.sleep(0.05) # on attend un peu avant de lire la trame suivante
+            #logger.debug("on attend un peu (0.2)")
+            #time.sleep(0.2) # on attend un peu avant de lire la trame
+            gpsline = str(self.readline())
+            self.gpsline = str(gpsline)
+            #try:
+            #    self.gpsline = gpsline.decode()
+            #    # self.nmea.tracker.write(self.gpsline) # write sentence in trace file
+            #except: # si la fonction decode n'a pas marché, c'est que le gps a envoyé une séquence en binaire
+            #    logger.info("decode failed")
+            #    # chkdata = gpsline.split("\r\n")
+            #    # logger.info("chkdata:"+str(chkdata[0]))
+            #    self.gspline = str(gpsline)
+            # is the frame valid ?
+            cksum = chksum_nmea(self.gpsline)
+            
+            if cksum != False:
+                # self.gpstrames.append(self.gpsline)
+                self.nmea.parse(self.gpsline) # parse sentence to send to chrono
+            else:
+                logger.debug("bad checksum:"+self.gpsline)
+                #self.stop()
+                
+            self.gpscomplete = self.nmea.gpscomplete
+            
+            #self.nmea.parse(self.gpsline)
+            #time.sleep(0.05) # on attend un peu avant de lire la trame suivante
+            #logger.debug("on attend un peu (0.2)")
+            #time.sleep(0.2) # on attend un peu avant de lire la trame suivante
+        self.nmea.remove_fifo()
         print("End of SimuControl")
 
     def readline(self):
+        logger.debug(str(len(self.lines))+" lines in file.")
         if self.currentline > len(self.lines) - 1:
             return ""
         gpsline = self.lines[self.currentline]
         self.currentline = self.currentline + 1
+        logger.debug("curent line number:"+str(self.currentline))
+        logger.debug("trame:["+str(gpsline)+"],line:"+str(self.currentline))
+        logger.debug("line is read")
         if gpsline == "":
             logger.debug("trame vide:["+str(gpsline)+"],line:"+str(self.currentline))
-            #self.__running = True
             self.nmea.write('END') # on signale au module Chrono qu'on a fini
         else:
-            # est-ce que la trame est valide ?
-            cksum = chksum_nmea(gpsline)
-            cksum = str(hex(cksum))[2:]
-            if len(cksum) < 2:
-                cksum = "0"+cksum
-            logger.debug("checksum:"+cksum)
-            
-            if cksum != False:
-                self.nmea.gpstrames.append(gpsline)
-            else:
-                logger.info("bad checksum:"+gpsline)
-
+            logger.info("line:"+str(self.currentline)+",trame:["+str(gpsline)+"]")
+        #    # est-ce que la trame est valide ?
+        #    cksum = chksum_nmea(gpsline)
+        #    cksum = str(hex(cksum))[2:]
+        #    if len(cksum) < 2:
+        #        cksum = "0"+cksum
+        #    logger.debug("checksum:"+cksum)
+        #    
+        #    if cksum != False:
+        #        self.nmea.gpstrames.append(gpsline)
+        #    else:
+        #        logger.info("bad checksum:"+gpsline)
+        #
             self.gpscomplete = self.nmea.gpscomplete
 
         return gpsline
@@ -154,25 +184,25 @@ class SimuControl(threading.Thread):
     def stop(self):
         self.simuactiv = False
         logger.debug("simuactiv:"+str(self.simuactiv))
-        self.nmea.stop()
-            
-        fifo = pathcmd+'/pipes/BUTTON' # le pipe BUTTON va être lu par le programme Chrono
-        try:
-            logger.debug("try open pipe:"+str(fifo))
-            pipe = os.open(fifo, os.O_WRONLY, os.O_NONBLOCK)
-            if True:
-                logger.debug("try write pipe:"+str(fifo))
-                os.write(pipe, "12"+'\r\n') # bouton 1 appui long : arrêt de MyChronoGPS
-                logger.debug("try close pipe:"+str(fifo))
-                os.close(pipe)
-        except OSError as err:
-            logger.error("cannot use named pipe OS error: {0}".format(err))
-            self.track_mode = OFF
-            pass
-        except:
-            print("cannot use named pipe ",fifo)
-            self.track_mode = OFF
-            pass
+        #self.nmea.stop()
+        #    
+        #fifo = pathcmd+'/pipes/BUTTON' # le pipe BUTTON va être lu par le programme Chrono
+        #try:
+        #    logger.debug("try open pipe:"+str(fifo))
+        #    pipe = os.open(fifo, os.O_WRONLY, os.O_NONBLOCK)
+        #    if True:
+        #        logger.debug("try write pipe:"+str(fifo))
+        #        os.write(pipe, "12"+'\r\n') # bouton 1 appui long : arrêt de MyChronoGPS
+        #        logger.debug("try close pipe:"+str(fifo))
+        #        os.close(pipe)
+        #except OSError as err:
+        #    logger.error("cannot use named pipe OS error: {0}".format(err))
+        #    self.track_mode = OFF
+        #    pass
+        #except:
+        #    print("cannot use named pipe ",fifo)
+        #    self.track_mode = OFF
+        #    pass
 
         self.__running = False
 
@@ -201,7 +231,7 @@ class SimuCommand(threading.Thread):
         threading.Thread.__init__(self)
         self.simu = simu
         
-        self.fifo = pathcmd+'/pipes/GPS' # le pipe GPS va être écrit par le programme principal de MyChronoGPS
+        self.fifo = pathcmd+'/pipes/GPSCMD' # le pipe GPS va être écrit par le programme principal de MyChronoGPS
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()

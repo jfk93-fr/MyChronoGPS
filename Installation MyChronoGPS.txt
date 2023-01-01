@@ -91,13 +91,13 @@ Installer les fichiers de MyChronoGPS
 	traces
 	tracks
 3 – copier les fichiers suivants dans le répertoire MyChronoGPS:
-	MyChronoGPS.1.15.py
-	MyChronoGPS_BUTTON.1.15.py
-	MyChronoGPS_Dummy.1.15.py
-	MyChronoGPS_NMEA_1_15.py
-	MyChronoGPS_OLED.1.15.py
-	MyChronoGPS_Parms.1.15.py
-	MyChronoGPS_UBX.1.15.py
+	MyChronoGPS.py
+	MyChronoGPS_BUTTON.py
+	MyChronoGPS_Dummy.py
+	MyChronoGPS_NMEA.py
+	MyChronoGPS_OLED.py
+	MyChronoGPS_Parms.py
+	MyChronoGPS_UBX.py
 	Rpi_I2C_driver.py
 	start_gps.sh
 4 – copier le fichier params.json dans le répertoire parms
@@ -106,7 +106,7 @@ Installer les fichiers de MyChronoGPS
 6 - installer Lighttpd
 $ sudo apt-get install lighttpd
 7 - installer Lighttpd PHP
-$ sudo apt-get install php7.3-fpm php7.3-mbstring php7.3-mysql php7.3-curl php7.3-gd php7.3-zip php7.3-xml -y
+$ sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-zip php7.4-xml -y
 8 - configurer lighttpd
 $ sudo lighttpd-enable-mod fastcgi
 $ sudo lighttpd-enable-mod fastcgi-php
@@ -119,7 +119,7 @@ $ sudo nano /etc/lighttpd/conf-available/15-fastcgi-php.conf
 ## Start an FastCGI server for php (needs the php7-cgi package)
 fastcgi.server += ( ".php" =>
         ((
-                "socket" => "/var/run/php/php7.3-fpm.sock",
+                "socket" => "/var/run/php/php7.4-fpm.sock",
                 "broken-scriptfilename" => "enable"
         ))
 )

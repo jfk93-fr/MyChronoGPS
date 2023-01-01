@@ -19,7 +19,7 @@ then
   then
       printf "GPS_OLED is already running %s\n" "$_GPS"
   else
-      if [ -p "/home/pi/MyChronoGPS/cache/DISPLAY"  ];
+      if [ -p "/home/pi/MyChronoGPS/cache/DISPLAY"  ]
 	  then
           rm /home/pi/projets/MyChronoGPS/cache/DISPLAY
 		  echo "DISPLAY removed"

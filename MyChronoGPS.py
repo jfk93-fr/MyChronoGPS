@@ -1153,7 +1153,8 @@ class DisplayControl(threading.Thread):
         else:
             self.displaySysBig = False
         self.sys_message = msg
-        self.sysloop = timer * 10 # 10 cycles = about 1 second
+        #self.sysloop = timer * 10 # 10 cycles = about 1 second
+        self.sysloop = timer * 4 # 10 cycles = about 1 second
         
     def set_contrast(self,contrast):
         try:
@@ -1365,9 +1366,18 @@ class SessionControl():
             self.__current_state = self.CLOSED
             logger.info("session file closed")
         
+    def commit(self):
+        if self.__current_state != self.CLOSED:
+            logger.info(str(self.fileDescriptor))
+            name = self.fileDescriptor.close
+            self.fileDescriptor.close()
+            #self.fileDescriptor = open(name, 'a')
+            self.fileDescriptor = open(pathdata+'/sessions/session-'+self.chrono.fileTime+'.txt', 'a')
+            logger.info("session file commit")
+        
     def write(self,line=""):
         if self.__current_state != self.OPEN:
-            self.start() #jfk
+            self.start_session() #jfk
             self.fileDescriptor = open(pathdata+'/sessions/session-'+self.chrono.fileTime+'.txt', 'a')
             self.__current_state = self.OPEN
             logger.info("session file open")
@@ -1405,7 +1415,8 @@ class SessionControl():
             self.chrono.dsess["tblaps"].append(temps_tour)
 
         line += "\r\n"
-        self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
+        #self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
+        self.fileDescriptor.write(line)
         
 class LiveSession(threading.Thread):
     # CLOSED = 0
@@ -1516,6 +1527,7 @@ class AnalysisControl():
         self.__current_state = self.CLOSED
         self.Line1 = False
         self.Line = False
+        self.Lap0 = False
         logger.info("AnalysisControl init complete")
 
     def start_analysis(self):
@@ -1544,6 +1556,14 @@ class AnalysisControl():
         self.Line += ',"cap":'+str(self.chrono.cap0)+'}]'
         self.write(self.Line)
         
+    def saveLap0(self):
+        self.Lap0 = '[{"timestamp":"'+str(self.chrono.time0)+'"'
+        self.Lap0 += ',"tour":1'
+        self.Lap0 += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
+        self.Lap0 += '],"vitesse":'+str(self.chrono.speed0)
+        self.Lap0 += ',"altitude":'+str(self.chrono.alt0)
+        self.Lap0 += ',"cap":'+str(self.chrono.cap0)+'}]'
+        
     def writeLine1(self):
         #line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         line = '[{"date":"'+formatGpsDate(self.gps)+'"'
@@ -1563,10 +1583,12 @@ class AnalysisControl():
         line += '}]'
         self.write(line)
         self.Line1 = True
+        if self.Lap0 != False:
+            self.write(self.Lap0)
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
-            self.start_session()
+            self.start_analysis()
         if self.__current_state == self.OPEN:
             line += "\r\n"
             #self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
@@ -1729,6 +1751,9 @@ class ChronoControl():
         self.dD = 0
         
     def begin(self):
+        if self.chrono_begin == True:
+            return True
+        #logger.info('begin chrono_begin:'+str(self.chrono_begin))
         self.chrono_begin = True
         self.nblap = 0
         self.chronoStartTime = self.getTime(gps.gpstime)
@@ -1748,6 +1773,7 @@ class ChronoControl():
         #jfk
         self.main_led.set_led_off()
         self.main_led.set_led_very_slow_flash()
+        #logger.info('begin lap:'+str(self.nblap))
         
     def define_start_wcap(self,lat,lon,cap):
         # definition of the start-finish line according to the coordinates of the middle of the start-finish line and the heading
@@ -1777,9 +1803,13 @@ class ChronoControl():
         self.capline.cap = cap
         self.capline.coords = []
         self.capline.draw(TrackWidth); # we take the whole width of the track
+        self.capline.coords.append("")
         self.capline.coords[0] = self.capline.coord1.lat
+        self.capline.coords.append("")
         self.capline.coords[1] = self.capline.coord1.lon
+        self.capline.coords.append("")
         self.capline.coords[2] = self.capline.coord2.lat
+        self.capline.coords.append("")
         self.capline.coords[3] = self.capline.coord2.lon
 
 
@@ -1810,6 +1840,10 @@ class ChronoControl():
         self.intline = []
         
     def start_chrono(self):
+        logger.info('start_chrono lap:'+str(self.nblap))
+        logger.info('start_chrono chrono_started:'+str(self.chrono_started))
+        if self.chrono_started == True:
+            return True
         if self.chrono_begin != True:
             # the stopwatch is started for the first time
             self.begin()
@@ -1867,14 +1901,16 @@ class ChronoControl():
         if self.last_time != self.gps_gpstime: # calculations are made only if the time changed.
             self.last_time = self.gps_gpstime
             # on essaie de valoriser les variables dès le début du calcul                
-            self.lat0 = self.gps_prevlat
-            self.lon0 = self.gps_prevlon
-            self.time0 = self.gps_gpstime
-            self.speed0 = self.gps_gpsvitesse
-            self.alt0 = self.gps_gpsaltitude
-            self.cap0 = self.gps_gpscap
-            # et on écrit le fichier analys
-            fanalys.writePoint()
+            #self.lat0 = self.gps_prevlat
+            #self.lon0 = self.gps_prevlon
+            #self.time0 = self.gps_gpstime
+            #self.speed0 = self.gps_gpsvitesse
+            #self.alt0 = self.gps_gpsaltitude
+            #self.cap0 = self.gps_gpscap
+            ## et on écrit le fichier analys
+            ##fanalys.writePoint()
+            #if self.nblap > 0:
+            #    fanalys.writePoint()
 
 
             if self.chrono_started == True: # calculations are only performed if the stopwatch is started
@@ -1918,15 +1954,18 @@ class ChronoControl():
                     # we will take care of the timing only if we are not in the pitlane
                     if self.in_pitlane == False:
                         # if we are in the process of timing, we trigger the writing of the analysis file
-                        #if self.nblap > 0:
-                        #    fanalys.writePoint()
-                            
-                        #self.lat0 = self.gps_prevlat
-                        #self.lon0 = self.gps_prevlon
-                        #self.time0 = self.gps_gpstime
-                        #self.speed0 = self.gps_gpsvitesse
-                        #self.alt0 = self.gps_gpsaltitude
-                        #self.cap0 = self.gps_gpscap
+                        if self.nblap > 0:
+                            fanalys.writePoint()
+                           
+                        self.lat0 = self.gps_prevlat
+                        self.lon0 = self.gps_prevlon
+                        self.time0 = self.gps_gpstime
+                        self.speed0 = self.gps_gpsvitesse
+                        self.alt0 = self.gps_gpsaltitude
+                        self.cap0 = self.gps_gpscap
+
+                        #if self.nblap == 0:
+                        #    fanalys.saveLap0()
                         
                         # the distance travelled between 2 gps points is calculated
                         distseg = distanceGPS(self.gps_prevlat, self.gps_prevlon, self.gps_latitude, self.gps_longitude)
@@ -1989,6 +2028,7 @@ class ChronoControl():
                             if self.nblap > 0:
                                 fsession.write()
                                 #fsession.close() # on ferme le fichier pour ne pas perdre l'information en cas de coupure de courant
+                                fsession.commit() # on ferme et on rouvre le fichier pour ne pas perdre d'information en cas de coupure de courant
     
                             if (len(self.intline)) > 0:
                                self.temps_secteurs = [] # the times of the sectors are erased
@@ -2123,6 +2163,7 @@ class ChronoControl():
             return timedelta(hours=0,minutes=0,seconds=0,milliseconds=0)
 
     def auto_start_line(self):
+        #logger.info('auto_start_line start_line:'+str(self.start_line))
         if self.start_line == False:
             if GpsChronoMode == 0:
                 # on détermine la ligne de départ-arrivée sur le point actuel
@@ -2164,18 +2205,84 @@ class ChronoControl():
                     # logger.info('distance circuit:'+str(distcir)+' '+str(self.neardist)+' '+str(TrackProximity))
 
                     if distcir < self.neardist: # we found an even closer circuit
+                        # si la définition automatique de la ligne est en cours, on l'arrête
+                        if acq != False:
+                            if acq.active == True:
+                                #logger.info('is acq:'+str(acq))
+                                acq.cancel() # on abandonne le thread d'acquisition automatique de la ligne de départ-arrivée                  
                         self.neartrack = circuits[track]["NomCircuit"]
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
                             # on va regarder si on a coupé la ligne de départ du circuit à proximité
                             # was the start/finish line cut ?
-                            cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
-                            #logger.info('is prox track cut:'+str(cut))
-                            if cut == True:
-                                self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
-                                self.define_start_wcoord(lat1, lon1, lat2, lon2)
-                                self.circuit = circuits[track]
-                                #self.start_line = True
+                            if self.gps.prevlat != 0:
+                                cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
+                                #logger.info('is prox track cut:'+str(cut))
+                                
+                                if cut == True:
+                                    self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
+                                    self.define_start_wcoord(lat1, lon1, lat2, lon2)
+                                    self.circuit = circuits[track]
+                                    logger.info('is prox track cut:'+str(cut))
+                                    self.begin()
+            
+                                    # we have just crossed the line that has just been defined  !
+                                    # on valorise les variables à partir des données du gps dès fois que çà changerait pendant le calcul
+                                    lat = self.gps.latitude
+                                    lon = self.gps.longitude
+                                    prevlat = self.gps.prevlat
+                                    prevlon = self.gps.prevlon
+                                    v0 = self.gps.last_speed # speed at the previous point
+                                    v1 = self.gps.gpsvitesse # speed at current point
+                                    vmoy = (v0+v1)/2 # average speed to travel the straight line segment
+                                    #corrFreq = self.gps.corrFreq
+                                    corrFreq = 1000000/self.gps.Freq # correction to be applied to the time according to the frequency
+                                    self.dD = 0 # no need for distance correction
+                                    self.dD = self.calculDistances(lat1,lon1,lat2,lon2,lat,lon)
+                                    
+                                    distseg = distanceGPS(prevlat, prevlon, lat, lon)
+                                    
+                                    # calculation of the distance between the previous point and the start-finish line
+                                    dDp0 = self.calculDistances(lat1,lon1,lat2,lon2,self.gps.prevlat,self.gps.prevlon)
+                                    dDp0 = self.calculDistances(lat1,lon1,lat2,lon2,prevlat,prevlon)
+                                    # calculation of the distance between the current point and the start-finish line
+                                    #dDp1 = self.calculDistances(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude)
+                                    dDp1 = self.calculDistances(lat1,lon1,lat2,lon2,lat,lon)
+                                    
+                                    dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
+                                    dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
+                                        
+                                    corrtime = self.chronoGpsTime - self.getTime(self.time0)
+                                    #distAB = self.dDprev + self.dD
+        
+                                    if distseg > 0: # distseg = 0 is possible, if the gps remains static
+                                        cormic = corrtime.microseconds + (corrFreq * (dc0/(dc0+dc1)))
+                                        corrtime = timedelta(microseconds=cormic)
+                                    self.chronoStartTime = self.getTime(self.time0) + corrtime
+                                    #time.sleep(3)
+                                    #self.chronoStartTime = self.getTime(self.gps.gpstime)
+                                    self.nblap = 1 # we start with the first lap
+                                    self.chrono_started = True
+                                    logger.info('auto_start_line lap:'+str(self.nblap))
+                                    logger.info('start_line:'+str(self.start_line))
+                           
+                                    self.getGpsData();
+                                    self.lat0 = self.gps_prevlat
+                                    self.lat0 = self.gps.prevlat
+                                    self.lon0 = self.gps_prevlon
+                                    self.lon0 = self.gps.prevlon
+                                    self.time0 = self.gps_gpstime
+                                    self.time0 = self.gps.gpstime
+                                    self.speed0 = self.gps_gpsvitesse
+                                    self.speed0 = self.gps.gpsvitesse
+                                    self.alt0 = self.gps_gpsaltitude
+                                    self.alt0 = self.gps.gpsaltitude
+                                    self.cap0 = self.gps_gpscap
+                                    self.cap0 = self.gps.gpscap
+            
+                                    #if self.nblap == 0:
+                                    #    fanalys.saveLap0()
+                                    #fanalys.saveLap0()
                             
                             #if WithCoords == True:
                             #    self.define_start_wcoord(lat1, lon1, lat2, lon2)
@@ -2184,9 +2291,6 @@ class ChronoControl():
                             #self.circuit = circuits[track]
                            
                 if self.start_line == True: # here we have just defined the start-finish line
-                    # si la définition automatique de la ligne est en cours, on l'arrête
-                    if acq != False:
-                       acq.stop()                  
                     # then we'll get the other intermediate lines and pitlane
                     # is the pitlane defined ?
                     self.pitin = False
@@ -2288,6 +2392,7 @@ class AcqControl(threading.Thread):
 
     def run(self):
         self.__running = True
+        self.__cancel = False
         self.active = True;
         while self.__running:
             if self.lat == False:
@@ -2344,22 +2449,24 @@ class AcqControl(threading.Thread):
             else:
                 logger.info("AcqControl time limit reached")
                 self.__running = False
-        logger.info(str(self.pgpsmin))
-        # the acquisition time is over, we will draw the line from the calculated coordinates
-        # instead of drawing the line, we could indicate that we are ready to draw it
-        self.chrono.define_start_wcap(self.pgpsmin["lat"],self.pgpsmin["lon"],self.pgpsmin["cap"])
-        # creation of the self-defined track
-        self.chrono.create_sfTrack()
-        
-        # we have just crossed the line that has just been defined  !
-        self.chrono.dD = 0 # no need for distance correction
-        self.chrono.start_chrono()
-        time.sleep(3)
-        self.chrono.chronoStartTime = self.chrono.getTime(self.pgpsmin["time"])
-        self.chrono.nblap = 1 # we start with the first lap
-        
-        self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
-        logger.info("Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
+        #logger.info("AcqControl cancel ?"+str(self.__cancel))
+        if self.__cancel == False: #le thread n'a pas été avorté
+            logger.info(str(self.pgpsmin))
+            # the acquisition time is over, we will draw the line from the calculated coordinates
+            # instead of drawing the line, we could indicate that we are ready to draw it
+            self.chrono.define_start_wcap(self.pgpsmin["lat"],self.pgpsmin["lon"],self.pgpsmin["cap"])
+            # creation of the self-defined track
+            self.chrono.create_sfTrack()
+            
+            # we have just crossed the line that has just been defined  !
+            self.chrono.dD = 0 # no need for distance correction
+            self.chrono.start_chrono()
+            time.sleep(3)
+            self.chrono.chronoStartTime = self.chrono.getTime(self.pgpsmin["time"])
+            self.chrono.nblap = 1 # we start with the first lap
+            
+            self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
+            logger.info("acq Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
         self.active = False;
         logger.info("AcqControl ended")
                 
@@ -2368,6 +2475,11 @@ class AcqControl(threading.Thread):
             logger.info("AcqControl already stopped")
             return
         self.__running = False
+        self.active = False;
+                
+    def cancel(self):
+        self.__cancel = True
+        self.stop()
     
 
 def deg2rad(dg):
@@ -2744,11 +2856,16 @@ if __name__ == "__main__":
                     chrono.stop()
                     lcd.set_display_time()
                 elif current_state == READY:
-                    chrono.begin()
+                    if chrono.chrono_begin != True:
+                        chrono.begin()
+                    #logger.info('main current_state:'+str(current_state))
+                    #logger.info('menu current_state:'+str(menu.get_state()))
+                    #logger.info('main lap:'+str(chrono.nblap))
                     lcd.set_display_ready()
                 elif current_state == RUNNING:
                     chrono.start_chrono()
                     lcd.set_display_chrono(chrono)
+                    logger.info('main current_state running ?:'+str(current_state))
                     #fsession.start() #jfk
 
             if (gps.gpscomplete == True):
@@ -2805,7 +2922,7 @@ if __name__ == "__main__":
                                 menu.running_state = STOP
                                 current_state = STOP
                                 if chrono.circuit != False:
-                                    logger.info("distance circuit:"+str(distcir)+"/"+str(TrackProximity))
+                                    #logger.info("distance circuit:"+str(distcir)+"/"+str(TrackProximity))
                                     chrono.circuit = False # the circuit object is deleted
                                     chrono.start_line = False # the start line is cleared
                     #
