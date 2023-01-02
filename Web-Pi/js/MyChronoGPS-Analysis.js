@@ -1,6 +1,6 @@
-if (typeof(data_ready) == 'undefined') {
-	//console.log('data_ready undefined');
-}
+//if (typeof(data_ready) == 'undefined') {
+//	//console.log('data_ready undefined');
+//}
 
 var curr_coord = 0;
 var latitude     = '';
@@ -733,6 +733,7 @@ function go()
 		var T1 = getObjTime(Point1.timestamp);
 		var dT = T1.getTime() - T0.getTime();
 		if (dT > 20000) {
+			console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
 			Tour.valid = false;
 		}
 		prevTimestamp = Point1.timestamp;
@@ -751,6 +752,7 @@ function go()
 		
 		if (nt > 0 && np <= 1) {
 			// on va ajouter les points 0 & 1 à la fin du tour précédent
+			console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
 			Point = new Object();
 			Point.timestamp = Tours[nt].points[np].timestamp;
 			Point.lat1 = Tours[nt].points[np].lat1;
@@ -767,6 +769,7 @@ function go()
 	// ne ratons pas le dernier tour
 	if (Tour) {
 		Tours.push(Tour);
+		console.log('ne ratons pas le dernier tour');
 		// on va ajouter le points 0 & 1 à la fin du tour précédent
 		nt = Tours.length-1;
 		console.log(JSON.stringify(Tours[nt-1]))
@@ -797,7 +800,7 @@ function go()
 	var T0 = getObjTime(Points[0].timestamp);
 	var T1 = getObjTime(Points[1].timestamp);
 	var dT = T1.getTime() - T0.getTime();
-	//console.log(JSON.stringify(dT));
+	console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
 	Frequence = 1000/dT;
 
 	latitude = Points[0].lat1;
@@ -1112,9 +1115,9 @@ function designLap(lap) {
 				time_start = Tcut.tdeb;
 				time_arrival = Tcut.tfin;
 				time_prev[0] = time_start;
-				////console.log('temps départ:'+time_start);
-				////console.log('temps fin:'+time_arrival);
-				////console.log('temps de coupure:'+JSON.stringify(Tcut));
+				console.log('temps départ:'+time_start);
+				console.log('temps fin:'+time_arrival);
+				console.log('temps de coupure:'+JSON.stringify(Tcut));
                 Points[i].timecut = time_arrival - time_start;		
 				// s'il s'agit d'un point de coupure, on l'indique dans le chemin
 				var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
@@ -1252,64 +1255,26 @@ function designCut(parm) {
 		////console.log('somme d0 d1:'+(dist0+dist1));
 		
 		var pointCut = getIntersection(linecoord,segcoords);
+
+		var corrtime = dt1.getTime() - dt0.getTime();
+		console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
+		
+		var vs0 = (v0*1000)/3600;
+		var vs1 = (v1*1000)/3600;
+		var vmoy = (vs0+vs1)/2;
+		
+		var dc0 = dist0*(vs1/vmoy);
+		var dc1 = dist1*(vs0/vmoy);
+	
+		corrtime = corrtime * (dc0/(dc0+dc1));
+		corrtime = Math.round(corrtime);
+		var temps = dt0.getTime() + corrtime;
 		
 		if (!tdeb) {
-			var corrtime = dt1.getTime() - dt0.getTime();
-			//corrtime = corrtime * (dist0/distseg);
-			////console.log('v0 & v1:'+v0+'/'+v1);
-			//corrtime = corrtime * ((dist0*v1)/(distseg*v0)); // avec une compensation selon la vitesse
-			//corrtime = corrtime * ((dist0*(v1/v0))/(distseg*(v1/v0))); // avec une compensation selon la vitesse
-			
-			var vs0 = (v0*1000)/3600;
-			var vs1 = (v1*1000)/3600;
-			////console.log('vs0 & vs1:'+vs0+'/'+vs1);
-			var vmoy = (vs0+vs1)/2;
-			////console.log('trapèze:'+Trap);
-			
-			var dc0 = dist0*(vs1/vmoy);
-			////console.log('dist0, dc0:'+dist0+','+dc0);
-			
-			var dc1 = dist1*(vs0/vmoy);
-			////console.log('dist1, dc1:'+dist1+','+dc1);
-			
-			//console.log('corrtime avec v:('+vs0+','+vs1+')'+(corrtime * (dc0/(dc0+dc1))));
-			//console.log('distances:'+dist0+'/'+dist1);
-			//console.log('corrtime sans v:'+(corrtime * (dist0/(dist0+dist1))));
-	
-			corrtime = corrtime * (dc0/(dc0+dc1));
-			//corrtime = corrtime * (dist0/(dist0+dist1));
-			
-			corrtime = Math.round(corrtime);
-			tdeb = dt0.getTime() + corrtime;
+			tdeb = temps;
 		}
 		else {
-			var corrtime = dt1.getTime() - dt0.getTime();
-			//corrtime = corrtime * (dist0/distseg);
-			////console.log('v0 & v1:'+v0+'/'+v1);
-			//corrtime = corrtime * ((dist0*v1)/(distseg*v0)); // avec une compensation selon la vitesse
-			//corrtime = corrtime * ((dist0*(v1/v0))/(distseg*(v1/v0))); // avec une compensation selon la vitesse
-			
-			var vs0 = (v0*1000)/3600;
-			var vs1 = (v1*1000)/3600;
-			////console.log('vs0 & vs1:'+vs0+'/'+vs1);
-			var vmoy = (vs0+vs1)/2;
-			////console.log('trapèze:'+Trap);
-			
-			var dc0 = dist0*(vs1/vmoy);
-			////console.log('dist0, dc0:'+dist0+','+dc0);
-			
-			var dc1 = dist1*(vs0/vmoy);
-			////console.log('dist1, dc1:'+dist1+','+dc1);
-			
-			//console.log('corrtime avec v:('+vs0+','+vs1+')'+(corrtime * (dc0/(dc0+dc1))));
-			//console.log('distances:'+dist0+'/'+dist1);
-			//console.log('corrtime sans v:'+(corrtime * (dist0/(dist0+dist1))));
-	
-			corrtime = corrtime * (dc0/(dc0+dc1));
-			
-			//corrtime = corrtime * (dist0/(dist0+dist1));
-			corrtime = Math.round(corrtime);
-			var tfin = dt0.getTime() + corrtime;
+			var tfin = temps;
 		}
 	}
 	var retour = new Object();

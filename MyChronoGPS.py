@@ -1142,7 +1142,7 @@ class DisplayControl(threading.Thread):
         self.chrono = chrono # the chrono object contains the times to be displayed
         self.display_mode = self.DISPLAY_CHRONO    
 
-        logger.info("circuit:"+str(type(self.chrono.circuit)))
+        #logger.info("circuit:"+str(type(self.chrono.circuit)))
         if self.chrono.circuit != False:
             if "PitMaxSpeed" in self.chrono.circuit:
                 self.PitMaxSpeed = self.chrono.circuit["PitMaxSpeed"]
@@ -1368,12 +1368,12 @@ class SessionControl():
         
     def commit(self):
         if self.__current_state != self.CLOSED:
-            logger.info(str(self.fileDescriptor))
+            #logger.info(str(self.fileDescriptor))
             name = self.fileDescriptor.close
             self.fileDescriptor.close()
             #self.fileDescriptor = open(name, 'a')
             self.fileDescriptor = open(pathdata+'/sessions/session-'+self.chrono.fileTime+'.txt', 'a')
-            logger.info("session file commit")
+            #logger.info("session file commit")
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
@@ -1527,7 +1527,7 @@ class AnalysisControl():
         self.__current_state = self.CLOSED
         self.Line1 = False
         self.Line = False
-        self.Lap0 = False
+        #self.Lap0 = False
         logger.info("AnalysisControl init complete")
 
     def start_analysis(self):
@@ -1555,14 +1555,14 @@ class AnalysisControl():
         self.Line += ',"altitude":'+str(self.chrono.alt0)
         self.Line += ',"cap":'+str(self.chrono.cap0)+'}]'
         self.write(self.Line)
-        
-    def saveLap0(self):
-        self.Lap0 = '[{"timestamp":"'+str(self.chrono.time0)+'"'
-        self.Lap0 += ',"tour":1'
-        self.Lap0 += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
-        self.Lap0 += '],"vitesse":'+str(self.chrono.speed0)
-        self.Lap0 += ',"altitude":'+str(self.chrono.alt0)
-        self.Lap0 += ',"cap":'+str(self.chrono.cap0)+'}]'
+    #    
+    #def saveLap0(self):
+    #    self.Lap0 = '[{"timestamp":"'+str(self.chrono.time0)+'"'
+    #    self.Lap0 += ',"tour":1'
+    #    self.Lap0 += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
+    #    self.Lap0 += '],"vitesse":'+str(self.chrono.speed0)
+    #    self.Lap0 += ',"altitude":'+str(self.chrono.alt0)
+    #    self.Lap0 += ',"cap":'+str(self.chrono.cap0)+'}]'
         
     def writeLine1(self):
         #line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
@@ -1583,8 +1583,9 @@ class AnalysisControl():
         line += '}]'
         self.write(line)
         self.Line1 = True
-        if self.Lap0 != False:
-            self.write(self.Lap0)
+        #if self.Lap0 != False:
+        #    logger.info("Lap0:"+str(self.Lap0))
+        #    self.write(self.Lap0)
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
@@ -1840,8 +1841,8 @@ class ChronoControl():
         self.intline = []
         
     def start_chrono(self):
-        logger.info('start_chrono lap:'+str(self.nblap))
-        logger.info('start_chrono chrono_started:'+str(self.chrono_started))
+        #logger.info('start_chrono lap:'+str(self.nblap))
+        #logger.info('start_chrono chrono_started:'+str(self.chrono_started))
         if self.chrono_started == True:
             return True
         if self.chrono_begin != True:
@@ -1912,7 +1913,6 @@ class ChronoControl():
             #if self.nblap > 0:
             #    fanalys.writePoint()
 
-
             if self.chrono_started == True: # calculations are only performed if the stopwatch is started
                 self.chronoGpsTime = self.getTime(self.gps_gpstime)
                 if self.start_line == True: # calculations are only performed if the line is well defined
@@ -1954,18 +1954,15 @@ class ChronoControl():
                     # we will take care of the timing only if we are not in the pitlane
                     if self.in_pitlane == False:
                         # if we are in the process of timing, we trigger the writing of the analysis file
+                        #logger.info("nblap:"+str(self.nblap))
                         if self.nblap > 0:
                             fanalys.writePoint()
-                           
-                        self.lat0 = self.gps_prevlat
-                        self.lon0 = self.gps_prevlon
-                        self.time0 = self.gps_gpstime
-                        self.speed0 = self.gps_gpsvitesse
-                        self.alt0 = self.gps_gpsaltitude
-                        self.cap0 = self.gps_gpscap
-
-                        #if self.nblap == 0:
-                        #    fanalys.saveLap0()
+                            self.lat0 = self.gps_prevlat
+                            self.lon0 = self.gps_prevlon
+                            self.time0 = self.gps_gpstime
+                            self.speed0 = self.gps_gpsvitesse
+                            self.alt0 = self.gps_gpsaltitude
+                            self.cap0 = self.gps_gpscap
                         
                         # the distance travelled between 2 gps points is calculated
                         distseg = distanceGPS(self.gps_prevlat, self.gps_prevlon, self.gps_latitude, self.gps_longitude)
@@ -1984,12 +1981,18 @@ class ChronoControl():
                             dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
                                 
                             corrtime = self.chronoGpsTime - self.chronoPrevTime
-                            distAB = self.dDprev + self.dD
+                            #distAB = self.dDprev + self.dD
 
                             if distseg > 0: # distseg = 0 is possible, if the gps remains static
                                 #cormic = corrtime.microseconds + (self.corrFreq * (self.dDprev/distAB))
                                 #cormic = corrtime.microseconds + (self.corrFreq * (dDp0/distseg))
-                                cormic = corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1)))
+
+                                #logger.info('corrtime:'+str(corrtime.seconds)+' sec,'+str(corrtime.microseconds)+' mic')
+                                #micro_seconds = corrtime.seconds*1000000+corrtime.microseconds
+                                #logger.info('start micro_seconds:'+str(micro_seconds))
+
+                                cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
+
                                 if self.ils != False:
                                     self.ils.set_ilstime(cormic)
                                 corrtime = timedelta(microseconds=cormic)
@@ -2060,13 +2063,21 @@ class ChronoControl():
                                 i = j
                                 dDprev = self.calculDistances(self.intline[i].lat1,self.intline[i].lon1,self.intline[i].lat2,self.intline[i].lon2,self.gps_prevlat,self.gps_prevlon)
                                 dD = self.calculDistances(self.intline[i].lat1,self.intline[i].lon1,self.intline[i].lat2,self.intline[i].lon2,self.gps_latitude,self.gps_longitude)
+                            
+                                v0 = self.gps_last_speed # speed at the previous point
+                                v1 = self.gps_gpsvitesse # speed at current point
+                                vmoy = (v0+v1)/2 # average speed to travel the straight line segment
+                                dc0 = dDprev*(v1/vmoy) # compensated distance before crossing the line
+                                dc1 = dD*(v0/vmoy) # compensated distance after crossing the line
 
                                 corrtime = self.chronoGpsTime - self.chronoPrevTime
 
-                                distAB = dDprev + dD
+                                #distAB = dDprev + dD
 
-                                if distAB > 0: # distAB = 0 is possible, if the gps remains static
-                                    cormic = corrtime.microseconds + (1000000 * (dDprev/distAB))
+                                #if distAB > 0: # distAB = 0 is possible, if the gps remains static
+                                if distseg > 0: # distAB = 0 is possible, if the gps remains static
+                                    #cormic = corrtime.microseconds + (1000000 * (dDprev/distAB)) # on ne pondère pas selon la vitesse
+                                    cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
                                     corrtime = timedelta(microseconds=cormic)
 
                                 temps_estime = self.chronoPrevTime + corrtime
@@ -2156,9 +2167,11 @@ class ChronoControl():
         hh = timestr[0:2]
         mm = timestr[2:4]
         ss = timestr[4:6]
-        ms = timestr[7:10]
+        #ms = timestr[7:10]
+        ms = timestr[7:9]
         try:
-            return timedelta(hours=int(hh),minutes=int(mm),seconds=int(ss),milliseconds=int(ms))
+            #return timedelta(hours=int(hh),minutes=int(mm),seconds=int(ss),milliseconds=int(ms))
+            return timedelta(hours=int(hh),minutes=int(mm),seconds=int(ss),milliseconds=int(ms)*10)
         except:
             return timedelta(hours=0,minutes=0,seconds=0,milliseconds=0)
 
@@ -2220,69 +2233,77 @@ class ChronoControl():
                                 #logger.info('is prox track cut:'+str(cut))
                                 
                                 if cut == True:
+                                    self.getGpsData(); # pour avoir accès aux données du GPS avec protection du rafraichissement pendant les calculs
+
                                     self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
                                     self.define_start_wcoord(lat1, lon1, lat2, lon2)
                                     self.circuit = circuits[track]
-                                    logger.info('is prox track cut:'+str(cut))
+                                    #logger.info('is prox track cut:'+str(cut))
                                     self.begin()
-            
-                                    # we have just crossed the line that has just been defined  !
-                                    # on valorise les variables à partir des données du gps dès fois que çà changerait pendant le calcul
-                                    lat = self.gps.latitude
-                                    lon = self.gps.longitude
-                                    prevlat = self.gps.prevlat
-                                    prevlon = self.gps.prevlon
+                                    self.nblap = 1 # we start with the first lap
+                                    self.chrono_started = True
+                                    
+                                    dt0 = self.getTime(self.gps_last_time)
+                                    dt1 = self.getTime(self.gps_gpstime)
+                                    
+                                    # calculation of the distance between the previous point and the start-finish line
+                                    dDp0 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_prevlat,self.gps_prevlon)
+                                    # calculation of the distance between the current point and the start-finish line
+                                    dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
+                                
+                                    #corrtime = self.chronoGpsTime - self.chronoPrevTime
+                                    
+                                    
+                                    #var corrtime = dt1.getTime() - dt0.getTime();
+                                    corrtime = dt1 - dt0;
+                                    #logger.info('corrtime:'+str(corrtime))
+		
+                                    #var vs0 = (v0*1000)/3600;
+                                    #var vs1 = (v1*1000)/3600;
+                                    #var vmoy = (vs0+vs1)/2;
                                     v0 = self.gps.last_speed # speed at the previous point
                                     v1 = self.gps.gpsvitesse # speed at current point
                                     vmoy = (v0+v1)/2 # average speed to travel the straight line segment
-                                    #corrFreq = self.gps.corrFreq
-                                    corrFreq = 1000000/self.gps.Freq # correction to be applied to the time according to the frequency
-                                    self.dD = 0 # no need for distance correction
-                                    self.dD = self.calculDistances(lat1,lon1,lat2,lon2,lat,lon)
-                                    
-                                    distseg = distanceGPS(prevlat, prevlon, lat, lon)
-                                    
-                                    # calculation of the distance between the previous point and the start-finish line
-                                    dDp0 = self.calculDistances(lat1,lon1,lat2,lon2,self.gps.prevlat,self.gps.prevlon)
-                                    dDp0 = self.calculDistances(lat1,lon1,lat2,lon2,prevlat,prevlon)
-                                    # calculation of the distance between the current point and the start-finish line
-                                    #dDp1 = self.calculDistances(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude)
-                                    dDp1 = self.calculDistances(lat1,lon1,lat2,lon2,lat,lon)
-                                    
+                                    #
+                                    #var dc0 = dist0*(vs1/vmoy);
+                                    #var dc1 = dist1*(vs0/vmoy);                                    
                                     dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                                     dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
-                                        
-                                    corrtime = self.chronoGpsTime - self.getTime(self.time0)
-                                    #distAB = self.dDprev + self.dD
-        
-                                    if distseg > 0: # distseg = 0 is possible, if the gps remains static
-                                        cormic = corrtime.microseconds + (corrFreq * (dc0/(dc0+dc1)))
-                                        corrtime = timedelta(microseconds=cormic)
-                                    self.chronoStartTime = self.getTime(self.time0) + corrtime
-                                    #time.sleep(3)
-                                    #self.chronoStartTime = self.getTime(self.gps.gpstime)
-                                    self.nblap = 1 # we start with the first lap
-                                    self.chrono_started = True
-                                    logger.info('auto_start_line lap:'+str(self.nblap))
-                                    logger.info('start_line:'+str(self.start_line))
+                                #
+                                    #corrtime = corrtime * (dc0/(dc0+dc1));
+                                    #logger.info('corrtime (mic):'+str(getMicroseconds(corrtime)))
+                                    corrmic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
+                                    #logger.info('dc0:'+str(dc0))
+                                    #logger.info('dc1:'+str(dc1))
+                                    #logger.info('ratio:'+str((dc0/(dc0+dc1))))
+                                    #logger.info('corrmic:'+str(corrmic))
+                                    #corrtime = Math.round(corrtime);
+                                    #var temps = dt0.getTime() + corrtime;
+                                    
+                                    #temps = dt0+timedelta(microseconds=corrmic)
+                                    temps = timedelta(microseconds=corrmic)
+                                    self.temps_t = temps #
+                                    self.temps_i = temps #
+                                    #logger.info('temps_t:'+str(temps))
+		
+                                    
+
+                                    #logger.info('chronoStartTime:'+str(self.chronoStartTime.seconds)+' sec,'+str(self.chronoStartTime.microseconds)+' mic')
+                                    #micro_seconds = self.chronoStartTime.seconds*1000000+self.chronoStartTime.microseconds
+                                    #micro_seconds = getMicroseconds(self.chronoStartTime)
+                                    #logger.info('start micro_seconds:'+str(micro_seconds))
+                                    #logger.info('auto_start_line lap:'+str(self.nblap))
+                                    #logger.info('start_line:'+str(self.start_line))
                            
-                                    self.getGpsData();
                                     self.lat0 = self.gps_prevlat
-                                    self.lat0 = self.gps.prevlat
                                     self.lon0 = self.gps_prevlon
-                                    self.lon0 = self.gps.prevlon
                                     self.time0 = self.gps_gpstime
-                                    self.time0 = self.gps.gpstime
                                     self.speed0 = self.gps_gpsvitesse
-                                    self.speed0 = self.gps.gpsvitesse
                                     self.alt0 = self.gps_gpsaltitude
-                                    self.alt0 = self.gps.gpsaltitude
                                     self.cap0 = self.gps_gpscap
-                                    self.cap0 = self.gps.gpscap
-            
-                                    #if self.nblap == 0:
-                                    #    fanalys.saveLap0()
-                                    #fanalys.saveLap0()
+                                #
+                                #if self.nblap == 0:
+                                #    fanalys.saveLap0()
                             
                             #if WithCoords == True:
                             #    self.define_start_wcoord(lat1, lon1, lat2, lon2)
@@ -2600,6 +2621,10 @@ def formatVitesse(vitesse):
     retour = retour+str(v)+"km/h "
     return retour
     
+def getMicroseconds(timed):
+    microseconds = timed.seconds*1000000+timed.microseconds
+    return microseconds
+    
 def get_thermal():
     with open('/sys/class/thermal/thermal_zone0/temp') as t:
         temp = t.read()
@@ -2865,7 +2890,7 @@ if __name__ == "__main__":
                 elif current_state == RUNNING:
                     chrono.start_chrono()
                     lcd.set_display_chrono(chrono)
-                    logger.info('main current_state running ?:'+str(current_state))
+                    #logger.info('main current_state running ?:'+str(current_state))
                     #fsession.start() #jfk
 
             if (gps.gpscomplete == True):
