@@ -13,7 +13,13 @@ locfile = 'LIVE'
 fic = dir+'/'+locfile
 if os.path.isfile(fic): 
     FD = open(fic, 'r')
-    info = json.loads(FD.read())
+    record = FD.read()
+    #print("record=[")
+    #print(str(record))
+    #print("]")
+    info = json.loads(record)
+    #info = json.loads(FD.read())
+    
     #rec = FD.read()
     #info = dict()
     #info["live"] = rec

@@ -587,8 +587,22 @@ function go()
 		timer = setTimeout(go, 3000);	
 		return false;
 	}
-
-	thisCircuit = Ev[0];
+	
+	if (Ev.circuit) {
+		thisCircuit = Ev.circuit[0];
+		thisPoint = Ev.point[0];
+		thisCircuit.altitude = thisPoint.altitude;
+		thisCircuit.cap = thisPoint.cap;
+		thisCircuit.lap = thisPoint.lap;
+		thisCircuit.neartrk = thisPoint.neartrk;
+		thisCircuit.pointgps = thisPoint.pointgps;
+		thisCircuit.timestamp = thisPoint.timestamp;
+		thisCircuit.vitesse = thisPoint.vitesse;
+	}
+	else {
+		thisCircuit = Ev[0];
+		thisPoint = Ev[0];
+	}
 
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
@@ -600,7 +614,8 @@ function go()
 		Point1 = Ev[0];
 	}
 	else {
-		Point1 = Ev[0];
+		//Point1 = Ev[0];
+		Point1 = thisPoint;
 	}
 
 	// on va chercher le circuit correspondant
@@ -1125,8 +1140,11 @@ function isPointReady()
 	if (!Array.isArray(Live)) {
 		// on n'a pas réussi à charger les coordonnées
 		var el = document.getElementById("zone-info");
-		if (el)
+		if (el) {
 			el.innerHTML = 'problème détecté';
+		}
+		// aller vers le prochain point
+		timer = setTimeout(getNextPoint, 1000);
 		return false;
 	}
 
@@ -1142,7 +1160,21 @@ function isPointReady()
 		return false;
 	}
 
-	thisCircuit = Ev[0];
+	if (Ev.circuit) {
+		thisCircuit = Ev.circuit[0];
+		thisPoint = Ev.point[0];
+		thisCircuit.altitude = thisPoint.altitude;
+		thisCircuit.cap = thisPoint.cap;
+		thisCircuit.lap = thisPoint.lap;
+		thisCircuit.neartrk = thisPoint.neartrk;
+		thisCircuit.pointgps = thisPoint.pointgps;
+		thisCircuit.timestamp = thisPoint.timestamp;
+		thisCircuit.vitesse = thisPoint.vitesse;
+	}
+	else {
+		thisCircuit = Ev[0];
+		thisPoint = Ev[0];
+	}
 
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
@@ -1154,7 +1186,8 @@ function isPointReady()
 		Point1 = Ev[0];
 	}
 	else {
-		Point1 = Ev[0];
+		//Point1 = Ev[0];
+		Point1 = thisPoint;
 	}
 
 	latitude = Point1.pointgps[0];

@@ -416,3 +416,27 @@ function copyClipboard(mousePt) {
 	document.getElementById("zone-info").innerHTML = 'Les coordonnées du point sont copiés dans le presse papier';
 	return true;
 }
+
+	
+function showPoint() {
+	// On recentre la map sur le point contenu dans l'input
+	var el = document.getElementById("mouseTrack");
+	//var coords = el.value;
+	var LatLng = el.value.split(",");
+	lat = LatLng[0];
+	lon = LatLng[1];
+	var googleLatLng = new google.maps.LatLng(lat,lon); 
+	map.setCenter(googleLatLng);
+	
+	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
+		return
+	console.log("un circuit va être créer à "+lat+","+lon);
+	NewCircuit = new Object();
+	NewCircuit.IdCircuit = 0;
+	NewCircuit.NomCircuit = "Nouveau Circuit";
+	NewCircuit.Latitude = lat;
+	NewCircuit.Longitude = lon;
+	NewCircuit.LongCircuit = 0;
+	
+	createMarker(NewCircuit,lat,lon);	
+}

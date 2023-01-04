@@ -1,2 +1,4 @@
-# MyChronoGPS Version "1.17"
-GPS stopwatch with Raspberry PI
+# MyChronoGPS
+GPS LapTimer with RaspberryPI and Python
+
+https://github.com/jfk93-fr/MyChronoGPS

@@ -1454,10 +1454,10 @@ class LiveSession(threading.Thread):
                         #logger.info("try open live Line1")
                         with open(self.live, 'w') as live: # the data is overwritten with more recent data
                             #logger.info("try write live Line1")
-                            live.write(self.Line1+"\r\n") # the coordinates of the current circuit are systematically written
+                            live.write("{\"circuit\":"+self.Line1+",\r\n") # the coordinates of the current circuit are systematically written
                             self.createPoint()
                             #logger.info("try write live point")
-                            live.write(self.Line+"\r\n")
+                            live.write("\"point\":"+self.Line+"}\r\n")
                             live.close()
                 else:
                     # we will write the line in the live session file without line 1
