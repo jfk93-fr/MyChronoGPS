@@ -1153,8 +1153,8 @@ class DisplayControl(threading.Thread):
         else:
             self.displaySysBig = False
         self.sys_message = msg
-        #self.sysloop = timer * 10 # 10 cycles = about 1 second
-        self.sysloop = timer * 4 # 10 cycles = about 1 second
+        self.sysloop = timer * 10 # 10 cycles = about 1 second
+        #self.sysloop = timer * 4 # 10 cycles = about 1 second
         
     def set_contrast(self,contrast):
         try:

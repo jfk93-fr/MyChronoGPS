@@ -1,6 +1,6 @@
-if (typeof(data_ready) == 'undefined') {
-	//console.log('data_ready undefined');
-}
+//if (typeof(data_ready) == 'undefined') {
+//	//console.log('data_ready undefined');
+//}
 
 function isDocInFullscreen() {
   if (document.fullscreenElement) {
