@@ -136,7 +136,7 @@ function saveParms() {
 	
 	upLoadParmsAjax(fname_save);
 	
-	document.getElementById("zone-info").innerHTML = 'Les données du circuit sont en cours de sauvegarde';
+	document.getElementById("zone-info").innerHTML = 'Les données paramètre sont en cours de sauvegarde';
 }
 
 function upLoadParmsAjax(proc) 
@@ -151,7 +151,7 @@ function upLoadParmsAjax(proc)
 					console.log(JSON.stringify(dataReturn));
 					var el = document.getElementById("zone-info");
 					if (el)
-						el.innerHTML = "fichier piste sauvegard&eacute;";
+						el.innerHTML = "fichier paramètre sauvegard&eacute;";
 				}
 				catch(e) {
 							dataReturn = this.responseText;
