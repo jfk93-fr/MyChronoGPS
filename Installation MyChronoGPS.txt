@@ -204,6 +204,11 @@ $ cd LCD-show/
 $ sudo ./LCD35-show
 Après redémarrage du Raspberry Pi vous devriez voir apparaitre le desktop de Raspbian sur votre petit écran.
 
+Pour faire pivoter l'affichage de 180° :
+$ cd LCD-show/
+$ sudo ./rotate.sh 180
+Après redémarrage du Raspberry Pi l'affiche sur l'écran a pivoté de 180°.
+
 Désactiver l’écran LCD 3.5 du raspberry pi et retourner vers un écran HDMI
 $ chmod -R 755 LCD-show
 $ cd LCD-show/
@@ -218,7 +223,7 @@ sh /home/pi/MyChronoGPS/start_gps.sh
 =============================================================================================================
 
 **************************
-Dans la version 1.15 de MyChronoGPS, les échanges avec l'écran se font via des fichiers en mémoire partagée à la place des named pipes.
+Depuis la version 1.15 de MyChronoGPS, les échanges avec l'écran se font via des fichiers en mémoire partagée à la place des named pipes.
 S'il n'existe pas, créer un dossier cache dans le dossier /home/pi/MyChronoGPS et donner les droits en écriture au groupe www-data :
 $ sudo mkdir /home/pi/MyChronoGPS/cache
 $ sudo chown www-data:www-data /home/pi/MyChronoGPS/cache
@@ -248,6 +253,16 @@ Pour éviter l'extinction de l'écran ajouter les lignes suivantes :
 @xset s off
 @xset -dpms
 @xset s noblank
+
+Utilisation de Google Maps API
+Par défaut, MyChronoGPS utilise Leaflet pour les outils analyse et design track.
+Si vous possédez une clé pour l'API Google Maps, vous pouvez utiliser l'API en faisant les cations suivantes :
+Copiez les fichiers du dossier GoogleMaps dans le dossier /var/www/html
+Editez le fichier /var/www/html/js/key.js
+Modifiez la ligne
+	var myKey = 'Your_API_Key';
+en remplacant le texte par votre clé API.
+Sauvez le fichier modifié.
 
 =============================================================================================================
 Erreurs Web
