@@ -29,112 +29,40 @@ var nbw = 0;
 
 document.getElementById("zone-info").innerHTML = 'Les données sont en cours de chargement, veuillez patienter.';
 
-// Initialize API Googlemap
-function initGooglemap() {
-  document.getElementById('map').style.display = 'block';
-  map = true;
-}
+document.getElementById('map').style.display = 'block';
+map = true;
 
 loadCircuits();
 
 function dataCircuitsReady() {
-	is_map_ready();
+	go();
 }	
-
-function is_map_ready()
-{
-	if (nbw > 20) {
-		alert("googlemap ne semble pas démarrer, vérifier votre connexion internet");
-		return;
-	}
-	nbw++;
-	if (!map) {
-		timer = setTimeout(is_map_ready, 1000);
-	}
-	else {
-		clearTimeout(timer);
-		go();
-	}
-}
-
-//function load_data()
-//{
-//	loadJSON(fname);
-//	is_ready();
-//}
-
-//function is_ready()
-//{
-//	//if (!retour_geolocation) {
-//	//	timer = setTimeout(is_ready, 100);
-//	//	return;
-//	//}
-//	if (!Circuit) {
-//		timer = setTimeout(is_ready, 100);
-//		return;
-//	}
-//	if (!map) {
-//		timer = setTimeout(is_ready, 100);
-//		return;
-//	}
-//	clearTimeout(timer);
-//	document.getElementById("zone-info").innerHTML = '';
-//	if (!lat) {
-//		// l'utilisateur n'a sans doute pas autorisé la geolocation, on place le curseur sur le circuit Carole !
-//		for (var i=0; i < Circuit.circuits.length; i++) {
-//			if (Circuit.circuits[i].NomCircuit == 'Carole') {
-//				lat = 48.9801;
-//				lng = 2.5222;
-//			}
-//		}
-//	}
-//	// le centre de la France !
-//	lat = 46.71488676953859;
-//	lng = 2.6913890507936644;
-//
-//    //var zoom = 6;
-//	//optionsMap = {
-//    //     zoom: zoom,
-//    //     center: new google.maps.LatLng(lat,lon),
-//    //     draggableCursor:"crosshair",
-//    //     mapTypeId: google.maps.MapTypeId.SATELLITE
-//    //};
-//	map = new google.maps.Map(document.getElementById('map'), {zoom: 6});
-//
-//	initMap(lat,lng);
-//}
 
 // Initialize and add the map
 function initMap(lat,lon) {
-	optionsMap = {
-         zoom: zoom,
-         center: new google.maps.LatLng(lat,lon),
-         draggableCursor:"crosshair",
-         mapTypeId: google.maps.MapTypeId.SATELLITE
-    };
-	map = new google.maps.Map(document.getElementById('map'), optionsMap);
-
-	google.maps.event.addListener(map, 'mousemove', function(event) {
-		mouseMove(event);
+	map = L.map('map').setView([lat,lon],zoom);
+	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 	});
-
-	google.maps.event.addListener(map, 'rightclick', function(event) {
-		copyClipboard(event);
+	Esri_WorldImagery.addTo(map);	
+	// Assumes your Leaflet map variable is 'map'..
+	L.DomUtil.addClass(map._container,'crosshair-cursor-enabled');
+	
+	map.on('mousemove', function(ev) {
+		mouseMove(ev);
 	});
-
-	google.maps.event.addListener(map, 'click', function(event) {
+	//
+	map.on('contextmenu', function(ev) {
+		copyClipboard(ev);
+	});
+	//
+	map.on('click', function(ev) {
 		if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 			return
-		addTracks(event);
+		addTracks(ev);
 	});
-	
-	var msgerr = Circuit.hasOwnProperty("msgerr");
-	if (msgerr) {
-		document.getElementById("zone-info").innerHTML = Circuit.msgerr;
-	}
-	else  {
-		markCircuit();
-	}
+
+	markCircuit();
 }
 
 function go()
@@ -142,39 +70,11 @@ function go()
 	initMap(latfr,lngfr);
 }
 
-//function loadJSON(fname) 
-//{
-//	var xhr=createXHR();
-//
-//  xhr.open("GET", fname+"?nocache=" + Math.random(),true);
-//	xhr.onreadystatechange=function() { ajax_xhr(xhr); };
-//	xhr.send(null);
-//}
-//
-//function ajax_xhr(xhr)
-//{
-//	if (xhr.readyState == 4) 
-//	{
-//		if (xhr.status == 200) 
-//		{
-//			if (xhr.responseText.substr(0,1) != '{') {
-//			  alert(xhr.responseText);
-//			}
-//			Circuit=eval("(" + xhr.responseText + ")");
-//		} 
-//		else 
-//		{
-//			document.getElementById("zone").innerHTML = "fichier JSON " + fname + " non trouv&eacute;";
-//		}
-//	}
-//}
-
 function addTracks(mousePt) {
-	mouseLatLng = mousePt.latLng;
-	var mouseCoord = mouseLatLng.toUrlValue();
-	var mouseLat = mouseLatLng.lat();
-	var mouseLon = mouseLatLng.lng();
-	console.log("un circuit va être créer à "+mouseLat+","+mouseLon);
+	mouseLatLng = mousePt.latlng;
+	var mouseLat = mouseLatLng.lat;
+	var mouseLon = mouseLatLng.lng;
+	alert("un circuit va être créer à "+mouseLat+","+mouseLon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";
@@ -236,20 +136,49 @@ function changeMarker(circuit,onoff)
 	var img_icon;
 	if (onoff == 0) {img_icon = icon_image_off;}
 	else {img_icon = icon_image_on;}
-  var marker = tab_marker[circuit]['marker'];
-	marker.setOptions({
-		icon:img_icon
-	});
+	var marker = tab_marker[circuit]['marker'];
+	var myIcon = L.icon({
+		iconUrl: img_icon,
+		iconSize: [38, 38],
+		popupAnchor: [0, 0]
+	});	
+	var markerpoint = tab_marker[circuit]['point'];
+
+	//L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map);
+	L.marker(markerpoint, {icon: myIcon}).addTo(map);
 }
 function showInfoMarker(circuit)
 {
-  var marker = tab_marker[circuit]['marker'];
-  tab_marker[circuit]['bulle'].open(map, marker);
-  /*
-	marker.setOptions({
-		icon:img_icon
-	});
-  */
+	
+	var marker = tab_marker[circuit]['marker'];
+	var point = tab_marker[circuit]['point'];
+	var info = tab_marker[circuit]['info'];
+	var myIcon = L.icon({
+		iconUrl: icon_image_on,
+		iconSize: [38, 38],
+		popupAnchor: [0, 0]
+	});	
+	var popup = L.popup()
+    .setLatLng(point)
+    .setContent(info)
+    .openOn(map);
+	return;
+
+
+	//tab_marker[circuit]['bulle'].open(map, marker);
+	///*
+	//marker.setOptions({
+	//icon:img_icon
+	//});
+	//*/
+
+	var marker = new L.Marker(point,{icon: myIcon, draggable:true}).bindPopup(info);
+	map.addLayer(marker);	
+ 	
+	//tab_marker[circuit.IdCircuit]=new Array();
+	//tab_marker[circuit.IdCircuit]['marker']=marker;
+	//tab_marker[circuit.IdCircuit]['point']=point;
+	//tab_marker[circuit.IdCircuit]['info']=info;
 }
 
 function createMarker(circuit,newlat,newlon)
@@ -263,16 +192,49 @@ function createMarker(circuit,newlat,newlon)
 	var clon = circuit.Loncenter*1;
 	if (!clon)
 		clon = circuit.Longitude;
-	var point = new google.maps.LatLng(clat, clon);
-
-	var marker = new google.maps.Marker({
-      				position: point,
-					title: circuit.NomCircuit,
-      				map: map,
-      				icon: icon_image,
-					dragable: drag,
- 					anchorPoint:new google.maps.Point(0, 0),
-				  });
+	if (typeof(clat) == "undefined") {
+		console.log(circuit);
+		return;
+	}
+	//var point = new google.maps.LatLng(clat, clon);
+	//
+	//var marker = new google.maps.Marker({
+    //  				position: point,
+	//				title: circuit.NomCircuit,
+    //  				map: map,
+    //  				icon: icon_image,
+	//				dragable: drag,
+ 	//				anchorPoint:new google.maps.Point(0, 0),
+	//			  });
+	//
+	//var page='MyChronoGPS-DesignTrack.html';
+	//var url = '';
+	//if (circuit.NomCircuit != "Nouveau Circuit") {
+	//	url = 'id='+circuit.NomCircuit;
+	//}
+	//else {
+	//	console.log("on va demander l'affichage d'un nouveau circuit");
+	//	url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
+	//}
+	//
+	//var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
+	//			'	<table align="center">' +
+	//			'		<tr>' +
+	//			'			<td colspan="2" align="center">'+
+	//			//'				<a href="#" onclick="showCircuit(\''+circuit.NomCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
+	//			'       		<a href="'+page+'?'+url+'">'+circuit.NomCircuit+'</a></td>' +
+	//			'		</tr>' +
+	//			'		<tr>' +
+	//			'			<td colspan="2" align="center">'+circuit.LongCircuit+' m</td>' +
+	//			'		</tr>' +
+	//			'	</table>' +
+	//			'</div>';
+	var myIcon = L.icon({
+		iconUrl: icon_image,
+		iconSize: [38, 38],
+		popupAnchor: [0, 0]
+	});	
+	var point = L.latLng(clat, clon);
 
 	var page='MyChronoGPS-DesignTrack.html';
 	var url = '';
@@ -283,12 +245,12 @@ function createMarker(circuit,newlat,newlon)
 		console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
-
+	
 	var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
 				'	<table align="center">' +
 				'		<tr>' +
 				'			<td colspan="2" align="center">'+
-				//'				<a href="#" onclick="showCircuit(\''+circuit.NomCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
+				//'				<a href="#" onclick="showCircuit(\''+circuit.IdCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
 				'       		<a href="'+page+'?'+url+'">'+circuit.NomCircuit+'</a></td>' +
 				'		</tr>' +
 				'		<tr>' +
@@ -296,19 +258,22 @@ function createMarker(circuit,newlat,newlon)
 				'		</tr>' +
 				'	</table>' +
 				'</div>';
+
+	var marker = new L.Marker(point,{icon: myIcon, draggable:true}).bindPopup(info);
+	map.addLayer(marker);	
  	
 	tab_marker[circuit.IdCircuit]=new Array();
 	tab_marker[circuit.IdCircuit]['marker']=marker;
 	tab_marker[circuit.IdCircuit]['point']=point;
 	tab_marker[circuit.IdCircuit]['info']=info;
 	
-	tab_marker[circuit.IdCircuit]['bulle'] = new google.maps.InfoWindow({
-		content: info
-	});
-
-	google.maps.event.addListener(marker, 'click', function() {
-  	    tab_marker[circuit.IdCircuit]['bulle'].open(map, marker);
-	});
+	//tab_marker[circuit.IdCircuit]['bulle'] = new google.maps.InfoWindow({
+	//	content: info
+	//});
+	//
+	//google.maps.event.addListener(marker, 'click', function() {
+  	//    tab_marker[circuit.IdCircuit]['bulle'].open(map, marker);
+	//});
 }
 
 function showCircuit(nomcircuit) {
@@ -324,44 +289,6 @@ function showCircuit(nomcircuit) {
 	w = window.open (page+'?'+url,'popup', 'menubar=1, location=0, toolbar=1, directories=0, status=1, scrollbars=1, resizable=1, width=1055, height=700') ; 
 	w.focus () ;    
 }
-
-//function go()
-//{
-//	// On vérifie que la méthode est implémentée dans le navigateur
-//	if ( navigator.geolocation ) {
-//		// On demande d'envoyer la position courante à la fonction callback
-//		navigator.geolocation.getCurrentPosition( callback, erreur );
-//	} else {
-//		// Function alternative sinon
-//		alternative();
-//	}
-//}
-
-//function erreur( error ) {
-//	retour_geolocation = true;
-//	switch( error.code ) {
-//		case error.PERMISSION_DENIED:
-//			console.log( 'L\'utilisateur a refusé la demande' );
-//			break;     
-//		case error.POSITION_UNAVAILABLE:
-//			console.log( 'Position indéterminée' );
-//			break;
-//		case error.TIMEOUT:
-//			console.log( 'Réponse trop lente' );
-//			break;
-//	}
-//	// Function alternative
-//	//alternative();
-//	alert('pas d\'alternative !');
-//};
-//
-//function callback( position ) {
-//	retour_geolocation = true;
-//    lat = position.coords.latitude;
-//    lng = position.coords.longitude;
-//    //console.log( lat, lng );
-//    // Do stuff
-//}
 
 function deg2rad(dg) {
 	return dg/180*Math.PI;
@@ -393,10 +320,10 @@ function distanceGPS(lat1, lng1, lat2, lng2) {
 }
 	
 function mouseMove(mousePt) {
-	mouseLatLng = mousePt.latLng;
-	var mouseCoord = mouseLatLng.toUrlValue();
-	var mouseLat = mouseLatLng.lat();
-	var mouseLon = mouseLatLng.lng();
+	mouseLatLng = mousePt.latlng;
+	//var mouseCoord = mouseLatLng.toUrlValue();
+	var mouseLat = mouseLatLng.lat;
+	var mouseLon = mouseLatLng.lng;
 	
 	var oStatusDiv = document.getElementById("mouseTrack")	
 	if (oStatusDiv) {
@@ -425,8 +352,9 @@ function showPoint() {
 	var LatLng = el.value.split(",");
 	lat = LatLng[0];
 	lon = LatLng[1];
-	var googleLatLng = new google.maps.LatLng(lat,lon); 
-	map.setCenter(googleLatLng);
+	//var googleLatLng = new google.maps.LatLng(lat,lon); 
+	//map.setCenter(googleLatLng);
+	map = L.map('map').setView([lat,lon]);
 	
 	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 		return

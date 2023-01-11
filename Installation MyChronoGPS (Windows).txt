@@ -1,37 +1,49 @@
-Attention dans le texte qui suit, toutes les lignes commençant par $ représente une commande à passer.
-Le caractère $ repréente l'invite de commande, il ne fait pas partie de la commande et ne doit pas être écrit.
-Exemple :
-$ cd /home/pi
-signifie qu'il faut écrire
-cd /home/pi
-
-MyChronoGPS fonctionne sur des Raspberry 2,3,4 et zero
-Les rpi 3 et au delà ou zeroW v2 sont recommandés 
-
 Création et installation d'une carte SD contenant MyChronoGPS
-Avec l'outil Pi Imager
-A partir d'un PC Windows, télécharger Raspberry Pi Imager et l'installer
-A partir d'un Raspberry, Pi Imager est déjà installé.
-1 - Lancez Pi Imager
-2 - Choisir l'OS selon le Raspberry destiné à accueillir MyChronoGPS (32-bit tout type de rpi, 64-bit rpi 3,4,400) de préférence avec l'environnement de bureau.
-3 - Allez dans les paramètres de Pi Imager
-    Cochez la case Enable SSH.
-	La case Username and password est automatiquement cochée.
-	Laissez Username à pi et entrez le password, chrono par exemple, notez le password.
-	Cochez la case Configure wireless LAN et entrez les paramètres de votre réseau Wifi local.
-	Cochez la case Set locale settings et entrez votre zone géographique et le type de clavier.
-	Sauvegardez les paramètres.
-4 - Installez la carte SD dans le lecteur et Allez dans Choose Storage
-	Le lecteur est automatiquement sélectionné, s'il y en a plusieurs choisir le lecteur dans lequel la carte SD cible est installée.
-5 - Retirez la carte SD et installez-là dans le Raspberry cible.
-6 	Démarrez le raspberry
+1 - récupérez une image raspian buster lite
+2 - écrire l'image sur la carte SD avec Win32DiskImager
+3 - écrire un fichier ssh vide sur la carte SD
+4 - démonter la carte et l'installer dans le RPI
+5 - brancher le RPI
+6 - pour accéder au RPI via une connexion SSH, repérez l'adresse IP du RPI dans le réseau
+7 - lancer putty
+8 - se connecter en SSH à l'adresse IP du RPI, port 22
 
-La suite de l'installation s'effectue à partir du rpi ou via une connexion ssh.
+Pour les RPI2, on utilise un dongle Wifi
+Rechercher le driver correspondant.
+Installation de la clé WiFi TP-LINK TL-WN725N
+Toutes les infos sont sur https://www.latelierdugeek.fr/2015/06/02/installer-cle-wifi-tp-link-tl-wn725n-raspberrypi-v2-raspbian/
 
+1 – entrer la commande
 
+2 - Repérer le nom du fichier pilote:
+https://www.raspberrypi.org/forums/viewtopic.php?p=462982#p462982
 
+ici : http://downloads.fars-robotics.net/wifi-drivers/8188eu-drivers/8188eu-4.1.19-v7-858.tar.gz
 
+3 – Passer les commandes :
+et
 
+puis :
+$ sudo reboot
+Configuration de la clé WiFi en ligne de commande
+1 – faire une scan du réseau en passant la commande :
+$ sudo iwlist wlan0 scan
+ou
+$ sudo iwlist wlan0 scan | grep ESSID
+	(n'affiche que les ESSID des réseaux WiFi disponibles à proximité)
+
+2 – ouvrir le fichier de configuration :
+$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+3 – ajouter les lignes suivantes :
+network={
+	ssid="networkname"
+	psk="networkPassword"
+}
+4 – terminer l'édition du fichier en faisant Ctrl+O puis Entrée lorsque le nom du fichier s'affiche et quitter l'éditeur avec Ctrl+X
+
+5 – reconfigurer l'interface :
+$ sudo wpa_cli -i wlan0 reconfigure
+Maintenant, on peut se connecter via le WiFi en indiquant l'adresse IP du RPI dans le réseau WiFi (voir la box internet)
 
 Terminer la config du Raspberry
 Passer la commande :
@@ -66,16 +78,6 @@ $ sudo pip3 install wiringpi
 Installer l'interface série
 $ sudo pip install pyserial
 $ sudo pip install gpio
-
-
-Installation de MyChronoGPS sur le rpi
-
-1 - à partir du dossier /home/pi lancez les commandes suivantes :
-$ sudo rm -rf MyChronoGPS
-$ git clone https://github.com/jfk93-fr/MyChronoGPS.git
-$ chmod -R 755 MyChronoGPS
-$ cd MyChronoGPS/
-$ sudo ./MyChronoGPS.sh
 
 Installer les fichiers de MyChronoGPS
 1 – dans le répertoire /home/pi/ créer un répertoire MyChronoGPS
