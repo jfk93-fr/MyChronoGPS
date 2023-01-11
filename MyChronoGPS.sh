@@ -19,7 +19,7 @@ fi
 if [ ! -d traces ]; then
 sudo mkdir traces
 fi
-
+#
 # création des dossiers et fichiers web
 sudo cp ./Web-Pi/index.html /var/www/html/index.html         
 sudo cp ./Web-Pi/MyChronoGPS.html /var/www/html/MyChronoGPS.html
