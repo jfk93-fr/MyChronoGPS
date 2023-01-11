@@ -28,11 +28,6 @@ A partir d'un Raspberry, Pi Imager est déjà installé.
 
 La suite de l'installation s'effectue à partir du rpi ou via une connexion ssh.
 
-
-
-
-
-
 Terminer la config du Raspberry
 Passer la commande :
 $ sudo raspi-config
@@ -43,141 +38,53 @@ $ sudo raspi-config
 A la fin de la configuration faire un reboot
 $ sudo reboot
 
-Installer les outils I2C pour Python
-1 – mettre à jour le système (s'il y a longtemps que ça n'a pas été fait)
+Installer les outils I2C pour Python (déjà installé sur les versions récentes)
+Mettre à jour le système (s'il y a longtemps que ça n'a pas été fait)
 $ sudo apt update
 $ sudo apt upgrade -y
-2 - Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus)
+
+Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus)
 et les outils de diagnostic (i2c-tools).
 $ sudo apt-get install -y python-smbus i2c-tools
-3 - L’installation terminée, on peut déjà tester si les modules sont bien chargés
+L’installation terminée, on peut déjà tester si les modules sont bien chargés
 
-4 - Vérifier l’adresse du périphérique avec i2cdetect
+Vérifier l’adresse du périphérique avec i2cdetect
 $ sudo i2cdetect -y 1
 (pour les anciens modèles : $ sudo i2cdetect -y 0)
 
-5 - si pip n'est pas installé, l'installer en passant les commandes
+Si pip n'est pas installé, l'installer en passant les commandes
 $ sudo apt-get update
 $ sudo apt-get install python-pip
 
-6 – installer wiringpi
+Si des périphériques sont installés sur les ports GPIO, installer wiringpi
 $ sudo pip3 install wiringpi
 
-Installer l'interface série
+Si besoin, installer l'interface série
 $ sudo pip install pyserial
 $ sudo pip install gpio
 
+Ensuite, il est nécessaire d'installer un serveur web pour avoir accès aux outils de visualisation des sessions et de la gestion des circuits.
+Il est également nécessaire pour l'affichage du tableau de bord sur un écran LCD. 
 
 Installation de MyChronoGPS sur le rpi
 
-1 - à partir du dossier /home/pi lancez les commandes suivantes :
+A partir du dossier /home/pi lancez les commandes suivantes :
 $ sudo rm -rf MyChronoGPS
 $ git clone https://github.com/jfk93-fr/MyChronoGPS.git
 $ chmod -R 755 MyChronoGPS
 $ cd MyChronoGPS/
-$ sudo ./MyChronoGPS.sh
 
-Installer les fichiers de MyChronoGPS
-1 – dans le répertoire /home/pi/ créer un répertoire MyChronoGPS
-2 – dans le répertoire MyChronoGPS créer les sous répertoires suivants:
-	analysis
-	cache
-	log
-	parms
-	pipes
-	sessions
-	traces
-	tracks
-3 – copier les fichiers suivants dans le répertoire MyChronoGPS:
-	MyChronoGPS.py
-	MyChronoGPS_BUTTON.py
-	MyChronoGPS_Dummy.py
-	MyChronoGPS_NMEA.py
-	MyChronoGPS_OLED.py
-	MyChronoGPS_Parms.py
-	MyChronoGPS_UBX.py
-	Rpi_I2C_driver.py
-	start_gps.sh
-4 – copier le fichier params.json dans le répertoire parms
-5 – dans le répertoire tracks copier tous les fichiers *.trk
+Installation de Lighttpd
+$ sudo ./Lighttpd.sh
 
-6 - installer Lighttpd
-$ sudo apt-get install lighttpd
-7 - installer Lighttpd PHP
-$ sudo apt-get install php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-zip php7.4-xml -y
-8 - configurer lighttpd
-$ sudo lighttpd-enable-mod fastcgi
-$ sudo lighttpd-enable-mod fastcgi-php
-
-$ sudo nano /etc/lighttpd/conf-available/15-fastcgi-php.conf
-# -*- depends: fastcgi -*-
-# /usr/share/doc/lighttpd/fastcgi.txt.gz
-# http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi
-
-## Start an FastCGI server for php (needs the php7-cgi package)
-fastcgi.server += ( ".php" =>
-        ((
-                "socket" => "/var/run/php/php7.4-fpm.sock",
-                "broken-scriptfilename" => "enable"
-        ))
-)
-
-	– éditer et modifier le fichier /etc/lighttpd/conf-available/10-cgi.conf
-# /usr/share/doc/lighttpd/cgi.txt
-
-server.modules += ( "mod_cgi" )
-
-$HTTP["url"] =~ "^/cgi-bin/" {
-	cgi.assign = ( ".py" => "/usr/bin/python3",
-	".cgi" => "" 
-	)
-	alias.url += ( "/cgi-bin/" => "/usr/lib/cgi-bin/" )
-}
-
-5 – passer la commande
-$ sudo lighttpd-enable-mod cgi
-6 – vérifier la config de lighttpd en passant la commande
-$ lighttpd -t -f /etc/lighttpd/lighttpd.conf
-7 – Si la syntaxe est ok, redémarrer lighttpd
-$ sudo service lighttpd force-reload
-8 – Donner les droits sudo à www-data
+Donner les droits sudo à www-data
 $ sudo visudo
 à la fin du fichier, ajouter la ligne
 www-data ALL=(ALL:ALL) NOPASSWD:ALL
 c'est nécessaire pour passer la commande start_gps.sh via une interface web
 
-Installer MyChronoGPS Web
-	– modifier les droits du répertoire /var/www/html
-	C'est le répertoire créé par l'installation de lighttp et c'est là qu'on va placer MyChronoGPS Web
-$ sudo chown -R www-data:www-data /var/www # l'utilisateur et le groupe www-data est propriétaire de /var/www
-$ sudo usermod -a -G www-data pi # ajoute l'utilisateur pi au groupe www-data
-$ sudo chmod -R g+rwX /var/www # attribution automatique des fichiers et répertoires au groupe www-data
-$ groups pi # vérifie l'abonnement de l'utilisateur aux groupes
-	- dans le répertoire /var/www/html copier les fichiers suivants:
-		index.html
-		MyChronoGPS.html
-		MyChronoGPS-Analysis.html
-		MyChronoGPS-Cmd.html
-		MyChronoGPS-Dashboard.html
-		MyChronoGPS-DesignTrack.html
-		MyChronoGPS-Live.html
-		MyChronoGPS-Sessions.html
-		MyChronoGPS-Tracks.html
-	- dans le répertoire /var/www/ copier les dossiers suivants:
-		ajax
-		css
-		Icones
-		img
-		js
-		
-8 – donner les droits sur le répertoire MyChronoGPS
-pi@raspberrypi:~ $ sudo chmod -R u+wx,g+wx,o+wx /home/pi/MyChronoGPS
-
-9 - changer le propriétaire du dossier tracks
-pi@raspberrypi:~ $ sudo chown -R www-data:www-data /home/pi/MyChronoGPS/tracks
-
-10 - changer le propriétaire du dossier parms
-pi@raspberrypi:~ $ sudo chown -R www-data:www-data /home/pi/MyChronoGPS/parms
+Installation de MyChronoGPS Web
+$ sudo ./MyChronoGPS.sh
 
 =============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
@@ -269,3 +176,6 @@ $ systemctl status lighttpd.service
 
 Consultez les fichiers log :
 "/var/log/lighttpd/error.log"
+
+Désinstaller lighttpd et php
+$ sudo apt-get remove lighttpd php7.4-fpm php7.4-mbstring php7.4-mysql php7.4-curl php7.4-gd php7.4-zip php7.4-xml
