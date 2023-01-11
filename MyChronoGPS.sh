@@ -38,4 +38,14 @@ sudo cp ./Web-Pi/Icones /var/www/html/Icones -r
 sudo cp ./Web-Pi/img /var/www/html/img -r
 sudo cp ./Web-Pi/js /var/www/html/js -r
 sudo cp ./Web-Pi/Leaflet /var/www/html/Leaflet -r
+#
+# modification des droits d'accès
+sudo chown -R www-data:www-data /var/www # l'utilisateur et le groupe www-data est propriétaire de /var/www
+sudo usermod -a -G www-data pi # ajoute l'utilisateur pi au groupe www-data
+sudo chmod -R g+rwX /var/www # attribution automatique des fichiers et répertoires au groupe www-data
 
+sudo chmod -R u+wx,g+wx,o+wx /home/pi/MyChronoGPS
+
+sudo chown -R www-data:www-data /home/pi/MyChronoGPS/tracks
+
+sudo chown -R www-data:www-data /home/pi/MyChronoGPS/parms
