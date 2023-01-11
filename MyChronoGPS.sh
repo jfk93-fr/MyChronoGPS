@@ -32,6 +32,8 @@ sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.ht
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-Tracks.html /var/www/html/MyChronoGPS-Tracks.html
 
 sudo cp ./Web-Pi/ajax /var/www/html/ajax -r
+sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
+
 sudo cp ./Web-Pi/css /var/www/html/css -r
 sudo cp ./Web-Pi/GoogleMaps /var/www/html/GoogleMaps -r
 sudo cp ./Web-Pi/Icones /var/www/html/Icones -r
