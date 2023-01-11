@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # création des répertoires de travail
 if [ ! -d analysis ]; then
