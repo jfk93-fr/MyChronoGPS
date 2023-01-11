@@ -87,6 +87,26 @@ Installation de MyChronoGPS Web
 $ sudo ./MyChronoGPS.sh
 
 =============================================================================================================
+Installation physique du GPS
+Le fichier paramètre de MyChronoGPS est configuré pour un GPS relié au Raspberry via une liaison série.
+Si le GPS est relié via le port USB, rechercher le fichier associé.
+Le fichier devrait avoir un nom sous la forme /etc/ttyACM*
+Pour afficher le nom, passer la commande
+$ ls /dev/ttyACM*
+
+Mettre à jour le fichier paramètre de MyChronoGPS en passant la commande
+$ sudo nano /home/pi/MychronoGPS/parms/parms.json
+Rechercher les lignes contenant "GPSPort"
+
+    "#GPSPort": "port rattaché au GPS (defaut; /dev/serial0)",
+    "GPSPort": "/dev/serial0",
+    "GPSPort": "/dev/ttyACM1",
+    "GPSPort": "/dev/ttyACM0",
+
+C'est la dernière ligne qui est prise en compte.
+Dans l'exemple ci-dessus, le GPS est associé au fichier /dev/ttyACM0
+
+=============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
 
 installer Adafruit_GPIO :
