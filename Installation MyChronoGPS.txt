@@ -59,9 +59,6 @@ Si pip n'est pas installé, l'installer en passant les commandes
 $ sudo apt-get update
 $ sudo apt-get install python-pip
 
-Si des périphériques sont installés sur les ports GPIO, installer wiringpi
-$ sudo pip3 install wiringpi
-
 Si besoin, installer l'interface série
 $ sudo pip install pyserial
 $ sudo pip install gpio
@@ -89,6 +86,9 @@ c'est nécessaire pour passer la commande start_gps.sh via une interface web
 Installation de MyChronoGPS Web
 A partir du répertoire MyChronoGPS (sinon $ cd /home/pi/MyChronoGPS)
 $ sudo ./MyChronoGPS.sh
+
+A la fin de l'installation, redémarrer le système
+$ sudo reboot
 
 =============================================================================================================
 Installation physique du GPS
