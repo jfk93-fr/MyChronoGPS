@@ -43,9 +43,12 @@ Mettre à jour le système (s'il y a longtemps que ça n'a pas été fait)
 $ sudo apt update
 $ sudo apt upgrade -y
 
-Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus)
-et les outils de diagnostic (i2c-tools).
-$ sudo apt-get install -y python-smbus i2c-tools
+Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus).
+$ sudo apt-get install -y python-smbus
+Les outils de diagnostic (i2c-tools) sont déjà installés.
+Si ce n'est pas le cas,
+$ sudo apt-get install -y i2c-tools
+
 L’installation terminée, on peut déjà tester si les modules sont bien chargés
 
 Vérifier l’adresse du périphérique avec i2cdetect
@@ -84,6 +87,7 @@ www-data ALL=(ALL:ALL) NOPASSWD:ALL
 c'est nécessaire pour passer la commande start_gps.sh via une interface web
 
 Installation de MyChronoGPS Web
+A partir du répertoire MyChronoGPS (sinon $ cd /home/pi/MyChronoGPS)
 $ sudo ./MyChronoGPS.sh
 
 =============================================================================================================
@@ -93,6 +97,13 @@ Si le GPS est relié via le port USB, rechercher le fichier associé.
 Le fichier devrait avoir un nom sous la forme /etc/ttyACM*
 Pour afficher le nom, passer la commande
 $ ls /dev/ttyACM*
+
+Si on ne trouve rien, on peut installer l'outil hwinfo
+$ sudo apt-get install hwinfo -y
+
+Et passer la commande suivante
+$ sudo hwinfo --short
+Repérer le GPS dans la liste affichée
 
 Mettre à jour le fichier paramètre de MyChronoGPS en passant la commande
 $ sudo nano /home/pi/MychronoGPS/parms/parms.json
@@ -105,7 +116,6 @@ Rechercher les lignes contenant "GPSPort"
 
 C'est la dernière ligne qui est prise en compte.
 Dans l'exemple ci-dessus, le GPS est associé au fichier /dev/ttyACM0
-
 =============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
 

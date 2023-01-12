@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo pip3 install wiringpi
+
 # création des répertoires de travail
 if [ ! -d analysis ]; then
 sudo mkdir analysis
@@ -26,6 +28,7 @@ sudo cp ./Web-Pi/MyChronoGPS.html /var/www/html/MyChronoGPS.html
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-Analysis.html /var/www/html/MyChronoGPS-Analysis.html
 sudo cp ./Web-Pi/MyChronoGPS-Cmd.html /var/www/html/MyChronoGPS-Cmd.html
 sudo cp ./Web-Pi/MyChronoGPS-Dashboard.html /var/www/html/MyChronoGPS-Dashboard.html
+sudo cp ./Web-Pi/MyChronoGPS-Parms.html /var/www/html/MyChronoGPS-Parms.html
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-DesignTrack.html /var/www/html/MyChronoGPS-DesignTrack.html
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-Live.html /var/www/html/MyChronoGPS-Live.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
@@ -45,9 +48,11 @@ sudo cp ./Web-Pi/Leaflet /var/www/html/Leaflet -r
 sudo chown -R www-data:www-data /var/www # l'utilisateur et le groupe www-data est propriétaire de /var/www
 sudo usermod -a -G www-data pi # ajoute l'utilisateur pi au groupe www-data
 sudo chmod -R g+rwX /var/www # attribution automatique des fichiers et répertoires au groupe www-data
+groups pi # vérifie l'abonnement de l'utilisateur aux groupes
 
+sudo chown -R www-data:www-data /home/pi/MyChronoGPS
 sudo chmod -R u+wx,g+wx,o+wx /home/pi/MyChronoGPS
 
-sudo chown -R www-data:www-data /home/pi/MyChronoGPS/tracks
+#sudo chown -R www-data:www-data /home/pi/MyChronoGPS/tracks
 
-sudo chown -R www-data:www-data /home/pi/MyChronoGPS/parms
+#sudo chown -R www-data:www-data /home/pi/MyChronoGPS/parms
