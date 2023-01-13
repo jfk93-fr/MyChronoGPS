@@ -9,7 +9,7 @@ function isDocInFullscreen() {
   return false;
 }
 var fullscreen = isDocInFullscreen();
-console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
+//console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
 
 //var el = document.getElementById('changescreen');
 //el.innerHTML = screen.width+' '+screen.height;
@@ -60,10 +60,12 @@ function go()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
+		console.log('go() erreur');
+		console.log(Dashboard);
 			//el.innerHTML = Live;
 		return false;
 	}
-	console.log(Dashboard[0]);
+	//console.log(Dashboard[0]);
 
 	Ev = eval(Dashboard[0]);
 	retour = Ev;
@@ -75,12 +77,12 @@ function go()
 		if (el)
 			el.innerHTML = retour.msgerr;
 		// tout recommencer dans quelques secondes
-		console.log(retour.msgerr)
+		//console.log(retour.msgerr)
 		timer = setTimeout(getNextPoint, 3000);	
 		return false;
 	}
 
-	console.log(Ev);
+	//console.log(Ev);
 	thisDashboard = Ev;
 	
 	displayDashboard();
@@ -95,9 +97,9 @@ function displayDashboard() {
 	clearDashboard()
 	var message = thisDashboard.dashboard;
 	var command = message.substr(0,1);
-	console.log(command);
+	//console.log(command);
 	var texte = message.substr(1);
-	console.log(texte);
+	//console.log(texte);
 	var tabLines = texte.split('//');
 	switch(command) {
 		case "D":
@@ -263,9 +265,9 @@ function displayLed(led,color) {
 }
 
 function stopBlinkLed() {
-	console.log('timeout');
+	//console.log('timeout');
 	for (property in led_timer) {
-		console.log(led_timer[property]);
+		//console.log(led_timer[property]);
 	}
 	return;
 	var led = document.getElementById('led-'+color);
@@ -314,6 +316,8 @@ function isPointReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
+		console.log('isPointReady() erreur');
+		console.log(Dashboard);
 		return false;
 	}
 
@@ -329,12 +333,12 @@ function isPointReady()
 		if (el)
 			el.innerHTML += ' '+retour.msgerr;
 		// aller vers le prochain point
-		console.log(retour.msgerr)
+		//console.log(retour.msgerr)
 		timer = setTimeout(getNextPoint, 3000);
 		return false;
 	}
 
-	console.log(Ev)
+	//console.log(Ev)
 	thisDashboard = Ev;
 	
 	displayDashboard();
@@ -413,7 +417,7 @@ function ajax_cmd(cmd) {
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
 		    //alert("responseText:"+this.responseText);
-			console.log(this.responseText);
+			//console.log(this.responseText);
         
             myObj = JSON.parse(this.responseText);
 			
@@ -465,7 +469,9 @@ function isInfosReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-			timerInfos = setTimeout(getInfos, 3000);
+		console.log('isInfosReady() erreur');
+		console.log(Infos);
+		timerInfos = setTimeout(getInfos, 3000);
 		return false;
 	}
 
@@ -534,15 +540,15 @@ function isInfosReady()
 		if (Infos.length > 2) {
 			Ev = eval(Infos[1]);
 			retourCircuit = Ev[0];
-			console.log(JSON.stringify(retourCircuit));
+			//console.log(JSON.stringify(retourCircuit));
 			FL = retourCircuit.FL;
 			Ev = eval(Infos[2]);
 			retourPoint = Ev[0];
 			pointgps = retourPoint.pointgps;
 			nearest = retourPoint.neartrk;
 			document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
-			console.log(document.getElementById("NomCircuit").innerHTML);
-			console.log(JSON.stringify(retourPoint));
+			//console.log(document.getElementById("NomCircuit").innerHTML);
+			//console.log(JSON.stringify(retourPoint));
 		}
 		else {
 			if (Infos.length > 1) {
@@ -551,8 +557,8 @@ function isInfosReady()
 				pointgps = retourPoint.pointgps;
 				nearest = retourPoint.neartrk;
 				document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
-				console.log(document.getElementById("NomCircuit").innerHTML);
-				console.log(JSON.stringify(retourPoint));
+				//console.log(document.getElementById("NomCircuit").innerHTML);
+				//console.log(JSON.stringify(retourPoint));
 			}
 		}
 	}
@@ -639,7 +645,7 @@ function resizescreen(div2rsz) {
 		set_windowscreen();
 		fullscreen = false;
 	}
-	console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
+	//console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
 }
 function set_fullscreen(el) {
    return (el.requestFullscreen ||

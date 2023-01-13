@@ -1185,15 +1185,16 @@ class IpControl(threading.Thread):
     def run(self):
         self.__running = True
         loop = 99
-        while self.__running:
+        while self.__running:   
             if loop > 30:
-               command = 'hostname -I'
-               proc_retval = subprocess.check_output(shlex.split(command))
-               self.ipadr = str(proc_retval.strip().decode())
-               loop = 0
+                command = 'hostname -I'
+                proc_retval = subprocess.check_output(shlex.split(command))
+                self.ipadr = str(proc_retval.strip().decode())
+                loop = 0
+                self.writeInfos() # Infos
             loop = loop+1
             #logger.info("call write Infos")
-            self.writeInfos() # Infos
+            #self.writeInfos() # Infos
             time.sleep(2) # every minute (30 loops * 2 seconds), we check if we have not changed the network
         logger.info("end of IpControl Thread of main program")
         
