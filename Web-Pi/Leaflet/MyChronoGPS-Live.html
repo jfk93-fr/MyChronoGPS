@@ -6,6 +6,9 @@
 	<title>MyChronoGPS Live</title>
 	<link rel="stylesheet" href="./css/w3.css">
 	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+	integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+	crossorigin=""/>
 </head>
 <!--<body onkeydown="ActionTouche(event)">-->
 <body>
@@ -73,15 +76,11 @@
 	<script src="./js/MyChronoGPS-Circuits.js"></script>
 	<script src="./js/MyChronoGPS-Live-ajax.js"></script>
 	<script src="./js/MyChronoGPS-Live.js"></script>
-	<script src="./js/key.js"></script>
-<!--
-    <script async defer
-		src="https://maps.googleapis.com/maps/api/js?key=Your_API_Key&libraries=geometry&callback=initGooglemap">
-    </script>
--->
-	<script>
-		var scriptTag = '<' + 'script async defer src="https://maps.googleapis.com/maps/api/js?key=' + myKey + '&libraries=geometry&callback=initGooglemap">'+'<'+'/script>';
-		document.write(scriptTag);
-	</script>
+	<!-- Make sure you put this AFTER Leaflet's CSS -->
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin="">
+	</script>	
+	<script src="js/leaflet-providers.js"></script>	
 </body>
 </html>

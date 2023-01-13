@@ -1,7 +1,3 @@
-if (typeof(data_ready) == 'undefined') {
-	//console.log('data_ready undefined');
-}
-
 var latitude     = '';
 var longitude    = '';
 
@@ -98,6 +94,11 @@ var mobpoint = "";
 var vitessep0 = 0;
 var play_live = true;
 
+document.getElementById("zone-info").innerHTML = 'Les données sont en cours de chargement, veuillez patienter.';
+
+document.getElementById('map').style.display = 'block';
+map = true;
+
 loadCircuits();
 
 function dataCircuitsReady() {
@@ -116,30 +117,9 @@ function dataCircuitsReady() {
 }	
 
 function dataLiveReady() {
-	document.getElementById('live').style.display = 'none';
-	is_map_ready();
+	go();
 }	
 
-function is_map_ready() {
-	if (nbw > 20) {
-		alert("googlemap ne semble pas démarrer, vérifier votre connexion internet");
-		return;
-	}
-	nbw++;
-	if (!map) {
-		timer = setTimeout(is_map_ready, 1000);
-	}
-	else {
-		clearTimeout(timer);
-		go();
-	}
-}
-
-// Initialize API Googlemap
-function initGooglemap() {
-  document.getElementById('map').style.display = 'block';
-  map = true;
-}
 // Initialize and add the map
 function initMap() {
 	if (thisCircuit.Latcenter === false) {
@@ -176,21 +156,22 @@ function initMap() {
 		var zoom = thisCircuit.Zoom*1;
 	}
 
-    optionsMap = {
-         zoom: zoom,
-         center: new google.maps.LatLng(lat,lon),
-         draggableCursor:"crosshair",
-         mapTypeId: google.maps.MapTypeId.SATELLITE
-    };
-	
-	map = new google.maps.Map(document.getElementById('map'), optionsMap);
-	//var point = {lat: lat, lng: lon};
-	var markerpoint = {lat: lat, lng: lon};
-	currentmarker = new google.maps.Marker({
-		position: markerpoint, title: thisCircuit.NomCircuit
-		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
-		,draggable: true
+	map = L.map('map').setView([lat,lon],zoom);
+	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 	});
+	Esri_WorldImagery.addTo(map);	
+	// Assumes your Leaflet map variable is 'map'..
+	L.DomUtil.addClass(map._container,'crosshair-cursor-enabled');
+	
+
+
+	//var point = {lat: lat, lng: lon};
+	//var markerpoint = {lat: lat, lng: lon};
+	//currentmarker = new google.maps.Marker({
+	//	position: markerpoint, title: 'entrée sur '+thisCircuit.NomCircuit
+	//});
+	var markerpoint = L.latLng(lat,lon);
 	var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
 				'	<table align="center">' +
 				'		<tr>' +
@@ -203,9 +184,8 @@ function initMap() {
 		info += '</a>';
 	}
 	info +=		'			</td>' +
-				'		</tr>';
-	if (thisCircuit.Adresse) {
-		info += '		<tr>' +
+				'		</tr>' +
+				'		<tr>' +
 				'			<td colspan="2" align="center">'+thisCircuit.Adresse+'</td>' +
 				'		</tr>' +
 				'		<tr>' +
@@ -213,48 +193,66 @@ function initMap() {
 				'		</tr>' +
 				'		<tr>' +
 				'			<td colspan="2" align="center">'+thisCircuit.LongCircuit+' m</td>' +
-				'		</tr>';
-	}
-	info +=		'	</table>' +
+				'		</tr>' +
+				'	</table>' +
 				'</div>';
 	
-	infoBulle = new google.maps.InfoWindow({
-		content: info
-	});
+	//infoBulle = new google.maps.InfoWindow({
+	//	content: info
+	//});
+	//
+	//google.maps.event.addListener(currentmarker, 'mouseover', function() {
+	//	document.getElementById("zone-info").innerHTML = '<B>'+thisCircuit.NomCircuit+'</B>';
+	//});
+	//
+	//google.maps.event.addListener(currentmarker, 'click', function() {
+  	//    infoBulle.open(map, currentmarker);
+	//});
+	//
+	//google.maps.event.addListener(map, 'mousemove', function(event) {
+	//	mouseMove(event);
+	//});
+	//
+	//google.maps.event.addListener(map, 'rightclick', function(event) {
+	//	copyClipboard(event);
+	//});
+	//
+	//google.maps.event.addListener(map, 'center_changed', function(event) {
+	//	var center = map.getCenter();
+	//	el = document.getElementById("Latcenter");
+	//	if (el)
+	//		el.value = center.lat();
+	//	el = document.getElementById("Loncenter");
+	//	if (el)
+	//		el.value = center.lng();
+	//});
+	//
+	//google.maps.event.addListener(map, 'zoom_changed', function(event) {
+	//	var zoom = map.getZoom();
+	//	el = document.getElementById("Zoom");
+	//	if (el)
+	//		el.value = zoom;
+	//});
+	//
+	//currentmarker.setMap(map);
+
+	currentmarker = new L.Marker(markerpoint,{draggable:true}).bindPopup(info);
+	map.addLayer(currentmarker);	
 	
-	google.maps.event.addListener(currentmarker, 'mouseover', function() {
+	currentmarker.on('mouseover', function() {
 		document.getElementById("zone-info").innerHTML = '<B>'+thisCircuit.NomCircuit+'</B>';
 	});
-
-	google.maps.event.addListener(currentmarker, 'click', function() {
-  	    infoBulle.open(map, currentmarker);
+	//
+	map.on('mousemove', function(ev) {
+		mouseMove(ev);
 	});
-
-	google.maps.event.addListener(map, 'mousemove', function(event) {
-		mouseMove(event);
+	//
+	map.on('contextmenu', function(event) {
+		copyClipboard(event);
 	});
-
-	google.maps.event.addListener(map, 'center_changed', function(event) {
-		var center = map.getCenter();
-		el = document.getElementById("Latcenter");
-		if (el)
-			el.value = center.lat();
-		el = document.getElementById("Loncenter");
-		if (el)
-			el.value = center.lng();
-	});
-
-	google.maps.event.addListener(map, 'zoom_changed', function(event) {
-		var zoom = map.getZoom();
-		el = document.getElementById("Zoom");
-		if (el)
-			el.value = zoom;
-	});
-
-	currentmarker.setMap(map);
 	
 	showLines();
-	
+		
 }
 
 function showLines() {
@@ -691,18 +689,28 @@ function drawLine(objline) {
 
 function drawLineWithCoord(objline) {
 	// on va tracer un segment de droite à partir des coordonnées de ses extrémités
+	
+	var A = new Array(objline.coord[0],objline.coord[1]);
+	// On marque une des extrémités du segment de droite
+	var markerpoint = {lat: A[0], lng: A[1]};
+	
+	objline.marker1 = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - 1'});
+	map.addLayer(objline.marker1);	
+	objline.marker1.on('dragend', function(ev) {changeMarker1(ev,objline);});
+	
+	var B = new Array(objline.coord[2],objline.coord[3]);
+	// On marque l'autre extrémité du segment de droite
+	var markerpoint = {lat: B[0], lng: B[1]};
+	
+	objline.marker2 = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - 2'});
+	map.addLayer(objline.marker2);	
+	objline.marker2.on('dragend', function(ev) {changeMarker2(ev,objline);});
 
 	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
 	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
-	objline.line = new google.maps.Polyline({
-		path: pathCoordinates,
-		geodesic: true,
-		strokeColor: objline.color,
-		//strokeColor: "black",
-		strokeOpacity: 1.0,
-		strokeWeight: 5
-	});
-	objline.line.setMap(map);
+	objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+	map.addLayer(objline.line);	
+	
 }
 
 function drawLineWithCap(objline) {
@@ -710,28 +718,62 @@ function drawLineWithCap(objline) {
 	
 	// on recherche le point B à 50 mètres du point A selon le cap fourni
 	var dist = 50; // 50m
-	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);	
+	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);
+	console.log('destination:'+B);
+	
 	var A = new Array(objline.lat,objline.lon);
+	// On marque le point actuel qui représente le milieu du segment de droite
+	var markerpoint = {lat: A[0], lng: A[1]};
+	
+	objline.marker = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - Milieu'});
+	map.addLayer(objline.marker);	
+	objline.marker.on('dragend', function(ev) {changeMarker(ev,objline);});
+
+	// on marque les 2 points sur la droite du cap
+	var markerpoint = {lat: B[0], lng: B[1]};
+	var localIcon = L.icon({
+		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+		iconAnchor: [8, 16]
+	});	
+	objline.markercap = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: 'Cap'});
+	map.addLayer(objline.markercap);	
+	objline.markercap.on('dragend', function(ev) {changeMarkercap(ev,objline);});
+		
+	// On trace une ligne entre le point milieu du segment de droite et le point cap
+	var pathCoordinates = [{lat: A[0], lng: A[1]},{lat: B[0], lng: B[1]}];
+	objline.linecap = new L.polyline(pathCoordinates, {color: 'blue'});
+	map.addLayer(objline.linecap);	
+	objline.marker.on('dragend', function(ev) {changeMarker(ev,objline);});
 
 	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
 	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
-	// pour ne pas déborder dans la pitlane, on ne va prendre que 60% de la largeur de la piste
-	var lgp = largeur_piste * 0.6;
 	var icoord = getPerpendiculaire(A,B);
-	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),lgp); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
-	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),lgp); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	console.log(icoord);
+	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	
+	var markerpoint = {lat: coord1[0], lng: coord1[1]};
+	var localIcon = L.icon({
+		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2.png',
+		iconAnchor: [32,64]
+	});
+	objline.markerB = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: objline.title+' - Bord', rotationAngle: 45});
+	map.addLayer(objline.markerB);	
+	objline.markerB.on('dragend', function(ev) {changeMarkerB(ev,objline);});
 
-	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de
+	var markerpoint = {lat: coord2[0], lng: coord2[1]};
+	var localIcon = L.icon({
+		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png',
+		iconAnchor: [8, 16]
+	});	
+	objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: objline.title+' - Bord opposé'});
+	map.addLayer(objline.markerB2);	
+
+	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de départ
 	if (Array.isArray(icoord)) {
 		var pathCoordinates = [{lat: coord1[0], lng: coord1[1]},{lat: coord2[0], lng: coord2[1]}];
-		objline.line = new google.maps.Polyline({
-			path: pathCoordinates,
-			geodesic: true,
-			strokeColor: objline.color,
-			strokeOpacity: 1.0,
-			strokeWeight: 5
-		});
-		objline.line.setMap(map);
+		objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+		map.addLayer(objline.line);	
 	}
 	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);
 }
@@ -809,7 +851,8 @@ function showMobile() {
 	var cap = Point1.cap;
 	// on efface la précédente représentation du mobile
 	if (mobpoint != '') {
-		mobpoint.setMap(null);
+		//mobpoint.setMap(null);
+		map.removeLayer(mobpoint)
 		mobpoint = '';
 	}
 	if (latitude*longitude == 0) {
