@@ -1154,6 +1154,7 @@ class DisplayControl(threading.Thread):
             self.displaySysBig = False
         self.sys_message = msg
         self.sysloop = timer * 10 # 10 cycles = about 1 second
+        self.sysloop = timer * 1 # 10 cycles = about 1 second
         #self.sysloop = timer * 4 # 10 cycles = about 1 second
         
     def set_contrast(self,contrast):
@@ -1929,7 +1930,7 @@ class ChronoControl():
                             self.lineCut = self.is_lineCut(self.pitin.lat1,self.pitin.lon1,self.pitin.lat2,self.pitin.lon2,self.gps_latitude,self.gps_longitude,self.gps_prevlat,self.gps_prevlon)
                             if self.lineCut == True:
                                 self.in_pitlane = True # we enter the pitlane
-                                self.lcd.set_display_sysmsg(" //Pit In",lcd.DISPLAY_BIG,2)
+                                self.lcd.set_display_sysmsg(" //Pit In",lcd.DISPLAY_BIG,20)
                                 # here, we will make a yellow LED blink as long as we are in the pitlane
                                 #jfk
                                 self.main_led.set_led_off()
@@ -1940,7 +1941,7 @@ class ChronoControl():
                             self.lineCut = self.is_oneLineCut()
                             if self.lineCut == True:
                                 self.in_pitlane = False # we leave the pitlane
-                                self.lcd.set_display_sysmsg(" //Pit Out",lcd.DISPLAY_BIG,2)
+                                self.lcd.set_display_sysmsg(" //Pit Out",lcd.DISPLAY_BIG,20)
                                 # here, we will turn off the yellow LED associated with the pitlane
                                 #jfk
                                 self.main_led.set_led_off()
@@ -2047,7 +2048,7 @@ class ChronoControl():
                                 buff1 = t+" Lap "+str(self.nblap)+"//"
                                 buff1 = buff1+t+"//"
                                 buff1 = buff1+lcd.localTime+" "+formatVitesse(self.gps_gpsvitesse)
-                                self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,2)
+                                self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,20)
                             
                             self.nblap += 1
 
@@ -2089,9 +2090,9 @@ class ChronoControl():
                                 
                                 self.temps_secteurs.append(self.temps_inter)
                                 if self.nblap > 0:
-                                    self.lcd.set_display_sysmsg("Secteur "+str(i+1)+"//"+formatTimeDelta(self.temps_inter)+"//"+formatLocalTime(gps),lcd.DISPLAY_BIG,2)
+                                    self.lcd.set_display_sysmsg("Secteur "+str(i+1)+"//"+formatTimeDelta(self.temps_inter)+"//"+formatLocalTime(gps),lcd.DISPLAY_BIG,20)
                                 else:
-                                    self.lcd.set_display_sysmsg(formatLocalTime(gps)+"//Sect. "+str(i+1),lcd.DISPLAY_BIG,2)
+                                    self.lcd.set_display_sysmsg(formatLocalTime(gps)+"//Sect. "+str(i+1),lcd.DISPLAY_BIG,20)
     
                                
                         self.temps_en_cours = temps - self.temps_t
