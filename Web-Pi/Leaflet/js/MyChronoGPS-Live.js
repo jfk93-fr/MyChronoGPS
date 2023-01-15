@@ -520,24 +520,34 @@ function point2Line(line) {
 function resetScreen() {
 	// On recentre la map avec le zoom d'origine
 	var zoom = thisCircuit.Zoom*1;
-	map.setZoom(zoom);
+	//map.setZoom(zoom);
 	lat = thisCircuit.Latcenter*1;
 	lon = thisCircuit.Loncenter*1;
-	var googleLatLng = new google.maps.LatLng(lat,lon); 
-	map.setCenter(googleLatLng);
+	//var googleLatLng = new google.maps.LatLng(lat,lon); 
+	//map.setCenter(googleLatLng);
+	//map = L.map('map').setView([lat,lon],zoom);
+	//map.flyTo([lat,lon],zoom);
+	setCenter(lat,lon);
 }
 
 function setCenter(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1) {
-	var googleLatLng = new google.maps.LatLng(zlat,zlon); 
-	map.setCenter(googleLatLng);
+	//var googleLatLng = new google.maps.LatLng(zlat,zlon); 
+	//map.setCenter(googleLatLng);
+	//map.flyTo([zlat,zlon],zoom);
+	var zoom = map.getZoom();
+	map.flyTo([zlat,zlon],zoom);
 }
 function setMaxZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
-	setCenter(zlat,zlon);
+	//setCenter(zlat,zlon);
 	var oldz = map.getZoom();
 	var newz = oldz + max;
 	if (newz !='NaN') {
 		map.setZoom(newz);
 	}
+	//var corner1 = L.latLng(zlat-0.001, zlon-0.001);
+	//var corner2 = L.latLng(zlat+0.001, zlon+0.001);
+	//var bounds  = L.latLngBounds(corner1, corner2);
+	//map.fitBounds(bounds);
 }
 function setOriginZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
 	var newz = thisCircuit.Zoom*1;
@@ -860,6 +870,7 @@ function showMobile() {
 		longitude = lngfr;
 	}
 	else {
+		//setMaxZoom(latitude,longitude)
 		var zoom = map.getZoom();
 		if (zoom <= zoomfr) {
 			zoom = zoom + 10;//jfk
@@ -868,23 +879,34 @@ function showMobile() {
 	}
 		
 	var markerpoint = {lat: latitude, lng: longitude};
-	mobpoint = new google.maps.Marker({
-		position: markerpoint, 
-		title: 'v:'+Math.round(Point1.vitesse)+'km/h\r\n'+
+	var	title = 'v:'+Math.round(Point1.vitesse)+'km/h\r\n'+
 		       'alt:'+Math.round(Point1.altitude)+'m\r\n'+
-               'cap:'+Math.round(Point1.cap*10)/10+'° '
-		,icon: {
-			path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-			rotation: cap,
-			fillColor: "cyan",
-			fillOpacity: 0.8,
-			scale: 5,
-			strokeColor: "gold",
-			strokeWeight: 2,
+               'cap:'+Math.round(Point1.cap*10)/10+'° ';
+				
+	var localIcon = L.icon({
+		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+		iconAnchor: [8, 16]
+	});	
+	mobpoint = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
+	map.addLayer(mobpoint);	
 
-			}
-		});
-	mobpoint.setMap(map);
+	//mobpoint = new google.maps.Marker({
+	//	position: markerpoint, 
+	//	title: 'v:'+Math.round(Point1.vitesse)+'km/h\r\n'+
+	//	       'alt:'+Math.round(Point1.altitude)+'m\r\n'+
+    //           'cap:'+Math.round(Point1.cap*10)/10+'° '
+	//	,icon: {
+	//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+	//		rotation: cap,
+	//		fillColor: "cyan",
+	//		fillOpacity: 0.8,
+	//		scale: 5,
+	//		strokeColor: "gold",
+	//		strokeWeight: 2,
+	//
+	//		}
+	//	});
+	//mobpoint.setMap(map);
 	setCenter(latitude, longitude)	;
 	
 	// si c'est pas le premier point, on va forcer le point précédent à la même valeur
@@ -1287,7 +1309,8 @@ function computeTimes() {
 
 	// ensuite on regarde la ligne de départ/arrivée
 	//var linecoord = objStart.coord;
-			var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
+	//var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
+	var latlng = L.latLng(pcoord.lat, pcoord.lng);
 	if (objStart.hasOwnProperty('coord')) {
 		var parmCut = new Object();
 		parmCut.linecoord = objStart.coord;
@@ -1307,7 +1330,8 @@ function computeTimes() {
 			time_prev[0] = time_start;
 			timecut = time_arrival - time_start;		
 			// s'il s'agit d'un point de coupure, on l'indique dans le chemin
-			var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
+			//var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
+			var latlng = L.latLng(pointCut[0], pointCut[1]);
 			var CP = getIntersectionSphere(parmCut.linecoord,parmCut.segcoords);
 			FirstPoint = Point0;
 		}
@@ -1806,10 +1830,10 @@ function rad2deg(rd) {
 }
 	
 function mouseMove(mousePt) {
-	mouseLatLng = mousePt.latLng;
-	var mouseCoord = mouseLatLng.toUrlValue();
-	var mouseLat = mouseLatLng.lat();
-	var mouseLon = mouseLatLng.lng();
+	mouseLatLng = mousePt.latlng;
+	//var mouseCoord = mouseLatLng.toUrlValue();
+	var mouseLat = mouseLatLng.lat;
+	var mouseLon = mouseLatLng.lng;
 	
 	var oStatusDiv = document.getElementById("LatLng")	
 	if (oStatusDiv) {

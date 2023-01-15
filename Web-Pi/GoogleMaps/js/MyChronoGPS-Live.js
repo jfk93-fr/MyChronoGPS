@@ -1,7 +1,3 @@
-if (typeof(data_ready) == 'undefined') {
-	//console.log('data_ready undefined');
-}
-
 var latitude     = '';
 var longitude    = '';
 
