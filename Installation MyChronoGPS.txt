@@ -43,11 +43,11 @@ Mettre à jour le système (s'il y a longtemps que ça n'a pas été fait)
 $ sudo apt update
 $ sudo apt upgrade -y
 
-Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus).
-$ sudo apt-get install -y python-smbus
-Les outils de diagnostic (i2c-tools) sont déjà installés.
-Si ce n'est pas le cas,
-$ sudo apt-get install -y i2c-tools
+#Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus).
+#$ sudo apt-get install -y python-smbus
+#Les outils de diagnostic (i2c-tools) sont déjà installés.
+#Si ce n'est pas le cas,
+#$ sudo apt-get install -y i2c-tools
 
 L’installation terminée, on peut déjà tester si les modules sont bien chargés
 
@@ -56,12 +56,12 @@ $ sudo i2cdetect -y 1
 (pour les anciens modèles : $ sudo i2cdetect -y 0)
 
 Si pip n'est pas installé, l'installer en passant les commandes
-$ sudo apt-get update
-$ sudo apt-get install python-pip
+	$ sudo apt-get update
+	$ sudo apt-get install python-pip
 
 Si besoin, installer l'interface série
-$ sudo pip install pyserial
-$ sudo pip install gpio
+	$ sudo pip install pyserial
+	$ sudo pip install gpio
 
 Ensuite, il est nécessaire d'installer un serveur web pour avoir accès aux outils de visualisation des sessions et de la gestion des circuits.
 Il est également nécessaire pour l'affichage du tableau de bord sur un écran LCD. 
