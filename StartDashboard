@@ -1,0 +1,7 @@
+@lxpanel --profile LXDE-pi
+@pcmanfm --desktop --profile LXDE-pi
+@xscreensaver -no-splash
+@xset s off
+@xset -dpms
+@xset s noblank
+@/usr/bin/chromium-browser --start-fullscreen --disk-cache-dir=/tmp/cache --disable-auto-reload --disable-restore-session-state http://localhost/MyChronoGPS-Dashboard.html
