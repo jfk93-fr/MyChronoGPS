@@ -33,6 +33,8 @@ sudo cp ./Web-Pi/Leaflet/MyChronoGPS-DesignTrack.html /var/www/html/MyChronoGPS-
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-Live.html /var/www/html/MyChronoGPS-Live.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
 sudo cp ./Web-Pi/Leaflet/MyChronoGPS-Tracks.html /var/www/html/MyChronoGPS-Tracks.html
+sudo cp ./Web-Pi/Leaflet/js /var/www/html -r
+sudo cp ./Web-Pi/Leaflet/css /var/www/html -r
 
 sudo cp ./Web-Pi/ajax /var/www/html/ajax -r
 sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
