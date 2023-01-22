@@ -109,7 +109,7 @@ La procédure d'installation demande si on doit changer les droits de **www-data
 Si Lighttpd est installé, répondre **Y**
 
 La procédure d'installation demande si on a une clé API pour GoogleMaps et si on veut l'utiliser.
-Si oui, le fichier key.js est édité et il faut remplacer {% highlight %}'Your_API_Key'{% endhighlight %} par la valeur de votre clé.
+Si oui, le fichier key.js est édité et il faut remplacer {% highlight shell_session %}'Your_API_Key'{% endhighlight %} par la valeur de votre clé.
 
 A la fin de l'installation, redémarrer le système
 {% highlight shell_session %}
