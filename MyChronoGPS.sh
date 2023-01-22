@@ -13,7 +13,7 @@ fi
 # Is Lighttpd installed
 #if [ ! -d /etc/lighttpd ] 
 #then 
-	echo "do you want to install Lighttpd? Y or N"
+	echo "do you want to install Lighttpd ? Y or N"
 	read rep
 	if [ $rep = "Y" ] || [ $rep = "y" ]
 	then
@@ -22,7 +22,7 @@ fi
 	fi	
 #else 
 #	echo "Lighttpd already installed" 
-fi
+#fi
 
 echo "do you want to edit visudo? Y or N"
 read rep
@@ -44,14 +44,12 @@ if [ ! -d analysis ]; then
 fi
 if [ ! -d cache ]; then
 	sudo mkdir cache
-	sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs $HOME/MyChronoGPS/cache
 fi
 if [ ! -d log ]; then
 	sudo mkdir log
 fi
 if [ ! -d pipes ]; then
 	sudo mkdir pipes
-	sudo mount -t tmpfs -o size=20M,mode=0777 tmpfs $HOME/MyChronoGPS/pipes
 fi
 if [ ! -d sessions ]; then
 	sudo mkdir sessions
@@ -108,9 +106,23 @@ then
 			sudo chmod -R g+rwX /var/www
 			groups $USER
 			
+			if [ -d cache ]; then
+				sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs $HOME/MyChronoGPS/cache
+			fi
+			if [ -d pipes ]; then
+				sudo mount -t tmpfs -o size=20M,mode=0777 tmpfs $HOME/MyChronoGPS/pipes
+			fi
+			
 			sudo chown -R www-data:www-data $HOME/MyChronoGPS
 		fi
 	fi
 fi
 
 sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
+
+echo "Do you want to mount the cache in memory at Raspberry startup ? Y or N"
+read rep
+if [ $rep = "Y" ] || [ $rep = "y" ]
+then
+	sudo sh ./MyChronoGPS_fstab.sh
+fi	
