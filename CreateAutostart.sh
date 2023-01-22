@@ -7,12 +7,13 @@ if [ ! -f ./StartDashboard ]; then
 	exit
 fi
 
-if [ ! -d /home/pi/.config/lxsession ]; then
+if [ ! -d $HOME/.config/lxsession ]; then
 	echo "create lxsession directory"
-	su mkdir /home/pi/.config/lxsession
+	sudo mkdir $HOME/.config/lxsession
 fi
-if [ ! -d /home/pi/.config/lxsession/LXDE-pi ]; then
+if [ ! -d $HOME/.config/lxsession/LXDE-pi ]; then
 	echo "create LXDE-pi directory"
-	su mkdir /home/pi/.config/lxsession/LXDE-pi
+	sudo mkdir $HOME/.config/lxsession/LXDE-pi
 fi
-su cp ./StartDashboard /home/pi/.config/lxsession/LXDE-pi/autostart
+echo "create autostart"
+sudo cp ./StartDashboard $HOME/.config/lxsession/LXDE-pi/autostart

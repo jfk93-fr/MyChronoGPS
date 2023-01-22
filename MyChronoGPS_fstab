@@ -1,0 +1,2 @@
+tmpfs /home/pi/MyChronoGPS/cache tmpfs size=2M,mode=0777 0 0
+tmpfs /home/pi/MyChronoGPS/pipes tmpfs size=20M,mode=0777 0 0

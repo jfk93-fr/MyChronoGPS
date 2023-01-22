@@ -192,9 +192,9 @@ def degrees_to_decimal(data, hemisphere):
         degrees = float(data[:decimalPointPosition-2])
         minutes = float(data[decimalPointPosition-2:])/60
         output = degrees + minutes
-        if hemisphere is 'N' or hemisphere is 'E':
+        if hemisphere == 'N' or hemisphere == 'E':
             return output
-        if hemisphere is 'S' or hemisphere is 'W':
+        if hemisphere == 'S' or hemisphere == 'W':
             return -output
     except:
         return ""

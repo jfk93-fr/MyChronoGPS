@@ -36,24 +36,24 @@ $ sudo raspi-config
 	P6 Serial Port => shell:non / serial port hardware:oui
 
 A la fin de la configuration faire un reboot
-$ sudo reboot
+	$ sudo reboot
 
 Installer les outils I2C pour Python (déjà installé sur les versions récentes)
 Mettre à jour le système (s'il y a longtemps que ça n'a pas été fait)
-$ sudo apt update
-$ sudo apt upgrade -y
+	$ sudo apt update
+	$ sudo apt upgrade -y
 
-#Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus).
-#$ sudo apt-get install -y python-smbus
-#Les outils de diagnostic (i2c-tools) sont déjà installés.
-#Si ce n'est pas le cas,
-#$ sudo apt-get install -y i2c-tools
+Une fois le système mis à jour, lancez l’installation des outils permettant de communiquer avec les périphériques i2c en Python (python-smbus).
+	$ sudo apt-get install -y python-smbus
+Les outils de diagnostic (i2c-tools) sont déjà installés.
+Si ce n'est pas le cas,
+	$ sudo apt-get install -y i2c-tools
 
 L’installation terminée, on peut déjà tester si les modules sont bien chargés
 
 Vérifier l’adresse du périphérique avec i2cdetect
-$ sudo i2cdetect -y 1
-(pour les anciens modèles : $ sudo i2cdetect -y 0)
+	$ sudo i2cdetect -y 1
+	(pour les anciens modèles : $ sudo i2cdetect -y 0)
 
 Si pip n'est pas installé, l'installer en passant les commandes
 	$ sudo apt-get update
@@ -69,23 +69,16 @@ Il est également nécessaire pour l'affichage du tableau de bord sur un écran 
 Installation de MyChronoGPS sur le rpi
 
 A partir du dossier /home/pi lancez les commandes suivantes :
-$ sudo rm -rf MyChronoGPS
-$ git clone https://github.com/jfk93-fr/MyChronoGPS.git
-$ chmod -R 755 MyChronoGPS
-$ cd MyChronoGPS/
+	$ sudo rm -rf MyChronoGPS
+	$ git clone https://github.com/jfk93-fr/MyChronoGPS.git
+	$ chmod -R 755 MyChronoGPS
+	$ cd MyChronoGPS/
+	$ sh MyChronoGPS.sh 
 
-Installation de Lighttpd
-$ sudo ./Lighttpd.sh
+Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, répondre Y
 
-Donner les droits sudo à www-data
-$ sudo visudo
-à la fin du fichier, ajouter la ligne
-www-data ALL=(ALL:ALL) NOPASSWD:ALL
-c'est nécessaire pour passer la commande start_gps.sh via une interface web
-
-Installation de MyChronoGPS Web
-A partir du répertoire MyChronoGPS (sinon $ cd /home/pi/MyChronoGPS)
-$ sudo ./MyChronoGPS.sh
+La procédure d'installation demande si on doit changer les droits de www-data dans visudo.
+Si Lighttpd est installé, répondre Y
 
 A la fin de l'installation, redémarrer le système
 $ sudo reboot
@@ -199,6 +192,8 @@ Modifiez la ligne
 en remplacant le texte par votre clé API.
 Sauvez le fichier modifié.
 
+=============================================================================================================
+Ci-dessous, quelques commandes utiles pour dépannage
 =============================================================================================================
 Erreurs Web
 500 – pour avoir le détail, passer la commande 
