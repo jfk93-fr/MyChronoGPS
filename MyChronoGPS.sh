@@ -11,8 +11,8 @@ then
 fi
 
 # Is Lighttpd installed
-if [ ! -d /etc/lighttpd ] 
-then 
+#if [ ! -d /etc/lighttpd ] 
+#then 
 	echo "do you want to install Lighttpd? Y or N"
 	read rep
 	if [ $rep = "Y" ] || [ $rep = "y" ]
@@ -20,8 +20,8 @@ then
 		sh ./Lighttpd.sh
 		echo "Lighttpd successfully installed"
 	fi	
-else 
-	echo "Lighttpd already installed" 
+#else 
+#	echo "Lighttpd already installed" 
 fi
 
 echo "do you want to edit visudo? Y or N"

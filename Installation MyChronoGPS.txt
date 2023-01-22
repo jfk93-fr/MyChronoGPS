@@ -73,12 +73,18 @@ A partir du dossier /home/pi lancez les commandes suivantes :
 	$ git clone https://github.com/jfk93-fr/MyChronoGPS.git
 	$ chmod -R 755 MyChronoGPS
 	$ cd MyChronoGPS/
+
+La procédure d'installation proprement dite de MyChronoGPS s'effectue par la commande :
 	$ sh MyChronoGPS.sh 
 
-Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, répondre Y
+Plusieurs questions sont posées.
+Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, c'est préférabel, aussi répondre Y
 
 La procédure d'installation demande si on doit changer les droits de www-data dans visudo.
 Si Lighttpd est installé, répondre Y
+
+La procédure d'installation demande si on a une clé API pour GoogleMaps et si on veut l'utiliser.
+Si oui, le fichier key.js est édité et il faut remplacer 'Your_API_Key' par la valeur de votre clé.
 
 A la fin de l'installation, redémarrer le système
 $ sudo reboot
@@ -99,7 +105,7 @@ $ sudo hwinfo --short
 Repérer le GPS dans la liste affichée
 
 Mettre à jour le fichier paramètre de MyChronoGPS en passant la commande
-$ sudo nano /home/pi/MychronoGPS/parms/parms.json
+$ sudo nano /home/pi/MyChronoGPS/parms/params.json
 Rechercher les lignes contenant "GPSPort"
 
     "#GPSPort": "port rattaché au GPS (defaut; /dev/serial0)",
@@ -150,23 +156,11 @@ avant la ligne exit 0 insérer la commande pour démarrer MyChronoGPS au démarr
 sh /home/pi/MyChronoGPS/start_gps.sh
 =============================================================================================================
 
-**************************
-Depuis la version 1.15 de MyChronoGPS, les échanges avec l'écran se font via des fichiers en mémoire partagée à la place des named pipes.
-S'il n'existe pas, créer un dossier cache dans le dossier /home/pi/MyChronoGPS et donner les droits en écriture au groupe www-data :
-$ sudo mkdir /home/pi/MyChronoGPS/cache
-$ sudo chown www-data:www-data /home/pi/MyChronoGPS/cache
+Pour monter la zone mémoire au reboot, à partir du répertoire MyChronoGPS, lancez la commande suivante :
+	$ sudo ./MyChronoGPS_fstab.sh
 
-Monter les dossiers temporaires en tant que mémoire partagée :
-$ sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs /home/pi/MyChronoGPS/cache
-$ sudo mount -t tmpfs -o size=20M,mode=0777 tmpfs /home/pi/MyChronoGPS/pipes
-
-Monter la zone mémoire au reboot :
-$ sudo nano /etc/fstab
-Ajouter une ligne au fichier :
-$ tpmfs /home/pi/MyChronoGPS/cache tmpfs size=2M,mode=0777 0 0
-$ tmpfs /home/pi/MyChronoGPS/pipes tmpfs size=20M,mode=0777 0 0
-
-Lancer le tableau de bord au démarrage du pi :
+Pour lancer le tableau de bord au démarrage du pi, à partir du répertoire MyChronoGPS, lancez la commande suivante :
+	$ sudo 
 Créer le dossier lxsession pour le pi :
 $ mkdir /home/pi/.config/lxsession
 Créer le dossier LXDE-pi :
