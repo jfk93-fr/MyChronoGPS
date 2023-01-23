@@ -75,7 +75,7 @@ A partir du dossier /home/pi lancez les commandes suivantes :
 	$ cd MyChronoGPS/
 
 La procédure d'installation proprement dite de MyChronoGPS s'effectue par la commande :
-	$ sh MyChronoGPS.sh 
+	$ sh MyChronoGPS.sh
 
 Plusieurs questions sont posées.
 Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, c'est préférabel, aussi répondre Y
@@ -92,17 +92,35 @@ $ sudo reboot
 =============================================================================================================
 Installation physique du GPS
 Le fichier paramètre de MyChronoGPS est configuré pour un GPS relié au Raspberry via une liaison série.
+Si c'est le cas, passer la commande :
+	$ cat /dev/serial0
+	
+les trames envoyées par le GPS doivent s'afficher sur la console.
+
 Si le GPS est relié via le port USB, rechercher le fichier associé.
 Le fichier devrait avoir un nom sous la forme /etc/ttyACM*
 Pour afficher le nom, passer la commande
-$ ls /dev/ttyACM*
+	$ ls /dev/ttyA*
 
-Si on ne trouve rien, on peut installer l'outil hwinfo
-$ sudo apt-get install hwinfo -y
+exemple :
+	pi@raspberrypi:~ $ ls /dev/ttyA*
+	/dev/ttyACM0  /dev/ttyAMA0
+	pi@raspberrypi:~ $
 
-Et passer la commande suivante
-$ sudo hwinfo --short
-Repérer le GPS dans la liste affichée
+Il faut essayer de trouver le bon fichier en passant la commande :
+	pi@raspberrypi:~ $ cat /dev/ttyAMA0
+	pi@raspberrypi:~ $
+
+Il n'y a rien en retour, essayer avec :
+	pi@raspberrypi:~ $ cat /dev/ttyACM0
+	$GNTXT,01,01,02,u-blox AG - www.u-blox.com*4E
+	
+	$GNTXT,01,01,02,HW UBX-M8030 00080000*60
+	
+	$GNTXT,01,01,02,ROM CORE 3.01 (107888)*2B
+
+Ce sont les trames NMEA envoyées par le GPS
+	/dev/ttyACM0
 
 Mettre à jour le fichier paramètre de MyChronoGPS en passant la commande
 $ sudo nano /home/pi/MyChronoGPS/parms/params.json

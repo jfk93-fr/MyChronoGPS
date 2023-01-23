@@ -59,9 +59,9 @@ if [ ! -d traces ]; then
 fi
 #
 _web=$(ls /var/www/html | grep -c MyChronoGPS) || true
-if [ "$_wiringpi" ]
+if [ "$_web" ]
 then
-	if [ "$_wiringpi" != "0" ]
+	if [ "$_web" != "0" ]
 	then
 		echo "It seems that the folders and web files are already installed."
 		echo "If you continue, the files will be overwritten."
