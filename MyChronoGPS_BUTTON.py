@@ -98,7 +98,7 @@ logger.info('running in '+python_bin+' version '+python_ver)
 class ButtonControl(threading.Thread):
     NOTPRESSED = 0
     PRESSED = 1
-    pipe_name = '/home/pi/projets/MyChronoGPS/pipes/BUTTON'
+    pipe_name = os.environ['HOME']+'/MyChronoGPS/pipes/BUTTON'
         
     def __init__(self, button_id, gpio_pin):
         threading.Thread.__init__(self)

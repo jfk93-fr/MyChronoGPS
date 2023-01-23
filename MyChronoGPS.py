@@ -55,11 +55,8 @@ import subprocess
 import shlex
 
 running = True
-#####pathcmd = '/home/pi/projets/MyChronoGPS'
-#####pathdata = '/home/userdata'
 pathcmd = Path.pathcmd
 pathdata = Path.pathdata
-#pathdata = '/media/pi/USERDATA'
 pathsimu = pathdata+'/simu/'
 pathlog = pathdata+'/log'
 pathcache = pathcmd+'/cache'

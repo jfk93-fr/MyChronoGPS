@@ -28,7 +28,7 @@ class FIFOLCD():
 
     def __init__(self):
         self.lcd = LCD16x2_I2C()
-        self.fifo = '/home/pi/projets/MyChronoGPS/pipes/DISPLAY'
+        self.fifo = os.environ['HOME']+'/MyChronoGPS/pipes/DISPLAY'
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()

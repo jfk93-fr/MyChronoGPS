@@ -43,9 +43,9 @@ ON = 1
 OFF = 0
 
 print(sys.argv)
-pathcmd = '/home/pi/MyChronoGPS'
+pathcmd = os.environ['HOME']+'/MyChronoGPS'
 cmdsimu =  "MyChronoGPS_SIMU."+VERSION
-pathdata = '/home/pi/MyChronoGPS'
+pathdata = os.environ['HOME']+'/MyChronoGPS'
 pathlog = pathdata+'/log/'
 
 #######################################################################################

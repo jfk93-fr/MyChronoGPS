@@ -19,9 +19,6 @@ pathcmd = Path.pathcmd
 pathdata = Path.pathdata
 pathlog = pathdata+'/log'
 cmdgps =  "MyChronoGPS"
-#cmdos = "su - pi python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+"MyChronoGPS.log 2>&1 &"
-#cmdos = "python "+pathcmd+"/"+cmdgps+".py & "
-#/home/pi/projets/MyChronoGPS/MyChronoGPS.py > /home/pi/projets/MyChronoGPS/log/log.txt 2>&1 &
 cmdos = "sudo sh "+pathcmd+"/start_gps.sh > "+pathlog+"/"+"start_gps.log 2>&1"
 
 # mydict représente le retour de la fonction ajax
