@@ -76,6 +76,8 @@ sudo cp ./Web-Pi/MyChronoGPS-Parms.html /var/www/html/MyChronoGPS-Parms.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
 
 sudo cp ./Web-Pi/ajax /var/www/html -r
+echo $HOME > /var/www/html/ajax/HOME.txt
+echo $USER > /var/www/html/ajax/USER.txt
 #sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
 
 sudo cp ./Web-Pi/css /var/www/html -r

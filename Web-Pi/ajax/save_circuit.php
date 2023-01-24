@@ -1,6 +1,6 @@
 <?php
 include('ajaxroot.php');
-$dir = $ajaxroot.'pi/MyChronoGPS/tracks';
+$dir = $ajaxroot.'/MyChronoGPS/tracks';
 
 $result = null;
 if (!is_dir ($dir)) {
