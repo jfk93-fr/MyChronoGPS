@@ -7,7 +7,7 @@ if [ "$_MyChronoGPS" ]
 then
     if [ "$_MyChronoGPS" != "0" ]
     then
-        printf "fstab is already adapted for MyChronoGPS %s\n" "$_MyChronoGPS"
+        printf "fstab is already adapted for MyChronoGPS %s\n"
         exit 4
     fi
 fi

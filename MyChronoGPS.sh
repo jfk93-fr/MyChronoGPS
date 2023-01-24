@@ -24,18 +24,15 @@ fi
 #	echo "Lighttpd already installed" 
 #fi
 
-echo "do you want to edit visudo? Y or N"
-read rep
-if [ $rep = "Y" ] || [ $rep = "y" ]
+echo "sudoers will be edited to give rights to www-data"
+echo "change of rights for MyChronoGPS"
+if [ ! -f www-data_AUTH ]
 then
-	echo "change of rights for MyChronoGPS"
-	if [ ! -f www-data_AUTH ]
-	then
-		echo "www-data_AUTH file is missing"
-	else
-		echo "copy of www-data_AUTH in /etc/sudoers.d"
-		sudo cp ./www-data_AUTH /etc/sudoers.d
-	fi
+	echo "www-data_AUTH file is missing"
+	exit 4
+else
+	echo "copy of www-data_AUTH in /etc/sudoers.d"
+	sudo cp ./www-data_AUTH /etc/sudoers.d
 fi
 
 # creation of working directories
@@ -76,8 +73,18 @@ sudo cp ./Web-Pi/MyChronoGPS-Parms.html /var/www/html/MyChronoGPS-Parms.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
 
 sudo cp ./Web-Pi/ajax /var/www/html -r
-echo $HOME > /var/www/html/ajax/HOME.txt
-echo $USER > /var/www/html/ajax/USER.txt
+
+sudo chown -R www-data:www-data /var/www
+echo "usermod -a -G www-data "$USER
+sudo usermod -a -G www-data $USER
+#sudo chmod -R g+rwX /var/www
+#sudo chmod -R 777 /var/www
+sudo chmod -R u+wx,g+wx,o+wx /var/www
+#echo "Pres enter to continue"
+#read rep
+sudo echo $HOME > /var/www/html/ajax/HOME.txt
+sudo echo $USER > /var/www/html/ajax/USER.txt
+sudo echo "<?php $ajaxroot = '"$USER"'; ?>" > /var/www/html/ajax/ajaxroot.php
 #sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
 
 sudo cp ./Web-Pi/css /var/www/html -r
@@ -104,7 +111,6 @@ echo "changing access rights of www-data"
 sudo chown -R www-data:www-data /var/www
 sudo usermod -a -G www-data $USER
 sudo chmod -R g+rwX /var/www
-groups $USER
 
 if [ -d cache ]; then
 	sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs $HOME/MyChronoGPS/cache
@@ -117,12 +123,8 @@ sudo chown -R www-data:www-data $HOME/MyChronoGPS
 
 sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
 
-echo "Do you want to mount the cache in memory at Raspberry startup ? Y or N"
-read rep
-if [ $rep = "Y" ] || [ $rep = "y" ]
-then
-	sudo sh ./MyChronoGPS_fstab.sh
-fi	
+echo "The cache is mounted in memory at Raspberry startup"
+sudo sh ./MyChronoGPS_fstab.sh
 
 sudo chown -R www-data:www-data $HOME/MyChronoGPS
 
