@@ -78,10 +78,7 @@ La procédure d'installation proprement dite de MyChronoGPS s'effectue par la co
 	$ sh MyChronoGPS.sh
 
 Plusieurs questions sont posées.
-Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, c'est préférabel, aussi répondre Y
-
-La procédure d'installation demande si on doit changer les droits de www-data dans visudo.
-Si Lighttpd est installé, répondre Y
+Si Lighttpd n'est pas installé, la procédure d'installation demande si on doit l'installer, c'est préférable, aussi répondre Y
 
 La procédure d'installation demande si on a une clé API pour GoogleMaps et si on veut l'utiliser.
 Si oui, le fichier key.js est édité et il faut remplacer 'Your_API_Key' par la valeur de votre clé.

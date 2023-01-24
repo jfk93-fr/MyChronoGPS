@@ -1,6 +1,6 @@
 <?php
 include('ajaxroot.php');
-$dir = $ajaxroot.'/MyChronoGPS/analysis';
+$dir = $ajaxroot.'MyChronoGPS/analysis';
 
 $result = array();
 $locfile = $_GET["analysis"];

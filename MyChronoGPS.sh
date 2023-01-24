@@ -84,7 +84,7 @@ sudo chmod -R u+wx,g+wx,o+wx /var/www
 #read rep
 sudo echo $HOME > /var/www/html/ajax/HOME.txt
 sudo echo $USER > /var/www/html/ajax/USER.txt
-sudo echo "<?php $ajaxroot = '"$USER"'; ?>" > /var/www/html/ajax/ajaxroot.php
+sudo echo "<?php \$ajaxroot = '"$HOME"'; ?>" > /var/www/html/ajax/ajaxroot.php
 #sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
 
 sudo cp ./Web-Pi/css /var/www/html -r
@@ -112,6 +112,10 @@ sudo chown -R www-data:www-data /var/www
 sudo usermod -a -G www-data $USER
 sudo chmod -R g+rwX /var/www
 
+sudo chown -R www-data:www-data $HOME/MyChronoGPS
+
+sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
+
 if [ -d cache ]; then
 	sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs $HOME/MyChronoGPS/cache
 fi
@@ -124,6 +128,9 @@ sudo chown -R www-data:www-data $HOME/MyChronoGPS
 sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
 
 echo "The cache is mounted in memory at Raspberry startup"
+sudo echo "tmpfs "$HOME"/MyChronoGPS/cache tmpfs size=2M,mode=0777 0 0" > MyChronoGPS_fstab
+sudo echo "tmpfs "$HOME"/MyChronoGPS/pipes tmpfs size=20M,mode=0777 0 0" >> MyChronoGPS_fstab
+
 sudo sh ./MyChronoGPS_fstab.sh
 
 sudo chown -R www-data:www-data $HOME/MyChronoGPS
