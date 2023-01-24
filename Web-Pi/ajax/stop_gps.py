@@ -3,7 +3,7 @@
 
 # Il faut donner des droits en exécution sur ce fichier :
 # sudo chmod +x /usr/lib/cgi-bin/stop_gps.py
-from MyChronoGPS_Paths import Paths
+from MyChronoGPS_WebPaths import Paths
 Path = Paths();
 
 import os

@@ -19,13 +19,13 @@ then
   then
       printf "GPS_OLED is already running %s\n" "$_GPS"
   else
-      if [ -p "/home/pi/MyChronoGPS/cache/DISPLAY"  ]
+      if [ -p $HOME"/MyChronoGPS/cache/DISPLAY"  ]
 	  then
-          rm /home/pi/projets/MyChronoGPS/cache/DISPLAY
+          rm $HOME/projets/MyChronoGPS/cache/DISPLAY
 		  echo "DISPLAY removed"
 	  fi
   fi
 fi
 
-su pi -c "/usr/bin/python3 /home/pi/MyChronoGPS/MyChronoGPS.py > /home/pi/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
+su $USER -c "/usr/bin/python3 "$HOME"/MyChronoGPS/MyChronoGPS.py > "$HOME"/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
 exit 0

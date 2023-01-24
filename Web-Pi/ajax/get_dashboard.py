@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # get_dashboard.py
-from MyChronoGPS_Paths import Paths
+from MyChronoGPS_WebPaths import Paths
 Path = Paths();
 dir = Path.pathdata+"/cache"
 import glob 

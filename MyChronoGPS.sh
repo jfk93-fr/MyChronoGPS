@@ -76,7 +76,7 @@ sudo cp ./Web-Pi/MyChronoGPS-Parms.html /var/www/html/MyChronoGPS-Parms.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
 
 sudo cp ./Web-Pi/ajax /var/www/html -r
-sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
+#sudo cp ./MyChronoGPS_Paths.py /var/www/html/ajax/MyChronoGPS_Paths.py
 
 sudo cp ./Web-Pi/css /var/www/html -r
 sudo cp ./Web-Pi/Icones /var/www/html -r
@@ -121,3 +121,7 @@ if [ $rep = "Y" ] || [ $rep = "y" ]
 then
 	sudo sh ./MyChronoGPS_fstab.sh
 fi	
+
+sudo chown -R www-data:www-data $HOME/MyChronoGPS
+
+sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS

@@ -4,7 +4,7 @@
 # Execution rights must be given to this file :
 # sudo chmod +x /usr/lib/cgi-bin/shutdown_pi.py
 
-from MyChronoGPS_Paths import Paths
+from MyChronoGPS_WebPaths import Paths
 Path = Paths();
 
 import os

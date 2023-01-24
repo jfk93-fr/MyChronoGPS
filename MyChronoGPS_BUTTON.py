@@ -58,8 +58,6 @@ BUSY = 1
 ON = 1
 OFF = 0
 
-#pathdata = '/home/userdata'
-#pathdata = '/media/pi/USERDATA'
 pathdata = Path.pathdata
 pathlog = pathdata+'/log'
 

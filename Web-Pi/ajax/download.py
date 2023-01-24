@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-from MyChronoGPS_Paths import Paths
+from MyChronoGPS_WebPaths import Paths
 Path = Paths();
 
 dira = Path.pathweb+"/userdata/"
