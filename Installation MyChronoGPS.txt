@@ -171,25 +171,8 @@ avant la ligne exit 0 insérer la commande pour démarrer MyChronoGPS au démarr
 sh /home/pi/MyChronoGPS/start_gps.sh
 =============================================================================================================
 
-Pour monter la zone mémoire au reboot, à partir du répertoire MyChronoGPS, lancez la commande suivante :
-	$ sudo ./MyChronoGPS_fstab.sh
-
 Pour lancer le tableau de bord au démarrage du pi, à partir du répertoire MyChronoGPS, lancez la commande suivante :
-	$ sudo 
-Créer le dossier lxsession pour le pi :
-$ mkdir /home/pi/.config/lxsession
-Créer le dossier LXDE-pi :
-$ mkdir /home/pi/.config/lxsession/LXDE-pi
-Créer le fichier autostart :
-$ sudo nano /home/pi/.config/lxsession/LXDE-pi/autostart
-@lxpanel –profile LXDE-pi
-@pcmanfm –desktop –profile LXDE-pi
-@xscreensaver -no-splash
-@/usr/bin/chromium-browser –-start-fullscreen --disable-restore-session-state http://localhost
-Pour éviter l'extinction de l'écran ajouter les lignes suivantes :
-@xset s off
-@xset -dpms
-@xset s noblank
+	$ sh ./CreateAutostart.sh
 
 Utilisation de Google Maps API
 Par défaut, MyChronoGPS utilise Leaflet pour les outils analyse et design track.
