@@ -83,11 +83,11 @@ sudo chmod -R u+wx,g+wx,o+wx /var/www
 #echo "Pres enter to continue"
 #read rep
 
-echo "change USER in Web environment"
+echo "change USER in Web environment" $HOME $USER
 sudo echo $HOME > /var/www/html/ajax/HOME.txt
 sudo echo $USER > /var/www/html/ajax/USER.txt
 sudo sed -r 's/USER/'$USER'/' ./Web-Pi/ajax/MyChronoGPS_WebPaths.py > /var/www/html/ajax/MyChronoGPS_WebPaths.py
-sudo echo "<?php \$ajaxroot = '"$HOME"'; ?>" > /var/www/html/ajax/ajaxroot.php
+sudo echo "<?php \$ajaxroot = '"$HOME"/'; ?>" > /var/www/html/ajax/ajaxroot.php
 
 sudo cp ./Web-Pi/css /var/www/html -r
 sudo cp ./Web-Pi/Icones /var/www/html -r
