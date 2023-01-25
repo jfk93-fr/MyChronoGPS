@@ -176,20 +176,29 @@ Pour lancer le tableau de bord au démarrage du pi, à partir du répertoire MyC
 
 Utilisation de Google Maps API
 Par défaut, MyChronoGPS utilise Leaflet pour les outils analyse et design track.
-Si vous possédez une clé pour l'API Google Maps, vous pouvez utiliser l'API en faisant les cations suivantes :
-Copiez les fichiers du dossier GoogleMaps dans le dossier /var/www/html
-Editez le fichier /var/www/html/js/key.js
+Si vous possédez une clé pour l'API Google Maps, vous pouvez demander à MyChronoGPS d'utiliser GoogleMaps à la place de Leaflet.
+Pour çà, dans le répertoire MyChronoGPS, effectuer les actions suivantes :
+	$ sh MyChronoGPS_GoogleMaps.sh
+A l'édition du fichier /var/www/html/js/key.js par nano
 Modifiez la ligne
 	var myKey = 'Your_API_Key';
 en remplacant le texte par votre clé API.
 Sauvez le fichier modifié.
 
+Il est également possible de revenir à l'utilisation de Leaflet à la place de GoogleMaps.
+Pour çà, dans le répertoire MyChronoGPS, effectuer les actions suivantes :
+	$ sh MyChronoGPS_Leaflet.sh
+
 =============================================================================================================
-Ci-dessous, quelques commandes utiles pour dépannage
+Ci-dessous, quelques commandes utiles pour le dépannage
 =============================================================================================================
+	$ lsusb # affichage des périphériques USB connecté au Raspberry (utile si GPS USB)
+	$ ls /dev/tty* # affichage des ports des périphériques (serial0, ttyACM0, ttyAMA0, etc)
+	$ ps -ef | grep MyChronoGPS # affichage des processus MyChronoGPS
+	
 Erreurs Web
 500 – pour avoir le détail, passer la commande 
-$ systemctl status lighttpd.service
+	$ systemctl status lighttpd.service
 
 Consultez les fichiers log :
 "/var/log/lighttpd/error.log"
