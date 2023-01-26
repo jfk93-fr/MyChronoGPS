@@ -1377,8 +1377,8 @@ function manageLine(line) {
 
 	obj = new Object();
 	// SI la ligne n'existe pas on va la placer là où on était centré
-	obj.lat = center.lat();
-	obj.lon = center.lng();
+	obj.lat = center.lat;
+	obj.lon = center.lng;
 	obj.cap = 0;
 	if (line == 0) {
 		obj.title = "Ligne de départ/arrivée";
@@ -1527,10 +1527,10 @@ function drawLineWithCap(objline) {
 
 function changeMarker(ev,objline) {
 	// Le marqueur du milieu de ligne a bougé, on recalcule les coordonnées
-	var latlon = objline.marker.getPosition();
+	var latlon = objline.marker.getLatLng();
 	
-	objline.lat = latlon.lat();
-	objline.lon = latlon.lng();
+	objline.lat = latlon.lat;
+	objline.lon = latlon.lng;
 	
 	// on va déplacer le point opposé de bord de piste
 	objline.coord[2] = objline.coord[0]+((objline.lat-objline.coord[0])*2);
@@ -1739,10 +1739,16 @@ function changeMarkercap(ev,objline) {
 	
 	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
 	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
+	// on commence par calculer la distance entre milieu le bord
+	var latlon = objline.markerB.getLatLng();
+	var C = new Array(latlon.lat, latlon.lng); // point bord
+	var dist = distanceGPS(A,C);
+	
+//jfk
 	var icoord = getPerpendiculaire(A,B);
 	console.log(icoord);
-	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
-	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 
 	if (objline.markerB != '') {
 		map.removeLayer(objline.markerB);
@@ -1756,6 +1762,7 @@ function changeMarkercap(ev,objline) {
 	});	
 	objline.markerB = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: objline.title+' - Bord', rotationAngle: 45});
 	map.addLayer(objline.markerB);	
+	objline.markerB.on('dragend', function(ev) {changeMarkerB(ev,objline);});
 
 	if (objline.markerB2 != '') {
 		map.removeLayer(objline.markerB2);
@@ -1876,10 +1883,10 @@ function constructLine() {
 		
 		ConstructMarks[0].addListener('dragend', function(ev) {
 			// on récupère les coordonnées des0 points
-			var latlon = ConstructMarks[0].getPosition();
+			var latlon = ConstructMarks[0].getLatLng();
 			var lat0 = latlon.lat;
 			var lon0 = latlon.lng;
-			var latlon = ConstructMarks[1].getPosition();
+			var latlon = ConstructMarks[1].getLatLng();
 			var lat1 = latlon.lat;
 			var lon1 = latlon.lng;
 			// on reconstruit la ligne avec le 2ème point
@@ -1925,10 +1932,10 @@ function constructLine() {
 		ConstructMarks[1].setMap(map);
 		ConstructMarks[1].addListener('dragend', function(ev) {
 			// on récupère les coordonnées des0 points
-			var latlon = ConstructMarks[0].getPosition();
+			var latlon = ConstructMarks[0].getLatLng();
 			var lat0 = latlon.lat;
 			var lon0 = latlon.lng;
-			var latlon = ConstructMarks[1].getPosition();
+			var latlon = ConstructMarks[1].getLatLng();
 			var lat1 = latlon.lat;
 			var lon1 = latlon.lng;
 			// on reconstruit la ligne avec le 2ème point
@@ -1967,11 +1974,11 @@ function displayAngle(objline) {
 	var html = "";
 	
 	// point 1
-	var latlon = objline.marker.getPosition();
-	var P1 = new Array(latlon.lat(), latlon.lng());
+	var latlon = objline.marker.getLatLng();
+	var P1 = new Array(latlon.lat, latlon.lng);
 	// point 2
-	var latlon = objline.markerB.getPosition();
-	var P2 = new Array(latlon.lat(), latlon.lng());
+	var latlon = objline.markerB.getLatLng();
+	var P2 = new Array(latlon.lat, latlon.lng);
 	//// point 3
 	//latlon = objline.markerB2.getPosition();
 	//var P3 = new Array(latlon.lat(), latlon.lng());
@@ -1979,8 +1986,8 @@ function displayAngle(objline) {
 	//latlon = objline.markerP1.getPosition();
 	//var P4 = new Array(latlon.lat(), latlon.lng());
 	// point 5
-	latlon = objline.markercap.getPosition();
-	var P5 = new Array(latlon.lat(), latlon.lng());
+	latlon = objline.markercap.getLatLng();
+	var P5 = new Array(latlon.lat, latlon.lng);
 
 	var angle = getAngle(P1,P2);
 	console.log('angle 1-2='+rad2deg(angle));

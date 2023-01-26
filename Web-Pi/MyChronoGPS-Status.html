@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS - Version 1</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS-Status.css">
+</head>
+<body>
+<div class="w3-main">
+	<div class="w3-container w3-row" id="zone-info">
+	</div>
+	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Dashboard</a></div>
+
+	<div class="w3-container">
+		<h1>MyChronoGPS - Version 1</h1>
+			<p>Etat de MyChronoGPS</p>
+	</div>
+
+	<div class="w3-container">
+		<div class="w3-responsive">
+			<div class="w3-row w3-padding-small">
+				<div class="w3-col l3">
+					Nom du Serveur Hôte :
+					<span id="hostname"></span>
+				</div>
+				<div class="w3-col l3">
+					Adresse IP :
+					<span id="adresseip"></span>
+				</div>
+				<div class="w3-col l3">
+					Température CPU :
+					<span id="cputemp"></span>
+				</div>
+			</div>
+			<div class="w3-row  w3-padding-small">
+				<div class="w3-col l2">
+					<a class="w3-button w3-border w3-round" href="#" id="show-process" onclick="displayProcess()">Show Process</a>
+				</div>
+				<div class="w3-col l10">
+					<div id="process"></div>
+				</div>
+			</div>
+			<div class="w3-row w3- w3-padding-small">
+				<div class="w3-col l2">
+					<a class="w3-button w3-border w3-round" href="#" id="show-disk" onclick="displayDisk()">Show Disk</a>
+				</div>
+				<div class="w3-col l10">
+					<div id="disk"></div>
+				</div>
+			</div>
+			<div class="w3-row">
+				<h2 id="retour"></h2>
+				<p id="message"></p>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="./js/MyChronoGPS-Status.js"></script>
+</body>
+</html>

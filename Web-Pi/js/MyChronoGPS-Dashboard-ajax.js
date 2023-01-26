@@ -1,4 +1,3 @@
-//var fonction_get = 'ajax/get_dashboard.php';
 var fonction_get = 'ajax/get_dashboard.py';
 
 var Dashboard = false;

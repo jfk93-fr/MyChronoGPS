@@ -1,7 +1,3 @@
-//if (typeof(data_ready) == 'undefined') {
-//	//console.log('data_ready undefined');
-//}
-
 function isDocInFullscreen() {
   if (document.fullscreenElement) {
     return true;
@@ -9,85 +5,161 @@ function isDocInFullscreen() {
   return false;
 }
 var fullscreen = isDocInFullscreen();
-//console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
-
-//var el = document.getElementById('changescreen');
-//el.innerHTML = screen.width+' '+screen.height;
-//el.innerHTML = 'sat 12 58°';
 
 
 var timer = '';
-var dashboard_timer = '';
-var led_timer = new Array();
-led_timer['green'] = '';
-led_timer['blue'] = '';
-led_timer['yellow'] = '';
-
-var inactiv_timeout = false;
-var delai_inactiv = 10000; // 10 secondes d'inactivité au max
-
-var Infos = false;
-var timerInfos = '';
-var fonction_getInfos = 'ajax/get_infos.py';
-var nbsats = ""
+var Status = false;
+var fonction_getGeneral = 'ajax/get_status.py';
 var tempcpu = ""
-var circuit = ""
-var FL = new Array()
-var pointgps = new Array()
-var nearest = new Array()
+var processShowed = false; 
+var processDisk = false;
+document.getElementById("process").style.display = "none";
+document.getElementById("disk").style.display = "none";
 
-
-var Colors = ['khaki','aqua','blue','red','green','indigo','yellow','orange','pink','brown','lime','cyan','purple','teal'];
-var nb_colors = Colors.length;
 
 // Début du programme
-loadDashboard();
+loadStatus(fonction_getGeneral);
 
-function dataDashboardReady() {
-	go();
+function loadStatus(func)
+{
+	var proc = func+"?nocache=" + Math.random()
+	loadAjax(proc);
+	isAjaxReady();
 }
 
-function go()
+function isAjaxReady()
 {
+	if (!Status) {
+		timer = setTimeout(isAjaxReady, 100);
+		return;
+	}
+	clearTimeout(timer);
+	var el = document.getElementById("zone-info");
+	if (el)
+		el.innerHTML = '';
+
+	dataStatusReady();
+}
+
+function loadAjax(proc) 
+{
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+			if (this.status == 200) {
+				//alert("responseText:"+this.responseText);
+				//console.log(this.responseText);
+				try {
+						Status = JSON.parse(this.responseText);
+						console.log(this.responseText)
+					}
+				catch(e) {Status = this.responseText;}
+			}
+			else 
+			{
+				var el = document.getElementById("zone-info");
+				if (el)
+					el.innerHTML = "URL " + proc + " non trouv&eacute;e";
+			}
+		}
+    }
+    xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
+    xmlhttp.send();
+}
+
+function dataStatusReady() {
 	if (timer) {
 		clearTimeout(timer);
 	}
-	document.getElementById('dashboard').style.display = 'block';
-	//resizescreen('dashboard');
 
-	if (!Array.isArray(Dashboard)) {
+	if (!Array.isArray(Status)) {
 		// on n'a pas réussi à charger les données
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('go() erreur');
-		console.log(Dashboard);
-			//el.innerHTML = Live;
+		console.log(Status);
 		return false;
 	}
-	//console.log(Dashboard[0]);
 
-	Ev = eval(Dashboard[0]);
+	Ev = eval(Status[0]);
 	retour = Ev;
 	if (retour.msgerr) {
 		// on n'a pas réussi à charger les données
-		clearDashboard()
+		//clearDashboard()
 		document.getElementById("loading").style.display = 'block';
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = retour.msgerr;
 		// tout recommencer dans quelques secondes
 		//console.log(retour.msgerr)
-		timer = setTimeout(getNextDisplay, 3000);	
+		timer = setTimeout(getNextPoint, 3000);	
 		return false;
 	}
 
 	//console.log(Ev);
-	thisDashboard = Ev;
-	
-	displayDashboard();
-	
-	getInfos();
+	thisStatus = Ev;
+	document.getElementById("adresseip").innerHTML = thisStatus.adresseip;
+	document.getElementById("hostname").innerHTML = thisStatus.hostname;
+	document.getElementById("cputemp").innerHTML = thisStatus.cputemp;
+	var el = document.getElementById("process");
+	var HTML = '<table class="status-table"><tr>';
+	//var title = thisStatus.pheader
+	for (var i=0; i < thisStatus.pheader.length; i++) {
+		HTML += "<th>"+thisStatus.pheader[i]+"</th>";
+	}
+	HTML += "<th>KILL</th>";
+	HTML += "</tr>";
+	for (var i=0; i < thisStatus.myprocess.length; i++) {
+		console.log(thisStatus.myprocess[i]);
+		console.log(thisStatus.myprocess[i].substr(48));
+		HTML += "<tr>";
+		var buf = thisStatus.myprocess[i];
+		for (var j=0; j < thisStatus.pheader.length-1; j++) {
+			var ip = buf.indexOf(' ');
+			var zd = buf.substr(0,ip)
+			HTML += "<td>"+zd+"</td>";
+			buf = buf.substr(ip).trim();
+		}
+		HTML += "<td>"+thisStatus.myprocess[i].substr(48)+"</td>"; // la commande complète est située à l'offset 48
+		HTML += "<th>KILL</th>";
+		HTML += "</tr>";
+	}
+	HTML += "</table>";
+	el.innerHTML = HTML;
+
+	var el = document.getElementById("disk");
+	var HTML = '<table class="status-table"><tr>';
+	HTML += "<th>"+thisStatus.disk[0].substr(0,10)+"</th>"; // Filesystem
+	HTML += "<th>"+thisStatus.disk[0].substr(16,4)+"</th>"; // Size
+	HTML += "<th>"+thisStatus.disk[0].substr(22,4)+"</th>"; // Used
+	HTML += "<th>"+thisStatus.disk[0].substr(27,5)+"</th>"; // Avail
+	HTML += "<th>"+thisStatus.disk[0].substr(33,4)+"</th>"; // Use%
+	HTML += "<th>"+thisStatus.disk[0].substr(38).trim()+"</th>"; // Mounted on
+	HTML += "</tr>";
+	var ip;
+	var zd;
+	var buf;
+	for (var i=1; i < thisStatus.disk.length; i++) {
+		console.log(thisStatus.disk[i]);
+		HTML += "<tr>";
+		buf = thisStatus.disk[i];
+		for (var j=0; j < 6; j++) {
+			ip = buf.indexOf(' ');
+			if (ip < 0) {zd = buf;}
+			else {zd = buf.substr(0,ip);}
+			HTML += "<td>"+zd+"</td>";
+			buf = buf.substr(ip).trim();
+		}
+		HTML += "</tr>";
+	}
+	HTML += "</table>";
+	el.innerHTML = HTML;
+
+	//thisStatus.myprocess;
+	//
+	//displayDashboard();
+	//
+	//getInfos();
 }
 
 // affichage du tableau de bord
@@ -120,7 +192,8 @@ function displayDashboard() {
 	}
 	displayLeds()
 
-	timer = setTimeout(getNextDisplay, 500); // rafraichissement toutes les 1/2 secondes
+	//timer = setTimeout(getNextPoint, 200);
+	timer = setTimeout(getNextPoint, 500); // rafraichissement toutes les 1/2 secondes
 }
 function clearDashboard() {
 	var el = document.getElementById('LD');
@@ -282,16 +355,16 @@ function stop_blink() {
 }
 
 // Rechercher le prochain point
-function getNextDisplay() {
+function getNextPoint() {
 	if (timer) {
 		clearTimeout(timer);
 	}
 	var proc = fonction_get+"?nocache=" + Math.random()
 	loadDashboardAjax(proc);
-	isDisplayReady();
+	isPointReady();
 }
 
-function isDisplayReady()
+function isPointReady()
 {
 	if (!Dashboard) {
 		dashboard_timer = setTimeout(isDashboardReady, 100);
@@ -315,7 +388,7 @@ function isDisplayReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('isDisplayReady() erreur');
+		console.log('isPointReady() erreur');
 		console.log(Dashboard);
 		return false;
 	}
@@ -333,7 +406,7 @@ function isDisplayReady()
 			el.innerHTML += ' '+retour.msgerr;
 		// aller vers le prochain point
 		//console.log(retour.msgerr)
-		timer = setTimeout(getNextDisplay, 3000);
+		timer = setTimeout(getNextPoint, 3000);
 		return false;
 	}
 
@@ -439,7 +512,7 @@ function setInactiv(delai=delai_inactiv) {
 }
 
 function restartDisplay() {
-	getNextDisplay();
+	getNextPoint();
 	getInfos()
 }
 
@@ -604,29 +677,33 @@ function isInfosReady()
 	
 }
 
-function loadInfosAjax(proc) 
-{
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4) {
-			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
-				try {Infos = JSON.parse(this.responseText);}
-				catch(e) {Infos = this.responseText;}
-			}
-			else 
-			{
-				var el = document.getElementById("zone-info");
-				if (el)
-					el.innerHTML = "URL " + proc + " non trouv&eacute;e";
-			}
-		}
-    }
-    xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
-    xmlhttp.send();
+function displayProcess() {
+	var el = document.getElementById("process");
+	if (processShowed == true) {
+		processShowed = false;
+		el.style.display = "none";
+		document.getElementById("show-process").innerHTML = 'Show Process';
+	}
+	else {
+		processShowed = true;
+		el.style.display = "block";
+		document.getElementById("show-process").innerHTML = 'X';
+	}
 }
 
+function displayDisk() {
+	var el = document.getElementById("disk");
+	if (processShowed == true) {
+		processShowed = false;
+		el.style.display = "none";
+		document.getElementById("show-disk").innerHTML = 'Show Disks';
+	}
+	else {
+		processShowed = true;
+		el.style.display = "block";
+		document.getElementById("show-disk").innerHTML = 'X';
+	}
+}
 
 
 // Fonction de redimensionnement de l'écran (normal ou fullscreen)
