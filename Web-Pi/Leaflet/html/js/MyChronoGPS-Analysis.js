@@ -1,7 +1,3 @@
-//if (typeof(data_ready) == 'undefined') {
-//	//console.log('data_ready undefined');
-//}
-
 var curr_coord = 0;
 var latitude     = '';
 var longitude    = '';
@@ -1321,10 +1317,14 @@ function designCut(parm) {
 	var v0 = parm.v0;
 	var v1 = parm.v1;
 	
-	var linecut = isLineCut(linecoord,segcoords);
-	////console.log('linecut:'+linecut+' coord:',segcoords);
+	//var linecut = isLineCut(linecoord,segcoords);
+	var linecut = false;
+	var pointCut = getIntersection(linecoord,segcoords);
+	//console.log('linecut:'+linecut+' coord:',segcoords);
 	
-	if (linecut) {
+	//if (linecut) {
+	if (pointCut != false) {
+		linecut = true;
 		////console.log('ligne franchie');
 		// On va calculer les distances entre le point, le point b et la ligne franchie
 		////console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
@@ -1337,7 +1337,7 @@ function designCut(parm) {
 		////console.log('dist1:'+dist1);
 		////console.log('somme d0 d1:'+(dist0+dist1));
 		
-		var pointCut = getIntersection(linecoord,segcoords);
+		//var pointCut = getIntersection(linecoord,segcoords);
 
 		var corrtime = dt1.getTime() - dt0.getTime();
 		console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
@@ -1371,8 +1371,15 @@ function designCut(parm) {
 
 function showLap(lap) {
 	var el = document.getElementById("simu");
-	if (el)
-		el.style.display = "block";
+	el.style.display = "block";
+	if (window.innerWidth <= 480) {
+		document.getElementById("switch-simu").style.display = "none";
+		document.getElementById("switch-graph").style.display = "none";
+		document.getElementById("menu-graph").style.display = "block";
+	}		
+	else {
+		document.getElementById("menu-graph").style.display = "none";
+	}		
 	// on sauvegarde le n° du tour dans la page
 	var el = document.getElementById("HiddenLap");
 	if (el)
@@ -2596,46 +2603,12 @@ function getObjTime(t) {
 	return ObTime;
 }
 
-function isLineCut(SegAB, SegCD) {
-	/***
-	// Pour déterminer si le segment de droite de référence est franchie,
-	// peut-être est-il préférable de déterminer si le segment de droite entre le point gps actuel et le point gps précédent
-	// coupe le segment de droite de la ligne de référence
-	// Pour vérifier l'intersection, on fait l'analyse du calcul des 4 triangles formés par les 4 points suivants :
-	// les 2 points du segment de droite de la ligne de référence A-B et
-	// les 2 points du segment de droite du point gps au point gps précédent C-D
-	// T1=C/[AB]
-	// T2=D/[AB]
-	// T3=A/[CD]
-	// T4=B/[CD]
-	***/
-	// il y a intersection si (T1*T2<0) et (T3*T4<0)
-	var m = 1;
-	var Xa = SegAB[1]*m;
-	var Ya = SegAB[0]*m;
-	var Xb = SegAB[3]*m;
-	var Yb = SegAB[2]*m;
-	var Xc = SegCD[1]*m;
-	var Yc = SegCD[0]*m;
-	var Xd = SegCD[3]*m;
-	var Yd = SegCD[2]*m;
-	
-	var T1 = (Xb-Xa)*(Yc-Ya) - (Yb-Ya)*(Xc-Xa);
-	var T2 = (Xb-Xa)*(Yd-Ya) - (Yb-Ya)*(Xd-Xa);
-	var T3 = (Xd-Xc)*(Ya-Yc) - (Yd-Yc)*(Xa-Xc);
-	var T4 = (Xd-Xc)*(Yb-Yc) - (Yd-Yc)*(Xb-Xc);
-	
-	var sp1 = (Xb-Xa)*(Yc-Ya) - (Yb-Ya)*(Xc-Xa);
-	var sp2 = (Xb-Xa)*(Yd-Ya) - (Yb-Ya)*(Xd-Xa);
 
-	var Seg1 = T1*T2;
-	var Seg2 = T3*T4;
-	if (Seg1 < 0) {
-		if (Seg2 < 0) {
-			return true; // les segments de droite se coupent
-		}
-	}
-	return false;
+function isLineCut(SegAB, SegCD) {
+	var intersec = getIntersection(SegAB,SegCD)
+	if (intersec != false)
+		intersec = true;
+	return intersec;
 }
 
 function getDestination(ilat,ilon, cap, distance, radius=6371e3) {
@@ -2793,86 +2766,51 @@ function pointDroite(A,B,d) { // coordonnées du point A, point B et distance à
 }
 
 function getIntersection(SegAB,SegCD) {
-	/************
-on calcule les coordonnées des droites
-puis on fait une petite équation comme sa : "droite1 = droite2"
-et puis on a tout les point d'intersections après il faut que le programme puisse géré sa ^^ mais ça marche
-
-rappel (même si tu le sais peut-être sa m'occupe :p ) :
-
-- calcul d'une droite à partir de 2 points :
-droite d'équation : y = ax + b
-a = (y1 - y2 ) / (x1 - x2)
-b = y1 - a.x1
-(Sachant que le point A a pour coordonnées : x1 et y1
-et le point B : x2 et y2)
-
-- savoir si elles sont sécantes :
-on a deux droite :
-y1 = a1.x + b1
-y2 = a2.x + b2
-
-on fait y1 = y2
-ce qui revient à :
-y1 - y2 = 0
-a1.x + b1 - a2.x - b2 = 0
-x(a1 - a2) + b1 - b2 = 0
-x = (b2 - b1) / (a1 - a2)
-
-et donc on à la fin de l'équation on obtient la valeur x où elle se croisent
-(si elles se croisent) et si elles se croisent pas alors tu aura un petit
-a1 - a2 = 0 (donc tu fait une condition pour vérifié si a1 - a2 != 0 ;)
-
-voilà
-si je me trompe dites moi que je parte pas sans avoir dit n'importe quoi ^^
-ça fait longtemps que j'ai pas fait de trigo ^^
-
-	************/
-	var Xa = SegAB[1]*1;
-	var Ya = SegAB[0]*1;
-	////console.log('a:'+Xa+','+Ya);
-	var Xb = SegAB[3]*1;
-	var Yb = SegAB[2]*1;
-	////console.log('b:'+Xb+','+Yb);
-	var Xc = SegCD[1]*1;
-	var Yc = SegCD[0]*1;
-	////console.log('c:'+Xc+','+Yc);
-	var Xd = SegCD[3]*1;
-	var Yd = SegCD[2]*1;
-//- calcul d'une droite à partir de 2 points :
-//droite d'équation : y = ax + b
-//a = (y1 - y2 ) / (x1 - x2)
-//b = y1 - a.x1
-//(Sachant que le point A a pour coordonnées : x1 et y1
-//et le point B : x2 et y2)
-	//var a = (Ya-Yb) / (Xa-Xb);
-	//var b = Ya - a*Xa;
-//- savoir si elles sont sécantes :
-//on a deux droite :
-//y1 = a1.x + b1
-//y2 = a2.x + b2
-//
-//on fait y1 = y2
-//ce qui revient à :
-//y1 - y2 = 0
-//a1.x + b1 - a2.x - b2 = 0
-//x(a1 - a2) + b1 - b2 = 0
-//x = (b2 - b1) / (a1 - a2)
-	var a1 = (Ya-Yb) / (Xa-Xb);
-	var b1 = Ya - a1*Xa;
-	var a2 = (Yc-Yd) / (Xc-Xd);
-	var b2 = Yc - a2*Xc;
-
-	var x = (b2 - b1) / (a1 - a2);
+	var Ax = SegAB[0]*1;
+	var Ay = SegAB[1]*1;
+	var Bx = SegAB[2]*1;
+	var By = SegAB[3]*1;
 	
-	var y = (a1*x)+b1
+	var Cx = SegCD[0]*1;
+	var Cy = SegCD[1]*1;
+	var Dx = SegCD[2]*1;
+	var Dy = SegCD[3]*1;
+
+	var Sx;
+	var Sy;
 	
-	var pxy = false;
-	if (a1-a2 != 0) {
-		var pxy = new Array(y,x);
+	if(Ax==Bx)
+	{
+		if(Cx==Dx) return false;
+		else
+		{
+			var pCD = (Cy-Dy)/(Cx-Dx);
+			Sx = Ax;
+			Sy = pCD*(Ax-Cx)+Cy;
+		}
 	}
-	return pxy;
-	
+	else
+	{
+		if(Cx==Dx)
+		{
+			var pAB = (Ay-By)/(Ax-Bx);
+			Sx = Cx;
+			Sy = pAB*(Cx-Ax)+Ay;
+		}
+		else
+		{
+			var pCD = (Cy-Dy)/(Cx-Dx);
+			var pAB = (Ay-By)/(Ax-Bx);
+			var oCD = Cy-pCD*Cx;
+			var oAB = Ay-pAB*Ax;
+			Sx = (oAB-oCD)/(pCD-pAB);
+			Sy = pCD*Sx+oCD;
+		}
+	}
+	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
+			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
+	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
+	  return new Array(Sx,Sy)
 }
 /*
 */

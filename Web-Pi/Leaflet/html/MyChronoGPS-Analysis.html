@@ -12,7 +12,7 @@
 </head>
 <!--<body onkeydown="ActionTouche(event)">-->
 <body>
-<div class="w3-main">
+<div class="w3-main LCD35">
 	<div id="zone-info"></div>
 	<textarea id="clipboard" cols=50 style="display:none"></textarea>
 
@@ -29,14 +29,16 @@
 <div class="w3-container" style="margin-left:15%">
 		<div class="w3-container w3-row">
 			<div class="w3-bar" id="menu-onglets" style="display:block">
+				<a href="MyChronoGPS.html" ><div class="w3-bar-item w3-button">Menu</div></a>
 				<div class="w3-bar-item w3-button" id="menu-map" onClick="displayMap();">Map</div>
 				<div class="w3-bar-item w3-button" id="menu-infos" onClick="displayInfos();">Infos</div>
-				<!--<div class="w3-bar-item w3-button" id="menu-stats" onClick="displayStats();">stats</div>-->
+				<div class="w3-bar-item w3-button" id="menu-graph" onClick="switchGraph();" style="display:none">Graphe</div>
 			</div>
 			
 			<div class="w3-container" id="onglet-map">
 				<div class="w3-bar" id="sousmenu-map">
 					<span id="zone-info"></span>&nbsp;
+					<span class="LCD35-hide">
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(0);" >FL</a>
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(1);" >Int1</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(2);" >Int2</a>		
@@ -45,24 +47,16 @@
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-2);" >PitOut</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="setMaxZoom();" >Zoom+</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="setOriginZoom();" >Zoom-</a>		
-					<span><input id="LatLng" value="" onchange="showInputPoint(this.id);"></input></span>
-					<span><input type="hidden" id="HiddenLatLng" value=""></input></span>
-					<a class="w3-bar-item w3-button" href="#"  onClick="showInputPoint('HiddenLatLng');" >Point</a>		
+					</span>
+					<span class="LCD35-hide"><input id="LatLng" value="" onchange="showInputPoint(this.id);"></input></span>
+					<span class="LCD35-hide"><input type="hidden" id="HiddenLatLng" value=""></input></span>
+					<span class="LCD35-hide"><a class="w3-bar-item w3-button" href="#"  onClick="showInputPoint('HiddenLatLng');" >Point</a></span>	
 					<span id="simu" style="display:none"> 
-						<a class="w3-bar-item w3-button" href="#" onClick="switchSimu();" >Simulateur</a>
-						<a class="w3-bar-item w3-button" href="#" onClick="switchGraph();" >Graphe</a>
-						<span class="w3-mobile">
-							Conversion
-							<select name=Conversion onchange="beginConvert(this)">
-								<option> &nbsp;
-								<option> KML
-								<option> IGC
-							</select>
-						</span>
-						<!--<a class="w3-bar-item w3-button" href="#" onClick="copyIGC();">Vers IGC</a>-->
+						<a id="switch-simu" class="w3-bar-item w3-button LCD35-hide" href="#" onClick="switchSimu();" >Simulateur</a>
+						<a  id="switch-graph"class="w3-bar-item w3-button" href="#" onClick="switchGraph();" >Graphe</a>
 					</span>
 				</div>
-				<div class="w3-container w3-row-padding" id="sousmenu-simu">
+				<div class="w3-container w3-row-padding LCD35-hide" id="sousmenu-simu" style="display:none">
 				 <div class="w3-cell">
 				  <div class="w3-row">&nbsp;</div>
 				  <div class="w3-row">

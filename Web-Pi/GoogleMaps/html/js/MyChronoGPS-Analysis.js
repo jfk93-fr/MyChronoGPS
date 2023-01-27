@@ -1,7 +1,3 @@
-//if (typeof(data_ready) == 'undefined') {
-//	//console.log('data_ready undefined');
-//}
-
 var curr_coord = 0;
 var latitude     = '';
 var longitude    = '';
@@ -95,7 +91,7 @@ loadCircuits();
 
 function dataCircuitsReady() {
 	loadCoords();
-	console.log(JSON.stringify(Coords))
+	//console.log(JSON.stringify(Coords))
 }	
 
 function dataCoordsReady() {
@@ -245,30 +241,6 @@ function showData() {
 	}
 	else el.style.display = 'none';
 
-	//el = document.getElementById("Adresse");
-	//if (thisCircuit.Adresse) {
-	//	el.value = thisCircuit.Adresse;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CodePostal");
-	//if (thisCircuit.CodePostal) {
-	//	el.value = thisCircuit.CodePostal;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Ville");
-	//if (thisCircuit.Ville) {
-	//	el.value = thisCircuit.Ville;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("URL");
-	//if (thisCircuit.URL) {
-	//	el.value = thisCircuit.URL;
-	//}
-	//else el.style.display = 'none';
-
 	el = document.getElementById("Latitude");
 	if (thisCircuit.Latitude) {
 		el.value = thisCircuit.Latitude;
@@ -280,18 +252,6 @@ function showData() {
 		el.value = thisCircuit.Longitude;
 	}
 	else el.style.display = 'none';
-
-	//el = document.getElementById("Latcenter");
-	//if (thisCircuit.Latcenter) {
-	//	el.value = thisCircuit.Latcenter;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Loncenter");
-	//if (thisCircuit.Loncenter) {
-	//	el.value = thisCircuit.Loncenter;
-	//}
-	//else el.style.display = 'none';
 
 	el = document.getElementById("LongCircuit");
 	if (thisCircuit.LongCircuit) {
@@ -307,7 +267,7 @@ function showData() {
 
 	/* FL en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("FLLat1");
-	////console.log("FL:"+thisCircuit.FL)
+	//console.log("FL:"+thisCircuit.FL)
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[0];
 	}
@@ -327,79 +287,6 @@ function showData() {
 		el.value = thisCircuit.FL[3];
 	}
 	else el.style.display = 'none';
-
-	/* FL en lat,lon,cap */
-	//el = document.getElementById("LatFL");
-	//if (thisCircuit.LatFL) {
-	//	el.value = thisCircuit.LatFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonFL");
-	//if (thisCircuit.LonFL) {
-	//	el.value = thisCircuit.LonFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapFL");
-	//if (thisCircuit.CapFL) {
-	//	el.value = thisCircuit.CapFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt1");
-	//if (thisCircuit.LatInt1) {
-	//	el.value = thisCircuit.LatInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt1");
-	//if (thisCircuit.LonInt1) {
-	//	el.value = thisCircuit.LonInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt1");
-	//if (thisCircuit.CapInt1) {
-	//	el.value = thisCircuit.CapInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt2");
-	//if (thisCircuit.LatInt2) {
-	//	el.value = thisCircuit.LatInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt2");
-	//if (thisCircuit.LonInt2) {
-	//	el.value = thisCircuit.LonInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt2");
-	//if (thisCircuit.CapInt2) {
-	//	el.value = thisCircuit.CapInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt3");
-	//if (thisCircuit.LatInt3) {
-	//	el.value = thisCircuit.LatInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt3");
-	//if (thisCircuit.LonInt3) {
-	//	el.value = thisCircuit.LonInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt3");
-	//if (thisCircuit.CapInt3) {
-	//	el.value = thisCircuit.CapInt3;
-	//}
-	//else el.style.display = 'none';
 }
 
 function showLines() {
@@ -424,7 +311,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objStart);
 	}
 	
@@ -450,7 +337,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[0]);
 	}
 	
@@ -476,7 +363,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[1]);
 	}
 	
@@ -552,16 +439,12 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objPitOut);
 	}
 }
 
 function point2Line(line) {
-	//var center = map.getCenter(); // on met de côté le centrage actuel
-	//// On recentre la map avec le zoom d'origine
-	//resetScreen();
-	
 	var obj = false;
 	if (line > 0) {
 		if (Tabint[line-1])
@@ -575,7 +458,6 @@ function point2Line(line) {
 		obj = objPitOut;
 	
 	if (obj.line) {
-		//setMaxZoom(obj.coord[0],obj.coord[1]); // recentrage sur les coordonnées at zoom max
 		setCenter(obj.coord[0],obj.coord[1]); // maintenant, on fait juste un recentrage sans changer le zoom
 		return;
 	}	
@@ -666,7 +548,7 @@ function go()
 			el.innerHTML = 'problème détecté';
 		return false;
 	}
-	console.log(JSON.stringify(Coords));
+	//console.log(JSON.stringify(Coords));
 		
 	curr_coord = 0;
 	Ev = eval(Coords[curr_coord]);
@@ -733,7 +615,7 @@ function go()
 		var T1 = getObjTime(Point1.timestamp);
 		var dT = T1.getTime() - T0.getTime();
 		if (dT > 20000) {
-			console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
+			//console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
 			Tour.valid = false;
 		}
 		prevTimestamp = Point1.timestamp;
@@ -752,7 +634,7 @@ function go()
 		
 		if (nt > 0 && np <= 1) {
 			// on va ajouter les points 0 & 1 à la fin du tour précédent
-			console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
+			//console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
 			Point = new Object();
 			Point.timestamp = Tours[nt].points[np].timestamp;
 			Point.lat1 = Tours[nt].points[np].lat1;
@@ -765,15 +647,15 @@ function go()
 
 		np++;
 	}
-	////console.log(Tours);
+	//console.log(Tours);
 	// ne ratons pas le dernier tour
 	if (Tour) {
 		Tours.push(Tour);
-		console.log('ne ratons pas le dernier tour');
+		//console.log('ne ratons pas le dernier tour');
 		// on va ajouter le points 0 & 1 à la fin du tour précédent
 		nt = Tours.length-1;
-		console.log(JSON.stringify(Tours[nt-1]))
-		console.log(JSON.stringify(Tours[nt]))
+		//console.log(JSON.stringify(Tours[nt-1]))
+		//console.log(JSON.stringify(Tours[nt]))
 		for (var np=0; np < 2; np++) {
 			Point = new Object();
 			Point.timestamp = Tours[nt].points[np].timestamp;
@@ -784,8 +666,8 @@ function go()
 			Point.cap = Tours[nt].points[np].cap;
 			Tours[nt-1].points.push(Point);
 		}
-		console.log(JSON.stringify(Tours[nt-1]))
-		console.log(JSON.stringify(Tours[nt]))
+		//console.log(JSON.stringify(Tours[nt-1]))
+		//console.log(JSON.stringify(Tours[nt]))
 	}
 
 	// dès la première ligne du fichier, on va chercher le circuit correspondant
@@ -794,18 +676,18 @@ function go()
 	//Tour = Tours[i];
 	Points = Tour.points;
 	var nbpoints = Points.length;
-	////console.log("nbpoints:"+nbpoints);
+	//console.log("nbpoints:"+nbpoints);
 	
 	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
 	var T0 = getObjTime(Points[0].timestamp);
 	var T1 = getObjTime(Points[1].timestamp);
 	var dT = T1.getTime() - T0.getTime();
-	console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
+	//console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
 	Frequence = 1000/dT;
 
 	latitude = Points[0].lat1;
 	longitude = Points[0].lon1;
-	////console.log("lat:"+latitude+",lon:"+longitude)
+	//console.log("lat:"+latitude+",lon:"+longitude)
 	
 	var trackfound = scanCircuit();
 	
@@ -830,7 +712,7 @@ function go()
 		return;
 	el.innerHTML = "";
 	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
-		////console.log("Tour:"+Tours[i].id);
+		//console.log("Tour:"+Tours[i].id);
 		var tour = Tours[i].id;
 		
 		if (Tours[i].valid) {
@@ -852,7 +734,7 @@ function initCircuit(track) {
 		thisCircuit = new Object();
 	//console.log(JSON.stringify(track));
 	for (property in track) {
-		////console.log(`${property}: ${track[property]}`);
+		//console.log(`${property}: ${track[property]}`);
 		if (!thisCircuit[property])
 			thisCircuit[property] = track[property];
 	}
@@ -931,22 +813,7 @@ function drawLineWithCap(objline) {
 		});
 		objline.line.setMap(map);
 	}
-	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);
-	
-	//// Pour les test on va rajouter un marqueur sur la perpendiculaire passant par la droite point de départ, bord de départ
-	//var ncoord = getPerpendiculaire(new Array(objline.lat, objline.lon),new Array(objline.coord[2], objline.coord[3]));
-	//var markerpoint = {lat: ncoord[0], lng: ncoord[1]};
-	//objline.markerP1 = new google.maps.Marker({
-	//	position: markerpoint, title: objline.title+' - P1'
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/4.png'
-	//	,draggable: true
-	//	});
-	//objline.markerP1.setMap(map);
-	
-	//displayAngle(objline);
-	
-	//displayCercleTrigo(objline);
-	
+	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);	
 }
 
 function drawCut() {
@@ -1061,7 +928,7 @@ function designLap(lap) {
 	//
 	// Pour construire le polygone on traite les points, point par point
 	for (var i=0; i < Points.length; i++) {
-		////console.log(JSON.stringify(Points[i]));
+		//console.log(JSON.stringify(Points[i]));
 		var pcoord = new Object();
 		pcoord.lat = Points[i].lat1;
 		pcoord.lng = Points[i].lon1;
@@ -1115,9 +982,9 @@ function designLap(lap) {
 				time_start = Tcut.tdeb;
 				time_arrival = Tcut.tfin;
 				time_prev[0] = time_start;
-				console.log('temps départ:'+time_start);
-				console.log('temps fin:'+time_arrival);
-				console.log('temps de coupure:'+JSON.stringify(Tcut));
+				//console.log('temps départ:'+time_start);
+				//console.log('temps fin:'+time_arrival);
+				//console.log('temps de coupure:'+JSON.stringify(Tcut));
                 Points[i].timecut = time_arrival - time_start;		
 				// s'il s'agit d'un point de coupure, on l'indique dans le chemin
 				var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
@@ -1238,26 +1105,30 @@ function designCut(parm) {
 	var v0 = parm.v0;
 	var v1 = parm.v1;
 	
-	var linecut = isLineCut(linecoord,segcoords);
-	////console.log('linecut:'+linecut+' coord:',segcoords);
+	//var linecut = isLineCut(linecoord,segcoords);
+	var linecut = false;
+	var pointCut = getIntersection(linecoord,segcoords);
+	//console.log('linecut:'+linecut+' coord:',segcoords);
 	
-	if (linecut) {
-		////console.log('ligne franchie');
+	//if (linecut) {
+	if (pointCut != false) {
+		linecut = true;
+		//console.log('ligne franchie');
 		// On va calculer les distances entre le point, le point b et la ligne franchie
-		////console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
-		////console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
+		//console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
+		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
-		////console.log('dist0:'+dist0);
+		//console.log('dist0:'+dist0);
 		var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
-		////console.log('distseg:'+distseg);
+		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
-		////console.log('dist1:'+dist1);
-		////console.log('somme d0 d1:'+(dist0+dist1));
+		//console.log('dist1:'+dist1);
+		//console.log('somme d0 d1:'+(dist0+dist1));
 		
-		var pointCut = getIntersection(linecoord,segcoords);
+		//var pointCut = getIntersection(linecoord,segcoords);
 
 		var corrtime = dt1.getTime() - dt0.getTime();
-		console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
+		//console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
 		
 		var vs0 = (v0*1000)/3600;
 		var vs1 = (v1*1000)/3600;
@@ -1288,8 +1159,15 @@ function designCut(parm) {
 
 function showLap(lap) {
 	var el = document.getElementById("simu");
-	if (el)
-		el.style.display = "block";
+	el.style.display = "block";
+	if (window.innerWidth <= 480) {
+		document.getElementById("switch-simu").style.display = "none";
+		document.getElementById("switch-graph").style.display = "none";
+		document.getElementById("menu-graph").style.display = "block";
+	}		
+	else {
+		document.getElementById("menu-graph").style.display = "none";
+	}		
 	// on sauvegarde le n° du tour dans la page
 	var el = document.getElementById("HiddenLap");
 	if (el)
@@ -1386,6 +1264,17 @@ function showLap(lap) {
 		if (el.className.indexOf(colorLap) < 0)
 			el.className += " "+colorLap;
 	}
+	console.log(il);
+	console.log('il:'+il+' Tours:'+JSON.stringify(Tours[il]));
+	/*
+	for (var pr=0; pr < Tours[il].pathRun.length; pr++) {
+		console.log('il:'+il+' paths:'+pr+'='+JSON.stringify(Tours[il].pathRun[pr]));
+	}
+	console.log(il);
+	for (var pr=0; pr < Tours[il].geocoords.length; pr++) {
+		console.log('il:'+il+' coords:'+pr+'='+JSON.stringify(Tours[il].geocoords[pr]));
+	}
+	*/
 
 	Tours[il].polyline = new google.maps.Polyline({
 		path: Tours[il].pathRun,
@@ -1410,92 +1299,16 @@ function showLap(lap) {
 	var markerpoint = new Object();
 	markerpoint.lat = Tours[il].pointCut[0];
 	markerpoint.lng = Tours[il].pointCut[1];
-	////console.log(markerpoint);
+	//console.log(markerpoint);
 	Tours[il].markerPC = new google.maps.Marker({
 		position: markerpoint, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'
 		//,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
 		,visible: true
 		});
 	Tours[il].markerPC.setMap(map);
-//		
-//	// affichage du point de début du tour (avant passage de la ligne)
-//	if (Tours[il].markerD1) {
-//		if (Tours[il].markerD1 != '') {
-//			Tours[il].markerD1.setMap(null);
-//			Tours[il].markerD1 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[0];
-//	////console.log(markerpoint);
-//	Tours[il].markerD1 = new google.maps.Marker({
-//		position: markerpoint, title: 'D1 '+Tours[il].points[0].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-//		});
-//	Tours[il].markerD1.setMap(map);
-//		
-//	if (Tours[il].segment0) {
-//		if (Tours[il].segment0 != '') {
-//			Tours[il].segment0.setMap(null);
-//			Tours[il].segment0 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[0],Tours[il].pathRun[1]);
-//	Tours[il].segment0 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'white',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment0.setMap(map);
 	
 	var l = Tours[il].pathRun.length-1;
-	////console.log(l);
-				
-//	// affichage du point de fin du tour (après passage de la ligne)
-//	if (Tours[il].markerD2) {
-//		if (Tours[il].markerD2 != '') {
-//			Tours[il].markerD2.setMap(null);
-//			Tours[il].markerD2 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[l];
-//	////console.log(markerpoint);
-//	Tours[il].markerD2 = new google.maps.Marker({
-//		position: markerpoint, title: 'D2 '+Tours[il].points[l].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//		});
-//	Tours[il].markerD2.setMap(map);
-//		
-//	//if (markerDB != '') {
-//	//	markerDB.setMap(null);
-//	//	markerDB = '';
-//	//}
-//	//var markerpoint = Tours[il].pathRun[0];
-//	//////console.log(markerpoint);
-//	//markerDB = new google.maps.Marker({
-//	//	position: markerpoint, title: 'DB'
-//	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//	//	});
-//	//markerDB.setMap(map);
-//		
-//	if (Tours[il].segment1) {
-//		if (Tours[il].segment1 != '') {
-//			Tours[il].segment1.setMap(null);
-//			Tours[il].segment1 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[l],Tours[il].pathRun[l-1]);
-//	Tours[il].segment1 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'black',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment1.setMap(map);
+	//console.log(l);
 	
 	displayMap();
 	
@@ -2357,19 +2170,19 @@ function markMultiPoints(tabPoints) {
 						});
 					tabMarktemp[l].setMap(map);
 				}
-				var spinter = getIntersectionSphere(seg1,seg2);
-				if (spinter) {
-					var lat = spinter.latitude;
-					var lng = spinter.longitude;
-					var markerpoint = {lat: lat, lng: lng};
-					tabMarktemp.push();
-					var l = tabMarktemp.length-1;
-					tabMarktemp[l] = new google.maps.Marker({
-						position: markerpoint, title: 'Y'
-						,draggable: true
-						});
-					tabMarktemp[l].setMap(map);
-				}
+				//var spinter = getIntersectionSphere(seg1,seg2);
+				//if (spinter) {
+				//	var lat = spinter.latitude;
+				//	var lng = spinter.longitude;
+				//	var markerpoint = {lat: lat, lng: lng};
+				//	tabMarktemp.push();
+				//	var l = tabMarktemp.length-1;
+				//	tabMarktemp[l] = new google.maps.Marker({
+				//		position: markerpoint, title: 'Y'
+				//		,draggable: true
+				//		});
+				//	tabMarktemp[l].setMap(map);
+				//}
 			}
 		}
 	}
@@ -2440,7 +2253,7 @@ function getObjTime(t) {
 		if (d < 10)
 			d = '0'+d;
 		dateSession = d+'/'+months[i]+'/'+dtnow.getFullYear();
-		////console.log('Date session générée:'+dateSession);
+		//console.log('Date session générée:'+dateSession);
 	}
 	var dt = dateSession;
 	syy = dt.substr(6,4);
@@ -2456,45 +2269,10 @@ function getObjTime(t) {
 }
 
 function isLineCut(SegAB, SegCD) {
-	/***
-	// Pour déterminer si le segment de droite de référence est franchie,
-	// peut-être est-il préférable de déterminer si le segment de droite entre le point gps actuel et le point gps précédent
-	// coupe le segment de droite de la ligne de référence
-	// Pour vérifier l'intersection, on fait l'analyse du calcul des 4 triangles formés par les 4 points suivants :
-	// les 2 points du segment de droite de la ligne de référence A-B et
-	// les 2 points du segment de droite du point gps au point gps précédent C-D
-	// T1=C/[AB]
-	// T2=D/[AB]
-	// T3=A/[CD]
-	// T4=B/[CD]
-	***/
-	// il y a intersection si (T1*T2<0) et (T3*T4<0)
-	var m = 1;
-	var Xa = SegAB[1]*m;
-	var Ya = SegAB[0]*m;
-	var Xb = SegAB[3]*m;
-	var Yb = SegAB[2]*m;
-	var Xc = SegCD[1]*m;
-	var Yc = SegCD[0]*m;
-	var Xd = SegCD[3]*m;
-	var Yd = SegCD[2]*m;
-	
-	var T1 = (Xb-Xa)*(Yc-Ya) - (Yb-Ya)*(Xc-Xa);
-	var T2 = (Xb-Xa)*(Yd-Ya) - (Yb-Ya)*(Xd-Xa);
-	var T3 = (Xd-Xc)*(Ya-Yc) - (Yd-Yc)*(Xa-Xc);
-	var T4 = (Xd-Xc)*(Yb-Yc) - (Yd-Yc)*(Xb-Xc);
-	
-	var sp1 = (Xb-Xa)*(Yc-Ya) - (Yb-Ya)*(Xc-Xa);
-	var sp2 = (Xb-Xa)*(Yd-Ya) - (Yb-Ya)*(Xd-Xa);
-
-	var Seg1 = T1*T2;
-	var Seg2 = T3*T4;
-	if (Seg1 < 0) {
-		if (Seg2 < 0) {
-			return true; // les segments de droite se coupent
-		}
-	}
-	return false;
+	var intersec = getIntersection(SegAB,SegCD)
+	if (intersec != false)
+		intersec = true;
+	return intersec;
 }
 
 function getDestination(ilat,ilon, cap, distance, radius=6371e3) {
@@ -2605,7 +2383,7 @@ Number.prototype.toDegrees = function() { return this * 180 / π; };
 	var S = D;
     // distance entre les 2 points, comptée sur un arc de grand cercle
 	var distance = S*RT;
-	//////console.log('distance='+distance);
+	//console.log('distance='+distance);
     return distance;
 }
 
@@ -2652,86 +2430,51 @@ function pointDroite(A,B,d) { // coordonnées du point A, point B et distance à
 }
 
 function getIntersection(SegAB,SegCD) {
-	/************
-on calcule les coordonnées des droites
-puis on fait une petite équation comme sa : "droite1 = droite2"
-et puis on a tout les point d'intersections après il faut que le programme puisse géré sa ^^ mais ça marche
-
-rappel (même si tu le sais peut-être sa m'occupe :p ) :
-
-- calcul d'une droite à partir de 2 points :
-droite d'équation : y = ax + b
-a = (y1 - y2 ) / (x1 - x2)
-b = y1 - a.x1
-(Sachant que le point A a pour coordonnées : x1 et y1
-et le point B : x2 et y2)
-
-- savoir si elles sont sécantes :
-on a deux droite :
-y1 = a1.x + b1
-y2 = a2.x + b2
-
-on fait y1 = y2
-ce qui revient à :
-y1 - y2 = 0
-a1.x + b1 - a2.x - b2 = 0
-x(a1 - a2) + b1 - b2 = 0
-x = (b2 - b1) / (a1 - a2)
-
-et donc on à la fin de l'équation on obtient la valeur x où elle se croisent
-(si elles se croisent) et si elles se croisent pas alors tu aura un petit
-a1 - a2 = 0 (donc tu fait une condition pour vérifié si a1 - a2 != 0 ;)
-
-voilà
-si je me trompe dites moi que je parte pas sans avoir dit n'importe quoi ^^
-ça fait longtemps que j'ai pas fait de trigo ^^
-
-	************/
-	var Xa = SegAB[1]*1;
-	var Ya = SegAB[0]*1;
-	////console.log('a:'+Xa+','+Ya);
-	var Xb = SegAB[3]*1;
-	var Yb = SegAB[2]*1;
-	////console.log('b:'+Xb+','+Yb);
-	var Xc = SegCD[1]*1;
-	var Yc = SegCD[0]*1;
-	////console.log('c:'+Xc+','+Yc);
-	var Xd = SegCD[3]*1;
-	var Yd = SegCD[2]*1;
-//- calcul d'une droite à partir de 2 points :
-//droite d'équation : y = ax + b
-//a = (y1 - y2 ) / (x1 - x2)
-//b = y1 - a.x1
-//(Sachant que le point A a pour coordonnées : x1 et y1
-//et le point B : x2 et y2)
-	//var a = (Ya-Yb) / (Xa-Xb);
-	//var b = Ya - a*Xa;
-//- savoir si elles sont sécantes :
-//on a deux droite :
-//y1 = a1.x + b1
-//y2 = a2.x + b2
-//
-//on fait y1 = y2
-//ce qui revient à :
-//y1 - y2 = 0
-//a1.x + b1 - a2.x - b2 = 0
-//x(a1 - a2) + b1 - b2 = 0
-//x = (b2 - b1) / (a1 - a2)
-	var a1 = (Ya-Yb) / (Xa-Xb);
-	var b1 = Ya - a1*Xa;
-	var a2 = (Yc-Yd) / (Xc-Xd);
-	var b2 = Yc - a2*Xc;
-
-	var x = (b2 - b1) / (a1 - a2);
+	var Ax = SegAB[0]*1;
+	var Ay = SegAB[1]*1;
+	var Bx = SegAB[2]*1;
+	var By = SegAB[3]*1;
 	
-	var y = (a1*x)+b1
+	var Cx = SegCD[0]*1;
+	var Cy = SegCD[1]*1;
+	var Dx = SegCD[2]*1;
+	var Dy = SegCD[3]*1;
+
+	var Sx;
+	var Sy;
 	
-	var pxy = false;
-	if (a1-a2 != 0) {
-		var pxy = new Array(y,x);
+	if(Ax==Bx)
+	{
+		if(Cx==Dx) return false;
+		else
+		{
+			var pCD = (Cy-Dy)/(Cx-Dx);
+			Sx = Ax;
+			Sy = pCD*(Ax-Cx)+Cy;
+		}
 	}
-	return pxy;
-	
+	else
+	{
+		if(Cx==Dx)
+		{
+			var pAB = (Ay-By)/(Ax-Bx);
+			Sx = Cx;
+			Sy = pAB*(Cx-Ax)+Ay;
+		}
+		else
+		{
+			var pCD = (Cy-Dy)/(Cx-Dx);
+			var pAB = (Ay-By)/(Ax-Bx);
+			var oCD = Cy-pCD*Cx;
+			var oAB = Ay-pAB*Ax;
+			Sx = (oAB-oCD)/(pCD-pAB);
+			Sy = pCD*Sx+oCD;
+		}
+	}
+	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
+			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
+	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
+	  return new Array(Sx,Sy)
 }
 /*
 */

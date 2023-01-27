@@ -8,14 +8,16 @@
 	<link rel="stylesheet" href="./css/MyChronoGPS.css">
 	<link rel="stylesheet" href="./css/MyChronoGPS-Status.css">
 </head>
-<body>
-<div class="w3-main">
+<body onload="afficherScreenSize('screensize');">
+<div class="w3-main LCD35">
 	<div class="w3-container w3-row" id="zone-info">
 	</div>
 	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
 	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Dashboard</a></div>
+	<!--<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="#" onclick="lcd35()">LCD35</a></div>-->
+	<div id="screensize" class="screensize"><!--taille écran--></div>
 
-	<div class="w3-container">
+	<div class="w3-container LCD35-hide">
 		<h1>MyChronoGPS - Version 1</h1>
 			<p>Etat de MyChronoGPS</p>
 	</div>
@@ -23,21 +25,27 @@
 	<div class="w3-container">
 		<div class="w3-responsive">
 			<div class="w3-row w3-padding-small">
-				<div class="w3-col l3">
+				<div class="w3-col l2 s6">
 					Nom du Serveur Hôte :
+				</div>
+				<div class="w3-col l2 s6">
 					<span id="hostname"></span>
 				</div>
-				<div class="w3-col l3">
+				<div class="w3-col l2 s6">
 					Adresse IP :
+				</div>
+				<div class="w3-col l2 s6">
 					<span id="adresseip"></span>
 				</div>
-				<div class="w3-col l3">
+				<div class="w3-col l2 s6">
 					Température CPU :
+				</div>
+				<div class="w3-col l2 s6">
 					<span id="cputemp"></span>
 				</div>
 			</div>
 			<div class="w3-row  w3-padding-small">
-				<div class="w3-col l2">
+				<div class="w3-col l2 s6">
 					<a class="w3-button w3-border w3-round" href="#" id="show-process" onclick="displayProcess()">Show Process</a>
 				</div>
 				<div class="w3-col l10">
@@ -45,7 +53,7 @@
 				</div>
 			</div>
 			<div class="w3-row w3- w3-padding-small">
-				<div class="w3-col l2">
+				<div class="w3-col l2 s6">
 					<a class="w3-button w3-border w3-round" href="#" id="show-disk" onclick="displayDisk()">Show Disk</a>
 				</div>
 				<div class="w3-col l10">
@@ -60,5 +68,14 @@
 	</div>
 </div>
 <script src="./js/MyChronoGPS-Status.js"></script>
+<!--<script src="./js/lcd35.js"></script>-->
+<script language="Javascript">
+function afficherScreenSize(id) {
+	el = document.getElementById(id);
+	if (el) {
+		el.innerHTML = window.innerWidth+'X'+window.innerHeight;
+	}
+}
+</script>
 </body>
 </html>

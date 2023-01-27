@@ -27,8 +27,15 @@ function switchGraph() {
 		graphRelease();
 		resizeMap();
 		is_graph = false;
+		if (window.innerWidth <= 480) {
+			document.getElementById("menu-graph").style.display = "block";
+		}		
+		else {
+			document.getElementById("menu-graph").style.display = "none";
+		}		
 		return;
 	}
+	document.getElementById("menu-graph").style.display = "none";
 	var el = document.getElementById("info-graph");
 	if (el) {
 		el.style.display = "block";
@@ -160,22 +167,23 @@ function drawChartLap(il) {
 	ograph.speed = Tours[il].points[0].vitesse; // Y axis
 	ograph.altitude = Tours[il].points[0].altitude;
 	ograph.cap = Tours[il].points[0].cap;
-	ograph.lat = Tours[il].geocoords[0].lat();
-	ograph.lon = Tours[il].geocoords[0].lng();
+	ograph.lat = Tours[il].geocoords[0].lat;
+	ograph.lon = Tours[il].geocoords[0].lng;
 	lapGraph.push(ograph);
 	for (var ip=1; ip < Tours[il].geocoords.length; ip++) {
 		var geodist = new Array();
 		geodist.push(Tours[il].geocoords[ip-1]);
 		geodist.push(Tours[il].geocoords[ip]);
-		var dist =	google.maps.geometry.spherical.computeLength(geodist);
+		//var dist =	google.maps.geometry.spherical.computeLength(geodist);
+		var dist = distance2segments(geodist);
 		distlap += dist;
 		ograph = new Object();
 		ograph.dist = distlap; // X axis
 		ograph.speed = Tours[il].points[ip].vitesse; // Y axis
 		ograph.altitude = Tours[il].points[ip].altitude;
 		ograph.cap = Tours[il].points[ip].cap;
-		ograph.lat = Tours[il].geocoords[ip].lat();
-		ograph.lon = Tours[il].geocoords[ip].lng();
+		ograph.lat = Tours[il].geocoords[ip].lat;
+		ograph.lon = Tours[il].geocoords[ip].lng;
 		// calcul de l'accélération
 		var accel = (((Tours[il].points[ip].vitesse - Tours[il].points[ip-1].vitesse)) * Frequence) / gkmh;
 		ograph.accel = accel;
@@ -205,3 +213,67 @@ function graphRelease() {
 	if (el)
 		el.style.display = "none";
 }
+
+function distance2segments(coords) {
+	var latA = deg2rad(coords[0].lat);
+	var lonA = deg2rad(coords[0].lng);
+	var latB = deg2rad(coords[1].lat);
+	var lonB = deg2rad(coords[1].lng);
+	/*
+	 **
+     * Returns the distance along the surface of the earth from ‘this’ point to destination point.
+     *
+     * Uses haversine formula: a = sin²(Δφ/2) + cosφ1·cosφ2 · sin²(Δλ/2); d = 2 · atan2(√a, √(a-1)).
+     *
+
+        // a = sin²(Δφ/2) + cos(φ1)⋅cos(φ2)⋅sin²(Δλ/2)
+        // δ = 2·atan2(√(a), √(1−a))
+        // see mathforum.org/library/drmath/view/51879.html for derivation
+		
+Presuming a spherical Earth with radius R (see below), and that the
+locations of the two points in spherical coordinates (longitude and
+latitude) are lon1,lat1 and lon2,lat2, then the Haversine Formula 
+(from R. W. Sinnott, "Virtues of the Haversine," Sky and Telescope, 
+vol. 68, no. 2, 1984, p. 159): 
+
+  dlon = lon2 - lon1
+  dlat = lat2 - lat1
+  a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
+  c = 2 * atan2(sqrt(a), sqrt(1-a)) 
+  d = R * c		
+
+Number.prototype.toRadians = function() { return this * π / 180; };
+Number.prototype.toDegrees = function() { return this * 180 / π; };
+*/
+	var radius = RT;
+	const R = radius;
+	const φ1 = latA,  λ1 = lonA;
+	const φ2 = latB, λ2 = lonB;
+	const Δφ = φ2 - φ1;
+	const Δλ = λ2 - λ1;
+
+	const a = Math.sin(Δφ/2)*Math.sin(Δφ/2) + Math.cos(φ1)*Math.cos(φ2) * Math.sin(Δλ/2)*Math.sin(Δλ/2);
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	const d = R * c;
+
+    // angle en radians entre les 2 points
+	var MsinlatA = Math.sin(latA);
+	var MsinlatB = Math.sin(latB);
+	var McoslatA = Math.cos(latA);
+	var McoslatB = Math.cos(latB);
+	var Mabs = Math.abs(lonB-lonA);
+	var Msin = MsinlatA * MsinlatB;
+	var Mcoslat = McoslatA * McoslatB;
+	var Mcoslon = Math.cos(Mabs);
+	var Mcos = Mcoslat*Mcoslon;
+	var Acos = Msin + Mcos;
+	if (Acos > 1) Acos = 1;
+	var D = Math.acos(Acos);
+    //var S = Math.acos(Math.sin(latA)*Math.sin(latB) + Math.cos(latA)*Math.cos(latB)*Math.cos(Math.abs(longB-longA)))
+	var S = D;
+    // distance entre les 2 points, comptée sur un arc de grand cercle
+	var distance = S*RT;
+	//console.log('distance='+distance);
+    return distance;
+}
+
