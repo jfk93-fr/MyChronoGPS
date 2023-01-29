@@ -1,0 +1,17 @@
+#div-refresh {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  top: 0%;
+  left: 0%;
+}
+#refresh.img {
+  width: 36px;
+}
+#div-switch-screen {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  top: 0%;
+  left: 40px;
+}

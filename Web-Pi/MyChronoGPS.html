@@ -6,25 +6,45 @@
 	<title>MyChronoGPS - Version 1</title>
 	<link rel="stylesheet" href="./css/w3.css">
 	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS-Main.css">
 </head>
 <!--<body onkeydown="ActionTouche(event)">-->
-<body>
+<body onload="afficherScreenSize('screensize');">
 <div class="w3-main LCD35">
 	<div class="w3-container w3-row" id="zone-info">
 		<p></p>
+		<!--
+		<div id="div-refresh">
+			<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+		</div>
+		<div id="div-switch-screen">
+			<button id="switch-screen" class="w3-button btnswap" onclick="switchScreenMode()"></button>
+		</div>
+		-->
 	</div>
+	<div class="w3-container">
+		<div id="div-up LCD35-show">
+			<button id="up" class="w3-button btnup LCD35-show" onclick="window.scroll(0, 0);"></button>
+		</div>
+		<div id="div-down LCD35-show">
+			<button id="down" class="w3-button btndown LCD35-show" onclick="window.scrollBy(0, window.innerHeight);"></button>
+		</div>
+	</div>
+	<!--
+	<div id="screensize" class="w3-container w3-row screensize "></div>
+	-->
 
-	<div class="wrapper w3-container header">
+	<div id="main" class="wrapper w3-container header">
 		<h1 class="LCD35-hide">MyChronoGPS - Version 1</h1>
 		<p class="LCD35-hide">Cet outil permet de gérer le fonctionnement de MyChronoGPS.</p>
 		<div class="w3-container">
 			<p>Contrôle du Chronomètre.</p>
 			<p class="LCD35-hide">Contrôlez le Chrono et le GPS Online</p>
 			<div class="w3-row">
-				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Tableau de Bord</a></span>
-				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Live.html" >Live Session</a></span>
-				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Status.html" >Etat GPS</a></span>
-				<span class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Cmd.html" >Commande au GPS</a></span>
+				<span class="w3-col l3 s6"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Tableau de Bord</a></span>
+				<span class="w3-col l3 s6"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Live.html" >Live Session</a></span>
+				<span class="w3-col l3 s6"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Status.html" >Etat GPS</a></span>
+				<span class="w3-col l3 s6"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Cmd.html" >Commande au GPS</a></span>
 			</div>
 		</div>
 		<div class="w3-container">
@@ -50,11 +70,37 @@
 	</div>
 </div>
 </body>
+<script src="./js/screenFunctions.js"></script>
 <script>
 var windowObjectReference;
 var strWindowFeatures = "menubar=no,location=no,resizable=no,scrollbars=no,status=no,width=480,height=320";
 function openDashboard() {
 	windowObjectReference = window.open("MyChronoGPS-Dashboard.html", "Dashboard", strWindowFeatures);
 }
+</script>
+<script>
+function elementPosition (a) {
+  var b = a.getBoundingClientRect();
+  return {
+    clientX: a.offsetLeft,
+    clientY: a.offsetTop,
+    viewportX: (b.x || b.left),
+    viewportY: (b.y || b.top)
+  }
+}
+var mon_element = document.getElementById('main');
+
+mon_element.addEventListener('click', function() {
+
+  var positions = elementPosition(mon_element);
+
+  console.log({
+    "Position horizontale dans la fenêtre": positions.clientX, 
+    "Position verticale dans la fenêtre": positions.clientY, 
+    "Position horizontale dans le document": positions.viewportX, 
+    "Position verticale dans le document": positions.viewportY
+ });
+
+});
 </script>
 </html>

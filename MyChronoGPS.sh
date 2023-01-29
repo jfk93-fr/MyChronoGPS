@@ -71,6 +71,7 @@ sudo cp ./Web-Pi/MyChronoGPS-Cmd.html /var/www/html/MyChronoGPS-Cmd.html
 sudo cp ./Web-Pi/MyChronoGPS-Dashboard.html /var/www/html/MyChronoGPS-Dashboard.html
 sudo cp ./Web-Pi/MyChronoGPS-Parms.html /var/www/html/MyChronoGPS-Parms.html
 sudo cp ./Web-Pi/MyChronoGPS-Sessions.html /var/www/html/MyChronoGPS-Sessions.html
+sudo cp ./Web-Pi/MyChronoGPS-Status.html /var/www/html/MyChronoGPS-Status.html
 
 sudo cp ./Web-Pi/ajax /var/www/html -r
 

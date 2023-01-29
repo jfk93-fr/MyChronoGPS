@@ -2010,16 +2010,19 @@ function simuRelease() {
 		el.style.display = "block";
 	// on efface la ligne représentant le mobile
 	if (simuline != '') {
-		simuline.setMap(null);
+		//simuline.setMap(null);
+		map.removeLayer(simuline);
 		simuline = '';
 	}
 	// on efface la représentation du mobile
 	if (simup0 != '') {
-		simup0.setMap(null);
+		//simup0.setMap(null);
+		map.removeLayer(simup0);
 		simup0 = '';
 	}
 	if (simup1 != '') {
-		simup1.setMap(null);
+		//simup1.setMap(null);
+		map.removeLayer(simup1);
 		simup1 = '';
 	}
 	
@@ -2971,6 +2974,29 @@ function writeMessage(text_mess,time_mess=1) {
 function resizeMap() {
 	if (!map)
 		return;
+	//var center = map.getCenter(); 
+	////var b1 = map.getBounds();
+	////console.log('lat centre='+center.lat);
+	////var bn = b1.getNorth();
+	////console.log('lat nord='+bn);
+	////var bs = b1.getSouth();
+	////console.log('lat sud='+bs);
+	////var ratio = (bn-bs)*0.8;
+	////var corner1 = b1._northEast;
+	////var corner2 = b1._southWest;
+	////var newsouth = bn-ratio;
+	////corner2.lat = newsouth;
+	////var latc = corner1.lat+((corner1.lat-corner2.lat)/2);
+	////var lngc = corner1.lng+((corner1.lng-corner2.lng)/2);
+	////var newcenter = L.latLng(latc,lngc);
+	//
+	////var nb = L.latLngBounds(corner1,corner2)
+	////map.setView(newcenter);
+	////L.setBounds(nb);
+	//map.setView(center);
+	
+	
+	
 	//
 	var el = document.getElementById("map");
 	var html = "";
@@ -2995,5 +3021,7 @@ function resizeMap() {
 		el.style.height = hopt+'px';
 		el.style.maxHeight = hopt+'px';
 	}
+	//var center2 = map.getCenter(); 
+	//map.panTo(center);
 }
 window.addEventListener('resize', resizeMap);

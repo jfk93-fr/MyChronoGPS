@@ -17,3 +17,4 @@ if [ ! -d $HOME/.config/lxsession/LXDE-pi ]; then
 fi
 echo "create autostart"
 sudo cp ./StartDashboard $HOME/.config/lxsession/LXDE-pi/autostart
+sudo cat $HOME/.config/lxsession/LXDE-pi/autostart

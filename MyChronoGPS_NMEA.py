@@ -327,11 +327,6 @@ class NmeaControl():
             time.sleep(0.1)
         self.write_busy = True
         
-        # try:
-        #     buffer = self.read()
-        # except:
-        #     pass
-
         try:
             pipe = os.open(self.fifo, os.O_WRONLY, os.O_NONBLOCK)
             if True:
@@ -376,7 +371,6 @@ class NmeaControl():
             # if self.gps.gpstime == 0:
             #     return
             if self.__current_state != self.OPEN:
-                # self.fileDescriptor = open(pathtraces+'/traces-'+formatGpsDateTime(self.gps,format="FILE")+'.nmea', 'a')
                 self.fileDescriptor = open(pathtraces+'/traces-'+formatDateTime(format="FILE")+'.nmea', 'a')
                 self.__current_state = self.OPEN
                 logger.info("tracker file open")

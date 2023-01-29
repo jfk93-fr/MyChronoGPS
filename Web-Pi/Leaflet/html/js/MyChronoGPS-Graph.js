@@ -1,4 +1,3 @@
-//var ctx = document.getElementById('graph').getContext('2d');
 var is_graph = false;
 var is_chart_loaded = false;
 var tabGraph = new Array();
@@ -45,7 +44,7 @@ function switchGraph() {
 	if (el)
 		el.style.display = "block";
 
-	is_graph = true;		
+	is_graph = true;
 	resizeMap();
 	datag = new google.visualization.DataTable();
 	datag.addColumn('number', 'X');
@@ -122,30 +121,40 @@ function switchGraph() {
 			var cap = point2mark.cap;
 		
 			if (graphmarker != '') {
-				graphmarker.setMap(null);
+				//graphmarker.setMap(null);
+				map.removeLayer(graphmarker)
 				graphmarker = '';
 			}
 			var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
 			console.log(markerpoint);
-			graphmarker = new google.maps.Marker({
-				position: markerpoint, 
-				title: 'T:\t'+lap+'\r\n'+
+			var title = 'T:\t'+lap+'\r\n'+
 					'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
 					'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
 					'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
-					'cap:\t'+Math.round(point2mark.cap*10)/10+'° '
-				,icon: {
-					path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-					rotation: cap,
-					fillColor: "cyan",
-					fillOpacity: 0.8,
-					scale: 5,
-					strokeColor: "gold",
-					strokeWeight: 2,
-					}
-				});
-			graphmarker.setMap(map);
-			setCenter(point2mark.lat, point2mark.lon);
+					'cap:\t'+Math.round(point2mark.cap*10)/10+'° ';
+			var localIcon = L.icon({
+				iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+				iconAnchor: [8, 16]
+			});	
+			graphmarker = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
+			map.addLayer(graphmarker);
+			//map.panTo(markerpoint);
+			map.setView(markerpoint);
+			
+			//graphmarker = new google.maps.Marker({
+			//	position: markerpoint, 
+			//	,icon: {
+			//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+			//		rotation: cap,
+			//		fillColor: "cyan",
+			//		fillOpacity: 0.8,
+			//		scale: 5,
+			//		strokeColor: "gold",
+			//		strokeWeight: 2,
+			//		}
+			//	});
+			//graphmarker.setMap(map);
+			//setCenter(markerpoint);
 		}
 		return;
 	});
@@ -197,7 +206,8 @@ function graphRelease() {
 	is_graph = false;
 
 	if (graphmarker != '') {
-		graphmarker.setMap(null);
+		//graphmarker.setMap(null);
+		map.removeLayer(graphmarker)
 		graphmarker = '';
 	}
 	//var el = document.getElementById("sousmenu-simu");
