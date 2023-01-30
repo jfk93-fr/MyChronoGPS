@@ -33,18 +33,33 @@ for fic in listfic:
             session["filename"] = T[0]
             session["filetype"] = T[1]
             # on recherche un "-" dans le nom du fichier
+            R = session["filename"].split("/")
+            #print(str(R))
+            #print(str(len(R)))
+            i = len(R)-1
+            #print(str(R[i]))
+            session["fileroot"]=session["filename"]        
+            session["filetime"]=R[i]            
             T = session["filename"].split("-")
+            #print(str(session["filename"]))
+            #session["fileroot"]=session["filename"]
+            #session["filetime"]=session["filename"]
             if len(T) > 1:
                 session["fileroot"] = T[0]
                 session["filetime"] = T[1]
-                FD = open(fic, 'r')
-                info = FD.read()
-                T = info.split(";") # c'est au format csv avec le séparateur ";" 
-                session["date_session"] = T[0]
-                session["heure_session"] = T[1]
-                session["circuit_session"] = T[2]
-                session["infos"] = info
-                FD.close()
-                result.append(session)
+            #print(str(session["fileroot"]))
+            #print(str(session["filetime"]))
+            FD = open(fic, 'r')
+            info = FD.read()
+            #print(str(info))
+            T = info.split(";") # c'est au format csv avec le séparateur ";" 
+            #print(str(T))
+            session["date_session"] = T[0]
+            session["heure_session"] = T[1]
+            session["circuit_session"] = T[2]
+            session["infos"] = info
+            #print(str(session))
+            FD.close()
+            result.append(session)
 json_str = json.dumps(result)
 print(json_str)

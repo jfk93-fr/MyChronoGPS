@@ -716,11 +716,11 @@ function go()
 		var tour = Tours[i].id;
 		
 		if (Tours[i].valid) {
-			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">Tour "+tour;
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour;
 			el.innerHTML += "<span id=\"timelap"+tour+"\"></span>"+"</a>";
 		}
 		else {
-			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">Tour "+tour+" invalide"+"</a>";
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour+" invalide"+"</a>";
 		}
 	}
 	

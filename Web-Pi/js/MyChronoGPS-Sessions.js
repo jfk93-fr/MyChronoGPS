@@ -1,4 +1,3 @@
-//var fname = 'ajax/get_sessions.php';
 var fname = 'ajax/get_sessions.py';
 var data_ready = false;
 var Sessions = false;

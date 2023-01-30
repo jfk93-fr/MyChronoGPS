@@ -55,6 +55,8 @@ if [ ! -d traces ]; then
 	sudo mkdir traces
 fi
 #
+sudo sh ./MyChronoGPS_Sample.sh
+#
 _web=$(ls /var/www/html | grep -c MyChronoGPS) || true
 if [ "$_web" ]
 then
