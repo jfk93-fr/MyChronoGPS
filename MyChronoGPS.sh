@@ -4,6 +4,7 @@ if [ "$_wiringpi" ]
 then
 	if [ "$_wiringpi" = "0" ]
 	then
+		echo "instaling wiringpi"
 		sudo pip3 install wiringpi
 	else
 		echo "wiringpi already instaleld"
@@ -55,7 +56,6 @@ if [ ! -d traces ]; then
 	sudo mkdir traces
 fi
 #
-sudo sh ./MyChronoGPS_Sample.sh
 #
 _web=$(ls /var/www/html | grep -c MyChronoGPS) || true
 if [ "$_web" ]
@@ -118,8 +118,15 @@ sudo usermod -a -G www-data $USER
 sudo chmod -R g+rwX /var/www
 
 sudo chown -R www-data:www-data $HOME/MyChronoGPS
-
 sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
+
+echo "Do you want to install sample files ? (Y-N)"
+read rep
+if [ $rep = "Y" ] || [ $rep = "y" ]
+then
+	sh ./MyChronoGPS_Sample.sh
+	echo "Sample files loaded"
+fi
 
 if [ -d cache ]; then
 	sudo mount -t tmpfs -o size=2M,mode=0777 tmpfs $HOME/MyChronoGPS/cache

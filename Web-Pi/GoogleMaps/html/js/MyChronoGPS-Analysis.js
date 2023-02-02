@@ -1158,16 +1158,17 @@ function designCut(parm) {
 
 
 function showLap(lap) {
-	var el = document.getElementById("simu");
-	el.style.display = "block";
-	if (window.innerWidth <= 480) {
-		document.getElementById("switch-simu").style.display = "none";
-		document.getElementById("switch-graph").style.display = "none";
+	if (window.innerWidth <= 500) {
+		document.getElementById("switch-graph").style.display = "block";
 		document.getElementById("menu-graph").style.display = "block";
+		var el = document.getElementById("simu");
+		el.style.display = "none";
 	}		
 	else {
-		document.getElementById("menu-graph").style.display = "none";
+		var el = document.getElementById("simu");
+		el.style.display = "block";
 	}		
+	
 	// on sauvegarde le n° du tour dans la page
 	var el = document.getElementById("HiddenLap");
 	if (el)
@@ -1233,6 +1234,12 @@ function showLap(lap) {
 			}
 			else {
 				var el = document.getElementById("simu");
+				if (el)
+					el.style.display = "none";
+				var el = document.getElementById("switch-graph");
+				if (el)
+					el.style.display = "none";
+				var el = document.getElementById("menu-graph");
 				if (el)
 					el.style.display = "none";
 			}

@@ -14,7 +14,7 @@ var tempcpu = ""
 var processShowed = false; 
 var processDisk = false;
 document.getElementById("process").style.display = "none";
-document.getElementById("disk").style.display = "none";
+document.getElementById("disks").style.display = "none";
 
 
 // Début du programme
@@ -107,7 +107,7 @@ function dataStatusReady() {
 	for (var i=0; i < thisStatus.pheader.length; i++) {
 		HTML += "<th>"+thisStatus.pheader[i]+"</th>";
 	}
-	HTML += "<th>KILL</th>";
+	/*HTML += "<th>KILL</th>";*/
 	HTML += "</tr>";
 	for (var i=0; i < thisStatus.myprocess.length; i++) {
 		console.log(thisStatus.myprocess[i]);
@@ -121,13 +121,13 @@ function dataStatusReady() {
 			buf = buf.substr(ip).trim();
 		}
 		HTML += "<td>"+thisStatus.myprocess[i].substr(48)+"</td>"; // la commande complète est située à l'offset 48
-		HTML += "<th>KILL</th>";
+		/*HTML += "<th>KILL</th>";*/
 		HTML += "</tr>";
 	}
 	HTML += "</table>";
 	el.innerHTML = HTML;
 
-	var el = document.getElementById("disk");
+	var el = document.getElementById("disks");
 	var HTML = '<table class="status-table"><tr>';
 	HTML += "<th>"+thisStatus.disk[0].substr(0,10)+"</th>"; // Filesystem
 	HTML += "<th>"+thisStatus.disk[0].substr(16,4)+"</th>"; // Size
@@ -683,25 +683,33 @@ function displayProcess() {
 		processShowed = false;
 		el.style.display = "none";
 		document.getElementById("show-process").innerHTML = 'Show Process';
+		el = document.getElementById("btnprocess");
+		el.className = "btnprocess";
 	}
 	else {
 		processShowed = true;
 		el.style.display = "block";
 		document.getElementById("show-process").innerHTML = 'X';
+		el = document.getElementById("btnprocess");
+		el.className = "btnprocess-off";
 	}
 }
 
-function displayDisk() {
-	var el = document.getElementById("disk");
+function displayDisks() {
+	var el = document.getElementById("disks");
 	if (processShowed == true) {
 		processShowed = false;
 		el.style.display = "none";
-		document.getElementById("show-disk").innerHTML = 'Show Disks';
+		document.getElementById("show-disks").innerHTML = 'Show Disks';
+		el = document.getElementById("btndisks");
+		el.className = "btndisks";
 	}
 	else {
 		processShowed = true;
 		el.style.display = "block";
-		document.getElementById("show-disk").innerHTML = 'X';
+		document.getElementById("show-disks").innerHTML = 'X';
+		el = document.getElementById("btndisks");
+		el.className = "btndisks-off";
 	}
 }
 

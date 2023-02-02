@@ -46,10 +46,12 @@ info["pheader"] = title
 for chaine in wprocess:
     if "MyChronoGPS" in chaine:
         if ".py" in chaine:
+            i = chaine.index("/")
+            d = str(chaine[:i])
+            a = chaine.split("/")
+            b = a[len(a)-1]
+            chaine = d+str(b)            
             myprocess.append(chaine)
-        #line = (' '.join(chaine.split())).split()
-        #myprocess.append(str(len(line)))
-        #myprocess.append(line)
 
 info["myprocess"] = myprocess
 

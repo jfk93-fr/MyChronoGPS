@@ -1536,14 +1536,32 @@ function drawLineWithCap(objline) {
 
 function changeMarker(ev,objline) {
 	// Le marqueur du milieu de ligne a bougé, on recalcule les coordonnées
+	var lat = objline.lat; // latitude avant déplacement
+	var lon = objline.lon; // longitude avant déplacement
 	var latlon = objline.marker.getPosition();
 	
 	objline.lat = latlon.lat();
 	objline.lon = latlon.lng();
 	
-	// on va déplacer le point opposé de bord de piste
-	objline.coord[2] = objline.coord[0]+((objline.lat-objline.coord[0])*2);
-	objline.coord[3] = objline.coord[1]+((objline.lon-objline.coord[1])*2);
+	// On va déplacer tous les points de façon homogène sur un plan
+	objline.coord[1] += (objline.lon - lon);
+	objline.coord[0] += (objline.lat - lat);
+	objline.coord[2] += (objline.lat - lat);
+	objline.coord[3] += (objline.lon - lon);
+
+	// On marque à nouveau le point par rapport au point de départ
+	if (objline.markerB != '') {
+		objline.markerB.setMap(null);
+		objline.markerB = '';
+	}
+	var markerpoint = {lat: objline.coord[0], lng: objline.coord[1]};
+	objline.markerB = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2.png'
+		,draggable: true
+		});
+	objline.markerB.setMap(map);
+	objline.markerB.addListener('dragend', function(ev) {changeMarkerB(ev,objline);});
 
 	// On marque à nouveau le point opposé par rapport au point de départ
 	if (objline.markerB2 != '') {

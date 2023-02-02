@@ -4,6 +4,8 @@ _web=$(ls /var/www/html | grep -c MyChronoGPS) || true
 if [ "$_web" = "0" ]
 then
 	echo "It seems that MyChronoGPS was not installed."
+	echo "press enter to continue"
+	read
 	exit 4
 fi
 

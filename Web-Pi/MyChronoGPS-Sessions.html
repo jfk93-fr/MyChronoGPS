@@ -9,8 +9,8 @@
 </head>
 <!--<body onkeydown="ActionTouche(event)">-->
 <body>
+<div id="zone-info" class="w3-container zone-info"></div>
 <div class="w3-main LCD35">
-	<div id="zone-info"></div>
 	<textarea id="clipboard" cols=50 style="display:none"></textarea>
 	<div class="w3-container">
 		<div id="div-up LCD35-show">
@@ -21,25 +21,45 @@
 		</div>
 	</div>
 	<!--<textarea id="clipboard" cols=50></textarea>-->
-	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+	<div class="w3-col LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+		<span class="w3-coll l3 s6 LCD35-show">
+			<a href="MyChronoGPS.html" class="w3-button w3-border w3-round">
+			<span class="btnmainmenu"></span>
+			</a>
+			Menu
+		</span>
 
 	<div class="wrapper w3-container header LCD35-hide">
 		<h1>MyChronoGPS - Version 1</h1>
 		<p>Recherchez les sessions collect&eacute;es par MyChronoGPS et d&eacute;butez leurs analyses.</p>
 	</div>
 
+	<div id="div-refresh">
+		<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+	</div>
+
 	<div id="sessions" class="w3-container">
 		<div class="w3-responsive">
 			<table id="tabsessions"class="w3-table-all">
+			<!--
 				<tr>
 					<th>Date</th>
 					<th>Heure</th>
 					<th>Circuit</th>
 					<th></th>
 				</tr>
+			-->
 			</table>
 		</div>
     </div>
+
+	<div class="wrapper w3-container header LCD35-show">
+		<div class="w3-row w3-row-padding">&nbsp;
+		</div>
+		<div class="w3-row w3-row-padding">&nbsp;
+		</div>
+    </div>
+	
 
 </div>
 <!--

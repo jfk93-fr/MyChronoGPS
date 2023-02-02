@@ -61,6 +61,34 @@ function dataParmsReady() {
 
 function go()
 {
+	/*
+		<div class="w3-responsive">
+			<table id="tabsessions"class="w3-table-all">
+				<tr>
+					<th>Date</th>
+					<th>Heure</th>
+					<th>Circuit</th>
+					<th></th>
+				</tr>
+			</table>
+		</div>
+	*/
+	var listeHTML = '<div class="w3-responsive"><table id="tabsessions"class="w3-table-all">';
+	if (Parms.length > 0) {
+		console.log(Parms[0]);
+		Parms.params = Parms[0];
+		for (variable in Parms.params) {
+			console.log(variable);
+			if (variable.substr(0,1) == "#") {
+				listeHTML += '<tr><td>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
+			}
+			else {
+				listeHTML += '<input id="'+variable+'" name="'+variable+'" value="'+Parms.params[variable]+'"></td></tr>';
+			}
+		}
+		listeHTML += '</table></div>';
+	}
+	/*
 	var listeHTML = '';
 	if (Parms.length > 0) {
 		console.log(Parms[0]);
@@ -75,6 +103,7 @@ function go()
 			}
 		}
 	}
+	*/
 	document.getElementById("liste_params").innerHTML = listeHTML;
 }
 

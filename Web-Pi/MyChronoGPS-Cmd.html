@@ -12,27 +12,72 @@
 	<div class="w3-container w3-row" id="zone-info">
 		<p></p>
 	</div>
-	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+	<div class="w3-row">
+		<span class="w3-col l3 LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></span>
+		<span class="w3-col l6 s6 LCD35-show">
+			<a href="MyChronoGPS.html" class="w3-button w3-border w3-round">
+			<span class="btnmainmenu"></span>
+			</a>
+			Menu
+		</span>
+		<span class="w3-col l3 LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Dashboard</a></span>
+		<span class="w3-col l6 s6 LCD35-show">
+			<a href="MyChronoGPS-Dashboard.html" class="w3-button w3-border w3-round">
+			<span class="btndashboard"></span>
+			</a>
+			Dashboard
+		</span>
+	</div>
 
 	<div class="wrapper w3-container header LCD35-hide">
 		<h1>MyChronoGPS - Version 1</h1>
 			<p>Contrôlez le Chrono et le GPS Online</p>
 	</div>
 
+	<div id="div-refresh">
+		<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+	</div>
+
 	<div class="w3-container">
 		<div class="w3-responsive">
 			<div class="w3-row">
-				<div class="w3-col l4 s4">
+				<div class="w3-col l4 LCD35-hide">
 					<button type="button" class="w3-button w3-border w3-round" onclick="ajax_cmd('start_gps.py')">Start GPS</button>
 					<p class="LCD35-hide">Démarre le programme MyChronoGPS sur le chronomètre</p>
 				</div>
-				<div class="w3-col l4 s4">
+				<div class="w3-col l4 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="ajax_cmd('start_gps.py')">
+						<span class="btngpson"></span>
+					</a>
+					<span>
+					Start GPS
+					</span>
+				</div>
+				
+				<div class="w3-col l4 LCD35-hide">
 					<button type="button" class="w3-button w3-border w3-round" onclick="ajax_cmd('stop_gps.py')">Stop GPS</button>
 					<p class="LCD35-hide">Arrête le programme MyChronoGPS sur le chronomètre</p>
 				</div>
-				<div class="w3-col l4 s4">
-					<button type="button" class="w3-button w3-border w3-round" onclick="ajax_cmd('shutdown_pi.py')">Arrêt MyChronoGPS</button>
+				<div class="w3-col l4 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="ajax_cmd('stop_gps.py')">
+						<span class="btngpsoff"></span>
+					</a>
+					<span>
+					Stop GPS
+					</span>
+				</div>
+				
+				<div class="w3-col l4 LCD35-hide">
+					<button type="button" class="w3-button w3-border w3-round" onclick="ajax_cmd('shutdown_pi.py')">Arrêt Complet</button>
 					<p class="LCD35-hide">Arrête le système MyChronoGPS</p>
+				</div>
+				<div class="w3-col l4 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="ajax_cmd('shutdown_pi.py')">
+						<span class="btnpwroff"></span>
+					</a>
+					<span>
+					Shutdown
+					</span>
 				</div>
 				<!--<div class="w3-col l3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Cmd.html" >Commande au GPS</a></div>-->
 			</div>

@@ -2393,7 +2393,10 @@ class AcqControl(threading.Thread):
         self.active = False
         self.chrono = chrono
         self.gps = chrono.gps
-        self.timelimit = TrackAcqTime
+        self.acqtime = TrackAcqTime
+        if self.acqtime == 0:
+            self.acqtime = 18000; # If TrackAcqTime = 0 then leave 1 hour (5*60*60) 
+        self.timelimit = self.acqtime
         if self.gps.Freq == 0:
             self.pulse = 0.2 # in general, GPS devices support 5 Hz
         else:
@@ -2407,7 +2410,7 @@ class AcqControl(threading.Thread):
         self.cap = False;
         self.max = False;
         self.timestamp = 0.
-        self.distmin = 40. # minimum distance to shorten the acquisition phase
+        self.distmin = TrackWidth*2. # minimum distance to shorten the acquisition phase = 2 times the track width
         logger.info("AcqControl init complete")
 
     def run(self):
@@ -2426,7 +2429,7 @@ class AcqControl(threading.Thread):
                     if self.gps.gpsvitesse < 10:
                         self.lat = self.gps.latitude
                         self.lon = self.gps.longitude
-                        self.timelimit = TrackAcqTime
+                        self.timelimit = self.acqtime
                         self.pgpsmax = dict({"time":"","dist":0,"lat":0,"lon":0,"cap":0,"vit":0})
                         self.pgpsmin = dict({"time":"","dist":99999,"lat":0,"lon":0,"cap":0,"vit":0})
                         self.max = False
@@ -2459,7 +2462,7 @@ class AcqControl(threading.Thread):
                             self.pgpsmin["lon"] = self.gps.longitude
                             self.pgpsmin["cap"] = self.gps.gpscap
                             self.pgpsmin["vit"] = self.gps.gpsvitesse
-                            # if the distance falls below 40m, the acquisition phase is shortened
+                            # if the distance falls below 2 times the track width, the acquisition phase is shortened
                             if dist < self.distmin:
                                if self.timelimit > 10:
                                    self.timelimit = 10
@@ -2470,7 +2473,7 @@ class AcqControl(threading.Thread):
                 logger.info("AcqControl time limit reached")
                 self.__running = False
         #logger.info("AcqControl cancel ?"+str(self.__cancel))
-        if self.__cancel == False: #le thread n'a pas été avorté
+        if self.__cancel == False: #the thread, has not been aborted
             logger.info(str(self.pgpsmin))
             # the acquisition time is over, we will draw the line from the calculated coordinates
             # instead of drawing the line, we could indicate that we are ready to draw it

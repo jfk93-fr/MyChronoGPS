@@ -20,8 +20,23 @@
 			<button id="down" class="w3-button btndown LCD35-show" onclick="window.scrollBy(0, window.innerHeight);"></button>
 		</div>
 	</div>
-	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
-	<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Dashboard</a></div>
+
+	<div class="w3-row">
+		<span class="w3-col l3 LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></span>
+		<span class="w3-col l6 s6 LCD35-show">
+			<a href="MyChronoGPS.html" class="w3-button w3-border w3-round">
+			<span class="btnmainmenu"></span>
+			</a>
+			Menu
+		</span>
+		<span class="w3-col l3 LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Dashboard.html" >Dashboard</a></span>
+		<span class="w3-col l6 s6 LCD35-show">
+			<a href="MyChronoGPS-Dashboard.html" class="w3-button w3-border w3-round">
+			<span class="btndashboard"></span>
+			</a>
+			Dashboard
+		</span>
+	</div>
 	<!--<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="#" onclick="lcd35()">LCD35</a></div>-->
 	<!--<div id="screensize" class="screensize"></div>-->
 
@@ -30,9 +45,9 @@
 			<p>Etat de MyChronoGPS</p>
 	</div>
 
-			<div id="div-refresh">
-				<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
-			</div>
+	<div id="div-refresh">
+		<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+	</div>
 
 	<div class="w3-container">
 		<div class="w3-responsive">
@@ -58,18 +73,36 @@
 			</div>
 			<div class="w3-row  w3-padding-small">
 				<div class="w3-col l2 s6">
+					<span class="w3-col l2 LCD35-hide">
 					<a class="w3-button w3-border w3-round" href="#" id="show-process" onclick="displayProcess()">Show Process</a>
+					</span>
+					<span class="w3-col l2 s12 LCD35-show">
+						<a href="#" class="w3-button w3-border w3-round" onclick="displayProcess()">
+							<span id="btnprocess" class="btnprocess"></span>
+						</a>
+						<span id="show-process-mini">
+						Process
+						</span>
+					</span>
 				</div>
-				<div class="w3-col l10">
-					<div id="process"></div>
+				<div class="w3-col l10 s12">
+					<div id="process" class="w3-tiny"></div>
 				</div>
 			</div>
 			<div class="w3-row w3- w3-padding-small">
 				<div class="w3-col l2 s6">
-					<a class="w3-button w3-border w3-round" href="#" id="show-disk" onclick="displayDisk()">Show Disk</a>
+					<span class="w3-col l2 LCD35-hide">
+					<a class="w3-button w3-border w3-round" href="#" id="show-disks" onclick="displayDisks()">Show Disks</a>
+					</span>
+					<span class="w3-col l2 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="displayDisks()">
+						<span id="btndisks" class="btndisks"></span>
+					</a><span id="show-disks-mini">
+					Disks
+					</span>
 				</div>
-				<div class="w3-col l10">
-					<div id="disk"></div>
+				<div class="w3-col l10 s12">
+					<div id="disks" class="w3-tiny"></div>
 				</div>
 			</div>
 			<div class="w3-row">

@@ -495,7 +495,8 @@ function isInfosReady()
 	distcircuit = retour.distcircuit;
 
 	var el = document.getElementById("nb-sats");
-	el.innerHTML = 'sat '+nbsats;
+	//el.innerHTML = 'sat '+nbsats;
+	el.innerHTML = nbsats;
 	
 	//el.style.display="none";
 	var el = document.getElementById("signal-container");
@@ -530,7 +531,8 @@ function isInfosReady()
 	
 	
 	document.getElementById("tempcpu").innerHTML = tempcpu+'°';
-	document.getElementById("NomCircuit").innerHTML = circuit+"("+distcircuit+"m)";
+	//document.getElementById("NomCircuit").innerHTML = circuit+"("+distcircuit+"m)";
+	document.getElementById("NomCircuit").innerHTML = circuit;
 	
 	// recherche des compléments d'infos sur LIVE
 	FL = new Array()
@@ -545,7 +547,8 @@ function isInfosReady()
 			retourPoint = Ev[0];
 			pointgps = retourPoint.pointgps;
 			nearest = retourPoint.neartrk;
-			document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
+			//document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
+			document.getElementById("NomCircuit").innerHTML = nearest[0];
 			//console.log(document.getElementById("NomCircuit").innerHTML);
 			//console.log(JSON.stringify(retourPoint));
 		}
@@ -555,7 +558,8 @@ function isInfosReady()
 				retourPoint = Ev[0];
 				pointgps = retourPoint.pointgps;
 				nearest = retourPoint.neartrk;
-				document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
+				//document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
+				document.getElementById("NomCircuit").innerHTML = nearest[0];
 				//console.log(document.getElementById("NomCircuit").innerHTML);
 				//console.log(JSON.stringify(retourPoint));
 			}

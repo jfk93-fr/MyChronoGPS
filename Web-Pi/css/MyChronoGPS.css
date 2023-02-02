@@ -600,7 +600,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 }
 
 .btnrefresh {
-	background-color: grey;
+	background-color: none;
 	padding:12px 16px;
 	vertical-align: middle;
 	text-align: center;
@@ -748,6 +748,173 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	left: 46px;
 	/*color: inherit;*/
 }
+
+.btndashboard {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/tablet-dashboard.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btngpscmd {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/crosshairs-gps-b.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnstatus {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/crosshairs-question-b.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnmainmenu {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/menu.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnlive {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/wifi.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnsessions {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/view-list.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnparams {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/book-edit.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btntracks {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/go-kart-track.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btncopy {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/content-save.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnprocess {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/eye.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btnprocess-off {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/eye-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btndisks {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/database.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btndisks-off {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/database-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+.btngpson {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/crosshairs-gps.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btngpsoff {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/crosshairs-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnmycoff {
+	background-image: url(../img/timer-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnpwroff {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/power.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnchart {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/chart-line.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+
+
+.zone-info {
+	width:  90%;
+	height: 36px;
+	position: fixed;
+	bottom: 2%;
+	left: 2%;
+}
+
+
+
 .screensize {
 	position: relative;
 	text-align: right;

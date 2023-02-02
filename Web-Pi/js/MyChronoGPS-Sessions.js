@@ -66,6 +66,14 @@ function afficheListeSessions()
 		alert('tabsessions not found in document');
 		return;
 	}
+	var HTML = "";
+	HTML += '<tr>';
+	HTML += '	<th>Date</th>';
+	HTML += '	<th>Heure</th>';
+	HTML += '	<th>Circuit</th>';
+	HTML += '	<th></th>';
+	HTML += '</tr>';
+	
 	for (var i=0; i < Sessions.length; i++) {
 		var session = Sessions[i];
 		var session_file = session.filetime+'.json'; // Nom du fichier de session
@@ -77,44 +85,80 @@ function afficheListeSessions()
 		var Lat2 = Tinfos[5];
 		var Lng2 = Tinfos[6];
 		
-		var etr = document.createElement('tr');
+		//var etr = document.createElement('tr');
+		HTML += '<tr>';
 
-		var etd = document.createElement('td');
-		var ancre = document.createElement('a');
-		ancre.href=href+session_file;
-		ancre.innerText = session.date_session;
-		etd.appendChild(ancre);
-		etr.appendChild(etd);
+		//var etd = document.createElement('td');
+		HTML += '<td>';
+		//var ancre = document.createElement('a');
+		HTML += '<a ';
+		//ancre.href=href+session_file;
+		HTML += 'href="'+href+session_file+'">';
+		//ancre.innerText = session.date_session;
+		HTML += session.date_session;
+		//etd.appendChild(ancre);
+		HTML += '</a>';
+		//etr.appendChild(etd);
+		HTML += '</td>';
 
-		var etd = document.createElement('td');
-		var ancre = document.createElement('a');
-		ancre.href=href+session_file;
-		ancre.innerText = session.heure_session;
-		etd.appendChild(ancre);
-		etr.appendChild(etd);
+		//var etd = document.createElement('td');
+		HTML += '<td>';
+		//var ancre = document.createElement('a');
+		HTML += '<a ';
+		//ancre.href=href+session_file;
+		HTML += 'href="'+href+session_file+'">';
+		//ancre.innerText = session.heure_session;
+		HTML += session.date_session;
+		//etd.appendChild(ancre);
+		HTML += '</a>';
+		//etr.appendChild(etd);
+		HTML += '</td>';
 
-		var etd = document.createElement('td');
-		var ancre = document.createElement('a');
-		ancre.href=href2;
+		//var etd = document.createElement('td');
+		HTML += '<td>';
+		//var ancre = document.createElement('a');
+		HTML += '<a ';
+		//ancre.href=href2;
+		HTML += 'href="'+href2;
 		if (NomCircuit != "") {
-			ancre.href += "id="+NomCircuit;
-			ancre.innerText = NomCircuit;
+			//ancre.href += "id="+NomCircuit;
+			HTML += 'id='+NomCircuit+'"';
+			//ancre.innerText = NomCircuit;
+			HTML += '>'+NomCircuit;
 		}
 		else {
-			ancre.href += "FL=["+Lat1+","+Lng1+","+Lat2+","+Lng2+"]";
-			ancre.innerText = "circuit non référencé";
+			//ancre.href += "FL=["+Lat1+","+Lng1+","+Lat2+","+Lng2+"]";
+			HTML += "FL=["+Lat1+","+Lng1+","+Lat2+","+Lng2+"]\"";
+			//ancre.innerText = "circuit non référencé";
 		}
-		etd.appendChild(ancre);
-		etr.appendChild(etd);
+		//etd.appendChild(ancre);
+		HTML += '</a>';
+		//etr.appendChild(etd);
+		HTML += '</td>';
 
-		var etd = document.createElement('td');
-		var ancre = document.createElement('a');
-		ancre.href = 'ajax/download.py?file='+session.filetime;
-		ancre.innerText = "Télécharger";
-		ancre.target = "_blank";
-		etd.appendChild(ancre);
-		etr.appendChild(etd);
+		//var etd = document.createElement('td');
+		HTML += '<td class=""LCD35-hide">';
+		//var ancre = document.createElement('a');
+		HTML += '<a class="LCD35-hide"';
+		//ancre.className = "LCD35-hide";
+		//ancre.href = 'ajax/download.py?file='+session.filetime;
+		//ancre.href = '#';
+		var urlFichier = 'ajax/download.py?file='+session.filetime;
+		//HTML += 'href="#" onclick="window.open(\''+urlFichier+'\');self.close();return false;" >';
+		//HTML += 'href="#" onclick="window.location = \''+urlFichier+'\'" >';
+		//HTML += 'href="'+urlFichier+'" >';
+		HTML += 'href="'+urlFichier+'&uniq=12" target = "_blank" >';
+		//HTML += 'href="#" onclick="'+urlFichier+'" >';
+		//ancre.innerText = "Télécharger";
+		HTML += "Télécharger";
+		/*ancre.target = "_blank";*/
+		//etd.appendChild(ancre);
+		HTML += '</a>';
+		//etr.appendChild(etd);
+		HTML += '</td>';
 		
-		el.appendChild(etr);
+		//el.appendChild(etr);
+		HTML += '</td>';
 	}
+	el.innerHTML = HTML;
 }
