@@ -762,7 +762,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	padding:8px 20px;
 	width:  36px;
 	height: 36px;
-	background-image: url(../img/crosshairs-gps-b.png) ; 
+	background-image: url(../img/crosshairs-gps.png) ; 
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }
@@ -771,7 +771,7 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	padding:8px 20px;
 	width:  36px;
 	height: 36px;
-	background-image: url(../img/crosshairs-question-b.png) ; 
+	background-image: url(../img/crosshairs-question.png) ; 
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }

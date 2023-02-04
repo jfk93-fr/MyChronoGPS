@@ -29,11 +29,44 @@
 <div class="w3-container" style="margin-left:15%">
 		<div class="w3-container w3-row">
 			<div class="w3-bar" id="menu-onglets" style="display:block">
-				<a href="MyChronoGPS-Sessions.html" ><div class="w3-bar-item w3-button">Sessions</div></a>
-				<a href="MyChronoGPS.html" ><div class="w3-bar-item w3-button">Menu</div></a>
-				<div class="w3-bar-item w3-button" id="menu-map" onClick="displayMap();">Map</div>
-				<div class="w3-bar-item w3-button" id="menu-infos" onClick="displayInfos();">Infos</div>
-				<div class="w3-bar-item w3-button" id="menu-graph" onClick="switchGraph();" style="display:none">Graphe</div>
+				<div class="LCD35-hide"> <a href="MyChronoGPS-Sessions.html" ><div class="w3-bar-item w3-button">Sessions</div></a></div>
+				<div class="w3-col s3">
+					<span class="LCD35-show">
+					<a href="MyChronoGPS-Sessions.html" class="w3-bar-item w3-button w3-border w3-round">
+					<span class="btnsessions"></span>
+					</a>
+					</span>
+				</div>
+				<div class="LCD35-hide">
+					<a href="MyChronoGPS.html" >
+					<div class="w3-bar-item w3-button">Menu</div>
+					</a>
+				</div>
+				<div class="w3-col s3">
+					<span class="LCD35-show">
+					<a href="MyChronoGPS.html" class="w3-bar-item w3-button w3-border w3-round">
+					<span class="btnmainmenu"></span>
+					</a>
+					</span>
+				</div>
+				<div class="LCD35-hide">
+					<div class="LCD35-hide w3-bar-item w3-button" id="menu-map" onClick="displayMap();">Map</div>
+				</div>
+				<div class="LCD35-show">
+					<a href="#" class="w3-bar-item  w3-button btntracks" id="menu-map" onClick="displayMap();">
+					</a>
+				</div>
+				<div class="LCD35-hide">
+					<div class="w3-bar-item w3-button LCD35-hide" id="menu-infos" onClick="displayInfos();">Infos</div>
+				</div>
+				<div class="LCD35-show">
+					<a href="#" class="w3-bar-item  w3-button btnmainmenu" id="menu-infos" onClick="displayInfos();">
+					</a>
+				</div>
+				<div class="LCD35-show">
+					<a href="#" class="w3-bar-item  w3-button btnchart" id="menu-graph" onClick="switchGraph();" style="display:none">
+					</a>
+				</div>
 			</div>
 			
 			<div class="w3-container" id="onglet-map">
@@ -47,14 +80,18 @@
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-1);" >PitIn</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-2);" >PitOut</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="setMaxZoom();" >Zoom+</a>		
-					<a class="w3-bar-item w3-button" href="#"  onClick="setOriginZoom();" >Zoom-</a>		
+					<a class="w3-bar-item w3-button" href="#"  onClick="setOriginZoom();" >Zoom-</a>
 					</span>
 					<span class="LCD35-hide"><input id="LatLng" value="" onchange="showInputPoint(this.id);"></input></span>
 					<span class="LCD35-hide"><input type="hidden" id="HiddenLatLng" value=""></input></span>
 					<span class="LCD35-hide"><a class="w3-bar-item w3-button" href="#"  onClick="showInputPoint('HiddenLatLng');" >Point</a></span>	
 					<span id="simu" style="display:none"> 
 						<a id="switch-simu" class="w3-bar-item w3-button LCD35-hide" href="#" onClick="switchSimu();" >Simulateur</a>
-						<a  id="switch-graph"class="w3-bar-item w3-button" href="#" onClick="switchGraph();" >Graphe</a>
+						<a  id="switch-graph" class="w3-bar-item w3-button LCD35-hide" href="#" onClick="switchGraph();" >Graphe</a>
+						<div class="LCD35-show">
+							<a href="#" class="w3-bar-item  w3-button btnchart" id="switch-graph" onClick="switchGraph();" style="display:none">
+							</a>
+						</div>
 					</span>
 				</div>
 				<div class="w3-container w3-row-padding LCD35-hide" id="sousmenu-simu" style="display:none">
@@ -126,7 +163,7 @@
 			</div>
 			
 			<div class="w3-container" id="onglet-infos">
-				<div class="w3-bar" id="sousmenu-infos">
+				<div class="w3-bar LCD35-hide" id="sousmenu-infos">
 					<div class="w3-bar-item w3-button" id="sousmenu-tours" onClick="displayInfosTours();">Tours</div>
 					<div class="w3-bar-item w3-button" id="sousmenu-circuit" onClick="displayInfosCircuit();">Circuit</div>
 				</div>
@@ -167,6 +204,7 @@
 				<div id="stats" style="width:50%; height:300px; margin:0 auto;"></div>
 			</div>
 		</div>
+
 </div>
 	<script src="./js/parse_url.js" type="text/javascript"></script>
 	<script src="./js/ajax.js" type="text/javascript"></script>

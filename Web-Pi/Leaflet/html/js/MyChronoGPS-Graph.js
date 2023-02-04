@@ -11,6 +11,8 @@ var tmpmark4 = false;
 var tmpmark5 = false;
 var tmpmark6 = false;
 var datag = false;
+var options = false;
+var lieu;
 
 google.charts.load('current', {packages: ['corechart']});
 google.charts.setOnLoadCallback(drawChart);
@@ -26,15 +28,15 @@ function switchGraph() {
 		graphRelease();
 		resizeMap();
 		is_graph = false;
-		if (window.innerWidth <= 480) {
-			document.getElementById("menu-graph").style.display = "block";
-		}		
-		else {
-			document.getElementById("menu-graph").style.display = "none";
-		}		
+		//if (window.innerWidth <= 480) {
+		//	document.getElementById("menu-graph").style.display = "block";
+		//}		
+		//else {
+		//	document.getElementById("menu-graph").style.display = "none";
+		//}		
 		return;
 	}
-	document.getElementById("menu-graph").style.display = "none";
+	//document.getElementById("menu-graph").style.display = "none";
 	var el = document.getElementById("info-graph");
 	if (el) {
 		el.style.display = "block";
@@ -63,7 +65,7 @@ function switchGraph() {
 	}
 	console.log(maxrows);
 	// préparation du tableau graphe
-	var tabGraph = new Array();
+	tabGraph = new Array();
 	for (var i=0; i < maxrows; i++) {
 		var tabCols = new Array();
 		for (var j=0; j < maxcols; j++) {
@@ -111,35 +113,35 @@ function switchGraph() {
 	chart.draw(datag, options);
 
 	google.visualization.events.addListener(chart, 'select', function() {
-		var lieu = chart.getSelection();
+		lieu = chart.getSelection();
 		if (lieu.length > 0) {
 			var x = lieu[0].row;
 			var y = lieu[0].column-1;
-			var lap = tabShow[y];
-			var point2mark = tabGraph[x][y];
-			console.log(JSON.stringify(point2mark));
-			var cap = point2mark.cap;
-		
-			if (graphmarker != '') {
-				//graphmarker.setMap(null);
-				map.removeLayer(graphmarker)
-				graphmarker = '';
-			}
-			var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
-			console.log(markerpoint);
-			var title = 'T:\t'+lap+'\r\n'+
-					'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
-					'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
-					'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
-					'cap:\t'+Math.round(point2mark.cap*10)/10+'° ';
-			var localIcon = L.icon({
-				iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
-				iconAnchor: [8, 16]
-			});	
-			graphmarker = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
-			map.addLayer(graphmarker);
-			//map.panTo(markerpoint);
-			map.setView(markerpoint);
+			//var lap = tabShow[y];
+			//var point2mark = tabGraph[x][y];
+			//console.log(JSON.stringify(point2mark));
+			//var cap = point2mark.cap;
+			setMarkerpoint(x,y);
+			//if (graphmarker != '') {
+			//	//graphmarker.setMap(null);
+			//	map.removeLayer(graphmarker)
+			//	graphmarker = '';
+			//}
+			//var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
+			//console.log(markerpoint);
+			//var title = 'T:\t'+lap+'\r\n'+
+			//		'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
+			//		'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
+			//		'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
+			//		'cap:\t'+Math.round(point2mark.cap*10)/10+'° ';
+			//var localIcon = L.icon({
+			//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+			//	iconAnchor: [8, 16]
+			//});	
+			//graphmarker = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
+			//map.addLayer(graphmarker);
+			////map.panTo(markerpoint);
+			//map.setView(markerpoint);
 			
 			//graphmarker = new google.maps.Marker({
 			//	position: markerpoint, 
@@ -165,6 +167,101 @@ function switchGraph() {
 
 	return;
 }
+
+function setMarkerpoint(x,y) {
+	var lap = tabShow[y];
+	var point2mark = tabGraph[x][y];
+	if (graphmarker != '') {
+		//graphmarker.setMap(null);
+		map.removeLayer(graphmarker)
+		graphmarker = '';
+	}
+	var cap = point2mark.cap;
+	var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
+	console.log(markerpoint);
+	var title = 'T:\t'+lap+'\r\n'+
+			'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
+			'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
+			'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
+			'cap:\t'+Math.round(point2mark.cap*10)/10+'° ';
+	var localIcon = L.icon({
+		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+		iconAnchor: [8, 16]
+	});	
+	graphmarker = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
+	map.addLayer(graphmarker);
+	//map.panTo(markerpoint);
+	map.setView(markerpoint);
+	
+	//graphmarker = new google.maps.Marker({
+	//	position: markerpoint, 
+	//	,icon: {
+	//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+	//		rotation: cap,
+	//		fillColor: "cyan",
+	//		fillOpacity: 0.8,
+	//		scale: 5,
+	//		strokeColor: "gold",
+	//		strokeWeight: 2,
+	//		}
+	//	});
+	//graphmarker.setMap(map);
+	//setCenter(markerpoint);
+	graphmarker.on('dragend', function(ev) {
+		changeMobilePoint(ev);
+		});
+}
+
+function changeMobilePoint(ev) {
+	//console.log(JSON.stringify(ev));
+	var x = lieu[0].row;
+	var y = lieu[0].column-1;
+	var lap = tabShow[y];
+	var il = lap-1;
+	console.log(JSON.stringify(Tours[il].geocoords));
+	// recherche du point le plus proche du marker mobile
+	var mindist = 999999;
+	var dist;
+	var im;
+	for (var ip=1; ip < Tours[il].geocoords.length; ip++) {
+		var lata = ev.target._latlng.lat;
+		var lnga = ev.target._latlng.lng;
+		var latb = Tours[il].geocoords[ip].lat;
+		var lngb = Tours[il].geocoords[ip].lng;
+		dist = distanceGPS(new Array(lata,lnga),new Array(latb,lngb));
+		console.log('dist:'+dist);
+		if (dist < mindist) {
+			mindist = dist;
+			im = ip;
+		}
+	}
+	console.log('mindist:'+mindist);
+	console.log('indice point:'+im);
+	// on place le mobile sur le point le plus près qu'on a trouvé
+	var point2mark = tabGraph[im][0];
+
+	//var point2mark = new Array();
+	//point2mark.lat = Tours[il].geocoords[im].lat;
+	//point2mark.lon = Tours[il].geocoords[im].lng;
+	//point2mark.cap = Tours[il].points[im].cap;
+	var x=im;
+	var y=0;
+	setMarkerpoint(x,y);
+	
+	//on repère le mobile sur le graphe
+	var lieu2 = new Array();
+	var newlocation = new Array();
+	lieu2.row = im;
+	lieu2.column = 0;
+	newlocation.push(lieu2);
+	
+	chart.draw(datag, options);
+	chart.setSelection([{'row' : im}]);
+	
+	//for (var
+}
+
+
 	
 function drawChartLap(il) {
 	// Ici, on va construire le tableau du tour en cours 
@@ -205,11 +302,11 @@ function drawChartLap(il) {
 function graphRelease() {
 	is_graph = false;
 
-	if (graphmarker != '') {
-		//graphmarker.setMap(null);
-		map.removeLayer(graphmarker)
-		graphmarker = '';
-	}
+	//if (graphmarker != '') {
+	//	//graphmarker.setMap(null);
+	//	map.removeLayer(graphmarker)
+	//	graphmarker = '';
+	//}
 	//var el = document.getElementById("sousmenu-simu");
 	//if (el)
 	//	el.style.display = "none";

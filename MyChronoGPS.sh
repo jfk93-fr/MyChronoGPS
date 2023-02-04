@@ -1,4 +1,7 @@
 #!/bin/sh
+_version=$(cat VERSION)
+echo "installation MyChronoGPS Version $_version"
+
 _wiringpi=$(ls /usr/local/lib/python*/dist-packages | grep -c wiringpi) || true
 if [ "$_wiringpi" ]
 then
@@ -16,6 +19,10 @@ fi
 #then 
 	echo "do you want to install Lighttpd ? Y or N"
 	read rep
+	if [ ! $rep ]
+	then
+		rep=$(echo "N")			
+	fi
 	if [ $rep = "Y" ] || [ $rep = "y" ]
 	then
 		sh ./Lighttpd.sh
@@ -100,16 +107,49 @@ sudo cp ./Web-Pi/js /var/www/html -r
 sudo cp ./Web-Pi/Leaflet/html /var/www -r
 echo "Have a GoogleMaps API key ? (Y-N)"
 read rep
+if [ ! $rep ]
+then
+	rep=$(echo "N")			
+fi
 if [ $rep = "Y" ] || [ $rep = "y" ]
 then
 	echo "installation of GoogleMaps instead of Leaflet"
-	sudo cp ./Web-Pi/GoogleMaps/html /var/www -r
-	echo "While editing the file,"
-	echo "Replace the value 'Your_API_Key' with the value of your GoogleMaps API key "
-	echo "press enter to continue"
-	read dummy
-	sudo nano /var/www/html/js/key.js
-	#echo "var myKey = '"$KEY"';" >> /var/www/html/js/key.js
+	if [ -f /var/www/html/js/key.js ]
+	then
+		echo "key.js file already exists"
+		sudo cut -d "'" -f 2 "/var/www/html/js/key.js"
+		echo "Do you want to replace it ? (Y-N)"
+		read rep
+		if [ ! $rep ]
+		then
+			rep=$(echo "N")			
+		fi
+		if [ $rep = "Y" ] || [ $rep = "y" ]
+		then
+			echo "save key.js file in key.js.bak"
+			sudo cp /var/www/html/js/key.js /var/www/html/js/key.js.bak
+			sudo cp ./Web-Pi/GoogleMaps/html /var/www -r
+			sudo cp /var/www/html/js/key.js.bak /var/www/html/js/key.js
+			echo "While editing the file,"
+			echo "Replace the value 'Your_API_Key' with the value of your GoogleMaps API key "
+			echo "press enter to continue"
+			read dummy
+			sudo nano /var/www/html/js/key.js
+		else
+			echo "Your key is"
+			sudo cut -d "'" -f 2 "/var/www/html/js/key.js"
+		fi
+	else
+		sudo cp ./Web-Pi/GoogleMaps/html /var/www -r
+		echo "While editing the file,"
+		echo "Replace the value 'Your_API_Key' with the value of your GoogleMaps API key "
+		echo "press enter to continue"
+		read dummy
+		sudo nano /var/www/html/js/key.js
+	fi
+	echo "changing access rights for key.js"
+	sudo chown www-data:www-data /var/www/html/js/key.js
+	sudo chmod g+rwX /var/www/html/js/key.js
 fi
 #
 echo "changing access rights of www-data"
@@ -122,6 +162,10 @@ sudo chmod -R u+wx,g+wx,o+wx $HOME/MyChronoGPS
 
 echo "Do you want to install sample files ? (Y-N)"
 read rep
+if [ ! $rep ]
+then
+	rep=$(echo "N")			
+fi
 if [ $rep = "Y" ] || [ $rep = "y" ]
 then
 	sh ./MyChronoGPS_Sample.sh
