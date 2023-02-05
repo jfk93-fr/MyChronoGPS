@@ -158,12 +158,10 @@ function initMap() {
 	//map = new google.maps.Map(document.getElementById('map'), optionsMap);
 	map = L.map('map').setView([lat,lon],zoom);
 	
-	L.tileLayer.provider('GeoportailFrance', {
-		variant: 'ORTHOIMAGERY.ORTHOPHOTOS',
-		/*variant: 'ORTHOIMAGERY.ORTHOPHOTOS2015',*/
-		maxZoom: 19,
-		apikey: 'choisirgeoportail'
-	}).addTo(map);	
+	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+	});
+	Esri_WorldImagery.addTo(map);	
 	
 	// Assumes your Leaflet map variable is 'map'..
 	L.DomUtil.addClass(map._container,'crosshair-cursor-enabled');
