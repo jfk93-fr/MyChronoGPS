@@ -2421,10 +2421,10 @@ class AcqControl(threading.Thread):
             if self.lat == False:
                 self.lat = self.gps.latitude
                 self.lon = self.gps.longitude
-                logger.info("Acq gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
+                #logger.info("Acq gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
             else:
                 # only processed if the timestamp has changed
-                logger.info("Acq gps gpstime:"+str(self.gps.gpstime)+" timestamp:"+ str(self.timestamp))
+                #logger.info("Acq gps gpstime:"+str(self.gps.gpstime)+" timestamp:"+ str(self.timestamp))
                 if self.timestamp != self.gps.gpstime:
                     self.timestamp = self.gps.gpstime
                     # if the speed is below 10 km/h we restart the procedure from this gps point
@@ -2439,7 +2439,7 @@ class AcqControl(threading.Thread):
                         dist = 0
                     else:
                         dist = distanceGPS(self.lat, self.lon, self.gps.latitude, self.gps.longitude)
-                        logger.info("Acq dist:"+str(dist)+" lat:"+str(self.lat)+"lon:"+str(self.lon)+" gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
+                        #logger.info("Acq dist:"+str(dist)+" lat:"+str(self.lat)+"lon:"+str(self.lon)+" gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
                     if self.max == False:
                         if dist > self.pgpsmax["dist"]:
                             # we're moving away
@@ -2454,8 +2454,8 @@ class AcqControl(threading.Thread):
                                 # we are getting closer for the first time
                                 self.max = True;
                                 self.chrono.lcd.set_display_sysmsg("Line Def//Started",lcd.DISPLAY,2)
-                                logger.info("Line Def Started:"+str(dist))
-                                logger.info(str(self.pgpsmax))
+                                #logger.info("Line Def Started:"+str(dist))
+                                #logger.info(str(self.pgpsmax))
                     else:
                         if dist < self.pgpsmin["dist"]:
                             # we are getting closer
@@ -2473,13 +2473,13 @@ class AcqControl(threading.Thread):
                 self.timelimit = self.timelimit - self.pulse
                 time.sleep(self.pulse)
             else:
-                logger.info("AcqControl time limit reached")
+                #logger.info("AcqControl time limit reached")
                 self.__running = False
         #logger.info("AcqControl cancel ?"+str(self.__cancel))
         if self.__cancel == True: #the thread, has been aborted
             logger.info("AcqControl aborted:"+str(self.pgpsmin))
         if self.__cancel == False: #the thread, has not been aborted
-            logger.info(str(self.pgpsmin))
+            #logger.info(str(self.pgpsmin))
             # the acquisition time is over, we will draw the line from the calculated coordinates
             # instead of drawing the line, we could indicate that we are ready to draw it
             self.chrono.define_start_wcap(self.pgpsmin["lat"],self.pgpsmin["lon"],self.pgpsmin["cap"])
@@ -2494,7 +2494,7 @@ class AcqControl(threading.Thread):
             self.chrono.nblap = 1 # we start with the first lap
             
             self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
-            logger.info("acq Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
+            #logger.info("acq Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
         self.active = False;
         logger.info("AcqControl ended")
                 
