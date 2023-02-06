@@ -2490,8 +2490,25 @@ class AcqControl(threading.Thread):
                                     
                                     self.chrono.dD = 0 # no need for distance correction
                                     self.chrono.dD = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
-                                    self.chrono.start_chrono()
+                                    
+                                    #self.chrono.start_chrono()
                                     #time.sleep(3)
+                                    self.chrono.begin()
+                                    self.chrono.nblap = 1 # we start with the first lap
+                                    self.chrono.chrono_started = True
+                                    # debug #
+                                    # self.chronoStartTime = self.getTime(gps.gpstime)
+                                    logger.info("comparasion des start time")
+                                    logger.info("chronoStartTime:"+str(self.chrono.chronoStartTime))
+                                    logger.info("gpstime (chrono):"+str(self.chrono.gps.gpstime))
+                                    logger.info("acqlines time k:"+str(self.acqlines[k]["time"]))
+                                    logger.info("acqlines getTime k:"+str(self.chrono.getTime(self.acqlines[k]["time"])))
+                                    logger.info("acqlines time j:"+str(self.acqlines[j]["time"]))
+                                    logger.info("acqlines getTime j:"+str(self.chrono.getTime(self.acqlines[j]["time"])))
+
+                                    self.chrono.chronoStartTime = self.chrono.getTime(self.acqlines[k]["time"])
+                                    # end debug #
+                                    
                                     
                                     dt0 = self.chrono.getTime(self.acqlines[k]["time"])
                                     dt1 = self.chrono.getTime(self.acqlines[j]["time"])

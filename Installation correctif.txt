@@ -1,6 +1,11 @@
 Pour installer les corrections
-A partir du dossier /home/pi lancez les commandes suivantes :
+Lancez les commandes suivantes :
+(la première ligne pour être sûr d'être sur le dossier racine)
+	$ cd $HOME
+(les lignes suivantes pour nettoyer un correctif précédent)	
+	$ sudo rm -rf temp
 	$ mkdir temp
+(installation du correctif)	
 	$ cd temp
 	$ git clone https://github.com/jfk93-fr/MyChronoGPS.git
 	$ cd MyChronoGPS
