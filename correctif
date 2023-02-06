@@ -5,9 +5,8 @@ sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_GoogleMaps.sh $HOME/MyChronoGPS/MyChr
 sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_Leaflet.sh $HOME/MyChronoGPS/MyChronoGPS_Leaflet.sh
 sudo cp $HOME/temp/MyChronoGPS/VERSION $HOME/MyChronoGPS/VERSION
 sudo cp $HOME/temp/MyChronoGPS/Web-Pi $HOME/MyChronoGPS -r
-sudo cp $HOME/temp/MyChronoGPS/tracks/Ales.trk $HOME/MyChronoGPS/tracks/Ales.trk
-sudo cp $HOME/temp/MyChronoGPS/tracks/Croix-en-Ternois.trk $HOME/MyChronoGPS/tracks/Croix-en-Ternois.trk
-sudo cp $HOME/temp/MyChronoGPS/tracks/Navarra.trk $HOME/MyChronoGPS/tracks/Navarra.trk
+sudo cp $HOME/MyChronoGPS/tracks $HOME/MyChronoGPS/save-tracks -r
+sudo cp $HOME/temp/MyChronoGPS/tracks $HOME/MyChronoGPS -r
 
 sudo chown -R www-data:www-data $HOME/MyChronoGPS
 
