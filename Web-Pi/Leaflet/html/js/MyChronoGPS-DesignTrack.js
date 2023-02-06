@@ -817,7 +817,7 @@ function showData() {
 
 }
 
-function copyTrack() {
+function copyTrack(parm=0) {
 	// on copy tous les input et on crée le fichier JSON de la piste
 	createNewTrack();
 	
@@ -840,7 +840,7 @@ function copyTrack() {
 	document.getElementById("zone-info").innerHTML = 'Les données du circuit sont copiées dans le presse papier';
 	
 	// juste pour les tests, on appelle la fonction de sauvegarde
-	saveTrack();
+	saveTrack(parm);
 }
 
 function createNewTrack() {
@@ -1104,7 +1104,8 @@ function createNewTrack() {
 	return true;
 }
 
-function saveTrack() {
+function saveTrack(parm) {
+	console.log('parm saveTrack:'+parm);
 	// on copy tous les input et on crée le fichier JSON de la piste
 	createNewTrack();
 
@@ -1126,10 +1127,19 @@ function saveTrack() {
 		dataPost.append(property, Track[property]);
 	}
 	*/
-	for (property in Track) {
+	for (property in Track) {		
 		var valuePost = Track[property];
 		if (Array.isArray(Track[property])) {
 			valuePost = '['+Track[property]+']';
+		}
+		// modification de IdCircuit en cas de copie
+		if (parm == 1) {
+			if (property == "IdCircuit") {
+				valuePost = "0"; // force la création d'un circuit
+			}
+			if (property == "NomCircuit") {
+				valuePost += "-Copie"; // force l'ajout du suffixe copie au nom du circuit
+			}
 		}
 		dataPost.append(property, valuePost);
 	}
