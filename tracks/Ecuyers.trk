@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e1756541138",
+    "NomCircuit": "Ecuyers",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 49.106303036740606,
+    "Longitude": 3.5060306573013253,
+    "Latcenter": 49.10827426848252,
+    "Loncenter": 3.5100834545227055,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        49.10735891457938,
+        3.5081374159348067,
+        49.1073940513322,
+        3.5078695462076466
+    ],
+    "LatFL": 49.10737648293095,
+    "LonFL": 3.5080034812605603,
+    "CapFL": 16.477241306730036
+}

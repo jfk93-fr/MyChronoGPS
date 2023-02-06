@@ -86,7 +86,7 @@ function addTracks(mousePt) {
 }
 
 function markCircuit() {
-	var listeHTML = '';
+	var listeHTML = '<div class="w3-container"><ul>';
 	for (var i=0; i < Circuit.circuits.length; i++) {
 		console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
 		var dist = distanceGPS(lat,lng,Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude);
@@ -122,13 +122,20 @@ function markCircuit() {
 		LatInt3 = Circuit.circuits[i].LatInt3;
 		LonInt3 = Circuit.circuits[i].LonInt3;
 
-		listeHTML += '<li><a'+
+		//listeHTML += '<li><div class="w3-col l6 s6"><a'+
+		listeHTML += '<div class="w3-col l6 s6"><a'+
 						' href="#"'+
 						' id="lien_circuit'+IdCircuit+'"' +
 						' onmouseover="changeMarker(\''+IdCircuit+'\',1);" onmouseout="changeMarker(\''+IdCircuit+'\',0);"'+
 						' onclick="showInfoMarker(\''+IdCircuit+'\');"'+
-						'>'+NomCircuit+'</a></li>';
+						'>'+NomCircuit+'</a></div>'+
+						'<div class="w3-col l6 s6"><a href="MyChronoGPS-DesignTrack.html?id='+NomCircuit+'" class="w3-button w3-round">'+
+						'<span class="btnedit-tracks"></span></a></div>'+
+						//'</li>';
+						'';
 	}
+	//listeHTML += '</ul></div>';
+	listeHTML += '</div>';
 	document.getElementById("liste_circuits").innerHTML = listeHTML;
 }
 function changeMarker(circuit,onoff)
@@ -354,7 +361,8 @@ function showPoint() {
 	lon = LatLng[1];
 	//var googleLatLng = new google.maps.LatLng(lat,lon); 
 	//map.setCenter(googleLatLng);
-	map = L.map('map').setView([lat,lon]);
+	//map = L.map('map').setView([lat,lon]);
+	map.setView([lat,lon],16);
 	
 	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 		return

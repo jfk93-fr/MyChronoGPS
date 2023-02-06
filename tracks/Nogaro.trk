@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e1797eebe67",
+    "NomCircuit": "Nogaro",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 43.76586409936166,
+    "Longitude": -0.038102604917811256,
+    "Latcenter": 43.76987938049429,
+    "Loncenter": -0.03977053119652352,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        43.77072078209773,
+        -0.04039516438941293,
+        43.77058138803884,
+        -0.040705059828363144
+    ],
+    "LatFL": 43.77064188485356,
+    "LonFL": -0.040539383522728574,
+    "CapFL": 322.10856777222824
+}

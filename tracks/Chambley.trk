@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e174036dc8d",
+    "NomCircuit": "Chambley",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 49.02560644248183,
+    "Longitude": 5.891136617603175,
+    "Latcenter": 49.0272942,
+    "Loncenter": 5.887431,
+    "LongCircuit": 1,
+    "Zoom": 15,
+    "PitMaxSpeed": 50,
+    "FL": [
+        49.02677486211398,
+        5.892244686351945,
+        49.02705505707917,
+        5.892328171158393
+    ],
+    "LatFL": 49.02691495951494,
+    "LonFL": 5.892286428730845,
+    "CapFL": 96.31987343225583
+}

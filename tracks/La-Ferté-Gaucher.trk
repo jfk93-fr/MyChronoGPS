@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e1775405aca",
+    "NomCircuit": "La Fert\u00e9 Gaucher",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 48.757856,
+    "Longitude": 3.284381,
+    "Latcenter": 48.757856,
+    "Loncenter": 3.284381,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        48.757851574267406,
+        3.2829832746793137,
+        48.75766716306152,
+        3.2827395035514977
+    ],
+    "LatFL": 48.75775936848806,
+    "LonFL": 3.2828613888822216,
+    "CapFL": 318.06445655621303
+}

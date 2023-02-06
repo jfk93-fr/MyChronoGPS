@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e17818c3ced",
+    "NomCircuit": "Folembray",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 49.544102,
+    "Longitude": 3.299796,
+    "Latcenter": 49.544102,
+    "Loncenter": 3.299796,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        49.54430690399567,
+        3.3013517094057554,
+        49.54452776592536,
+        3.301077692525946
+    ],
+    "LatFL": 49.544417334512374,
+    "LonFL": 3.3012147015218445,
+    "CapFL": 57.166028172874235
+}

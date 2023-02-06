@@ -812,6 +812,15 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	background-repeat: no-repeat;
 }
 
+.btnedit-tracks {
+	padding:0px 8px;
+	/*width:  18px;*/
+	/*height: 18px;*/
+	background-image: url(../img/book-edit.png) ; 
+	background-size: 18px 18px;
+	background-repeat: no-repeat;
+}
+
 .btntracks {
 	padding:8px 20px;
 	width:  36px;

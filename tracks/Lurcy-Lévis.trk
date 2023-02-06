@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "63e13b49e81c5",
+    "NomCircuit": "Lurcy-L\u00e9vis",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 46.718144,
+    "Longitude": 2.9465997,
+    "Latcenter": 46.718144,
+    "Loncenter": 2.9465997,
+    "LongCircuit": 1,
+    "Zoom": 15,
+    "PitMaxSpeed": 50,
+    "FL": [
+        46.717153858716074,
+        2.9494833773315863,
+        46.717416203739745,
+        2.9493933647227024
+    ],
+    "LatFL": 46.71728503118694,
+    "LonFL": 2.9494383710412024,
+    "CapFL": 0.00014307701093230207
+}
