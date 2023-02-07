@@ -2565,7 +2565,7 @@ class AcqControl(threading.Thread):
                     time.sleep(self.sleep)
         #logger.info("AcqControl cancel ?"+str(self.__cancel))
         if self.__cancel == True: #the thread, has been aborted
-            logger.info("AcqControl aborted:"+str(self.pgpsmin))
+            logger.info("AcqControl aborted")
         if self.__cancel == False: #the thread, has not been aborted
             # we have just crossed the line that has just been defined  !
             self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
