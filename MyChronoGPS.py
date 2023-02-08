@@ -282,7 +282,7 @@ class GpsControl(threading.Thread):
                 cpt = cpt + 1
                 time.sleep(0.01)
             self.gpsline = self.lire_fifo()
-            logger.debug("gps frame:["+str(self.gpsline)+"]")
+            #logger.debug("gps frame:["+str(self.gpsline)+"]")
             if str(self.gpsline).find("END") >= 0:
                 logger.info("end detected:["+str(self.gpsline)+"]")
                 self.__running = False
@@ -306,7 +306,7 @@ class GpsControl(threading.Thread):
         logger.info("end of GpsControl Thread of main program")
 
     def lire_fifo(self):
-        logger.debug("lire_fifo GPSDATA")
+        #logger.debug("lire_fifo GPSDATA")
         retour = ""
         if len(self.buffer) > 0:
             if self.buffer[0] == "":
@@ -322,12 +322,12 @@ class GpsControl(threading.Thread):
                 pass
         if len(self.buffer) > 0:
             retour = self.buffer.pop(0)
-        logger.debug("GPSDATA lue")
+        #logger.debug("GPSDATA lue")
         return retour
         
     def parse(self,sentence):
         self.buffstate = BUSY
-        logger.debug("buffstate:"+str(self.buffstate))
+        #logger.debug("buffstate:"+str(self.buffstate))
         self.gpsdict = json.loads(sentence) 
         self.prevlat = self.latitude # prevlat and prevlon are used to calculate the last travelled line segment
         self.prevlon = self.longitude
@@ -338,7 +338,7 @@ class GpsControl(threading.Thread):
         
         self.gpsfix = self.VALID
         if self.nbparse == 0:
-            logger.debug("gpsdict:"+str(self.gpsdict))
+            #logger.debug("gpsdict:"+str(self.gpsdict))
             self.nbparse = self.nbparse + 1
         if "d" in self.gpsdict:
             self.gpsdate = self.gpsdict["d"]
@@ -379,7 +379,7 @@ class GpsControl(threading.Thread):
         self.gpscomplete = True;
 
         self.buffstate = FREE
-        logger.debug("buffstate:"+str(self.buffstate))
+        #logger.debug("buffstate:"+str(self.buffstate))
         
     def clear_buff(self):
         cpt = 0
@@ -820,8 +820,8 @@ class DisplayControl(threading.Thread):
                     self.displaySmall = True
                     gps.gpsfix = gps.INVALID
                     self.waiting_time = 1; # delay 1 second
-                else:
-                    logger.debug("gpsline:["+gps.gpsline+"]")
+                #else:
+                    #logger.debug("gpsline:["+gps.gpsline+"]")
                 if gps.gpsfix == gps.VALID:
                     self.localTime = formatLocalTime(gps)
                     if (self.display_mode == self.DATE_TIME):
@@ -1968,40 +1968,58 @@ class ChronoControl():
                             
                         # is the start-finish line crossed ?
                         if self.startLineCut == True:
+                            #logger.debug("coords line:["+str(self.startlat1)+","+str(self.startlon1)+"],["+str(self.startlat2)+","+str(self.startlon2)+"]")
+                            #logger.debug("coords ppos:["+str(self.gps_prevlat)+","+str(self.gps_prevlat)+"]")
+                            #logger.debug("coords apos:["+str(self.gps_latitude)+","+str(self.gps_longitude)+"]")
                             # calculation of the distance between the previous point and the start-finish line
                             dDp0 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_prevlat,self.gps_prevlon)
                             # calculation of the distance between the current point and the start-finish line
                             dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
                             
-                            v0 = self.gps_last_speed # speed at the previous point
-                            v1 = self.gps_gpsvitesse # speed at current point
+                            v0 = (self.gps_last_speed*1000)/3600 # speed at the previous point
+                            v1 = (self.gps_gpsvitesse*1000)/3600 # speed at current point
                             vmoy = (v0+v1)/2 # average speed to travel the straight line segment
                             dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                             dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
                                 
                             corrtime = self.chronoGpsTime - self.chronoPrevTime
                             #distAB = self.dDprev + self.dD
+                            #logger.debug("ditances:["+str(dDp0)+","+str(dDp1)+"]")
+                            #logger.debug("vitesses:["+str(v0)+","+str(v1)+"]")
+                            #logger.debug("dit corr:["+str(dc0)+","+str(dc1)+"]")
+                            #logger.debug("time cor before:["+str(corrtime)+"]")
 
                             if distseg > 0: # distseg = 0 is possible, if the gps remains static
-                                #cormic = corrtime.microseconds + (self.corrFreq * (self.dDprev/distAB))
-                                #cormic = corrtime.microseconds + (self.corrFreq * (dDp0/distseg))
+                                cormic = corrtime.microseconds + (self.corrFreq * (dDp0/distseg))
+                                #logger.debug("cormic (dDp0/distseg) :["+str(timedelta(microseconds=cormic))+"]")
 
                                 #logger.info('corrtime:'+str(corrtime.seconds)+' sec,'+str(corrtime.microseconds)+' mic')
                                 #micro_seconds = corrtime.seconds*1000000+corrtime.microseconds
                                 #logger.info('start micro_seconds:'+str(micro_seconds))
 
                                 cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
+                                #logger.debug("cormic (dc0/(dc0+dc1)) :["+str(timedelta(microseconds=cormic))+"]")
+                                cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
+                                #logger.debug("cormic rounded (dc0/(dc0+dc1)) :["+str(timedelta(microseconds=cormic))+"]")
 
                                 if self.ils != False:
                                     self.ils.set_ilstime(cormic)
                                 corrtime = timedelta(microseconds=cormic)
+                            #logger.debug("time cor after:["+str(corrtime)+"]")
                             temps_estime = self.chronoPrevTime + corrtime
                             
                             temps = temps_estime - self.chronoStartTime # temps = time passed since the start 
                             if self.nblap == 0:
                                 self.temps_t = temps
 
+                            #logger.debug("chronoStartTime :["+str(self.chronoStartTime)+"]")
+                            #logger.debug("temps_estime :["+str(temps_estime)+"]")
+                            #logger.debug("temps :["+str(temps)+"]")
+                            #logger.debug("temps_t :["+str(self.temps_t)+"]")
+
                             self.temps_tour = temps - self.temps_t
+                            #logger.debug("temps_tour :["+str(self.temps_tour)+"]")
+
                             self.temps_t = temps #
     
                             # the start-finish line is also the part of the last sector
@@ -2187,7 +2205,7 @@ class ChronoControl():
             if GpsChronoMode > 0:
                 self.neardist = 999999
                 self.neartrack = ""
-                logger.debug("circuit:"+str(type(circuits)))
+                #logger.debug("circuit:"+str(type(circuits)))
                 for track in circuits:
                     LatFL = 0
                     LonFL = 0
@@ -2424,6 +2442,7 @@ class AcqControl(threading.Thread):
         self.__running = True
         self.__cancel = False
         self.active = True;
+        logger.info("AcqControl is running")
         while self.__running:
             if self.lat == False:
                 # on peuple le premier élément du tableau
@@ -2433,13 +2452,14 @@ class AcqControl(threading.Thread):
                 self.sleep = 1
                 if self.vit > 0:
                     self.sleep = self.pulse/self.vit
-                #logger.info("sleep for "+str(self.sleep)+" secondes")
+                if self.sleep > 20:
+                    self.sleep = 20
+                #logger.debug("sleep for "+str(self.sleep)+" secondes")
                 time.sleep(self.sleep)
-                
                 #logger.info("Acq gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
             else:
                 # only processed if the timestamp has changed
-                #logger.info("Acq gps gpstime:"+str(self.gps.gpstime)+" timestamp:"+ str(self.timestamp))
+                #logger.debug("Acq gps gpstime:"+str(self.gps.gpstime)+" timestamp:"+ str(self.timestamp))
                 if self.timestamp != self.gps.gpstime:
                     self.timestamp = self.gps.gpstime
                     #logger.info("len acqlines before:"+str(len(self.acqlines)))
@@ -2448,7 +2468,7 @@ class AcqControl(threading.Thread):
                     seglon1 = self.acqlines[j]["lon"]
                     self.getline()
                     self.acqlines.append(self.acqline) # ligne suivante
-                    #logger.info("len acqlines after:"+str(len(self.acqlines)))
+                    #logger.debug("len acqlines after:"+str(len(self.acqlines)))
                     #logger.info(str(self.acqlines))
                     
                     max = len(self.acqlines)
@@ -2557,11 +2577,13 @@ class AcqControl(threading.Thread):
                         self.sleep = 1
                         if self.vit > 0:
                             self.sleep = self.pulse/self.vit
-                        #logger.info("sleep for "+str(self.sleep)+" secondes")
+                        if self.sleep > 20:
+                            self.sleep = 20
+                        #logger.debug("sleep for "+str(self.sleep)+" secondes")
                         time.sleep(self.sleep)
                 else:
                     self.sleep = 1
-                    #logger.info("sleep for "+str(self.sleep)+" secondes")
+                    #logger.debug("sleep for "+str(self.sleep)+" secondes")
                     time.sleep(self.sleep)
         #logger.info("AcqControl cancel ?"+str(self.__cancel))
         if self.__cancel == True: #the thread, has been aborted
@@ -2569,8 +2591,7 @@ class AcqControl(threading.Thread):
         if self.__cancel == False: #the thread, has not been aborted
             # we have just crossed the line that has just been defined  !
             self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
-            #logger.info("acq Line Defined lat:"+str(self.pgpsmin["lat"])+",lon:"+str(self.pgpsmin["lon"])+",cap:"+str(self.pgpsmin["cap"]))
-            #logger.info("len acqlines after line is defined:"+str(len(self.acqlines)))
+            #logger.debug("len acqlines after line is defined:"+str(len(self.acqlines)))
         self.active = False;
         logger.info("AcqControl ended")
                 
@@ -3011,6 +3032,7 @@ if __name__ == "__main__":
                                         if distcir < TrackProximity: # we are near the circuit
                                             # if the GPS point acquisition thread is running, it is stopped to force the use of the nearby circuit
                                             if acq.active != False:
+                                                logger.info("we are near a circuit ("+str(distcir)+"m), GPS point acquisition thread is stopped. ")
                                                 acq.stop()
                                             if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
                                                 #button1.button_state = READY
@@ -3029,7 +3051,9 @@ if __name__ == "__main__":
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
+                                    #logger.debug("current_sate:"+str(current_state))
                                     if acq != False:
+                                        #logger.debug("acq.active:"+str(acq.active))
                                         # if the GPS point acquisition thread is running, it is stopped
                                         if acq.active != False:
                                             acq.stop()
@@ -3086,41 +3110,53 @@ if __name__ == "__main__":
         #
         chrono.terminate() # arrête proprement la classe ChronoControl
         #
+        #logger.debug("menu:"+str(menu))
         if menu != False:
             menu.stop()
             menu.join()
+        #logger.debug("gps:"+str(gps))
         if gps != False:
             if gps.gpsactiv == True:
                 gps.stop()
             gps.join()
+        #logger.debug("tracker:"+str(tracker))
         if tracker != False:
             tracker.stop()
             tracker.join()
+        #logger.debug("fsession:"+str(fsession))
         if fsession != False:
             fsession.stop()
             #fsession.join()
+        #logger.debug("fanalys:"+str(fanalys))
         if fanalys != False:
             fanalys.stop()
             #fanalys.join()
+        #logger.debug("flive:"+str(flive))
         if flive != False:
             flive.stop()
             flive.join()
+        #logger.debug("led1:"+str(led1))
         if led1 != False:
             led1.stop()
             led1.join()
+        #logger.debug("lcd:"+str(lcd))
         if lcd != False:
             lcd.stop()
             logger.info("main lcd stop")
             lcd.join()
+        #logger.debug("ipClass:"+str(ipClass))
         if ipClass != False:
             ipClass.stop()
             ipClass.join()
+        #logger.debug("acq:"+str(acq))
         if acq != False:
             acq.stop()
             acq.join()
+        #logger.debug("ils:"+str(ils))
         if ils != False:
             ils.stop()
             ils.join()
+        #logger.debug("END of main program MyChronoGPS")
                 
     except KeyboardInterrupt:
         logger.info("User Cancelled (Ctrl C)")
