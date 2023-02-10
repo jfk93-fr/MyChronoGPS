@@ -94,7 +94,7 @@ loadCircuits();
 
 function dataCircuitsReady() {
 	loadCoords();
-	console.log(JSON.stringify(Coords))
+	//console.log(JSON.stringify(Coords))
 }	
 
 function dataCoordsReady() {
@@ -331,7 +331,7 @@ function showData() {
 
 	/* FL en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("FLLat1");
-	////console.log("FL:"+thisCircuit.FL)
+	//console.log("FL:"+thisCircuit.FL)
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[0];
 	}
@@ -448,7 +448,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objStart);
 	}
 	
@@ -474,7 +474,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[0]);
 	}
 	
@@ -500,7 +500,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[1]);
 	}
 	
@@ -576,7 +576,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		////console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objPitOut);
 	}
 }
@@ -701,7 +701,7 @@ function go()
 			el.innerHTML = 'problème détecté';
 		return false;
 	}
-	console.log(JSON.stringify(Coords));
+	//console.log(JSON.stringify(Coords));
 		
 	curr_coord = 0;
 	Ev = eval(Coords[curr_coord]);
@@ -768,7 +768,7 @@ function go()
 		var T1 = getObjTime(Point1.timestamp);
 		var dT = T1.getTime() - T0.getTime();
 		if (dT > 20000) {
-			console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
+			//console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
 			Tour.valid = false;
 		}
 		prevTimestamp = Point1.timestamp;
@@ -787,7 +787,7 @@ function go()
 		
 		if (nt > 0 && np <= 1) {
 			// on va ajouter les points 0 & 1 à la fin du tour précédent
-			console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
+			//console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
 			Point = new Object();
 			Point.timestamp = Tours[nt].points[np].timestamp;
 			Point.lat1 = Tours[nt].points[np].lat1;
@@ -800,27 +800,29 @@ function go()
 
 		np++;
 	}
-	////console.log(Tours);
+	//console.log(Tours);
 	// ne ratons pas le dernier tour
 	if (Tour) {
 		Tours.push(Tour);
-		console.log('ne ratons pas le dernier tour');
+		//console.log('ne ratons pas le dernier tour');
 		// on va ajouter le points 0 & 1 à la fin du tour précédent
 		nt = Tours.length-1;
-		console.log(JSON.stringify(Tours[nt-1]))
-		console.log(JSON.stringify(Tours[nt]))
-		for (var np=0; np < 2; np++) {
-			Point = new Object();
-			Point.timestamp = Tours[nt].points[np].timestamp;
-			Point.lat1 = Tours[nt].points[np].lat1;
-			Point.lon1 = Tours[nt].points[np].lon1;
-			Point.vitesse = Tours[nt].points[np].vitesse;
-			Point.altitude = Tours[nt].points[np].altitude;
-			Point.cap = Tours[nt].points[np].cap;
-			Tours[nt-1].points.push(Point);
+		if (nt > 0) {
+			//console.log(JSON.stringify(Tours[nt-1]))
+			//console.log(JSON.stringify(Tours[nt]))
+			for (var np=0; np < 2; np++) {
+				Point = new Object();
+				Point.timestamp = Tours[nt].points[np].timestamp;
+				Point.lat1 = Tours[nt].points[np].lat1;
+				Point.lon1 = Tours[nt].points[np].lon1;
+				Point.vitesse = Tours[nt].points[np].vitesse;
+				Point.altitude = Tours[nt].points[np].altitude;
+				Point.cap = Tours[nt].points[np].cap;
+				Tours[nt-1].points.push(Point);
+			}
+			//console.log(JSON.stringify(Tours[nt-1]))
+			//console.log(JSON.stringify(Tours[nt]))
 		}
-		console.log(JSON.stringify(Tours[nt-1]))
-		console.log(JSON.stringify(Tours[nt]))
 	}
 
 	// dès la première ligne du fichier, on va chercher le circuit correspondant
@@ -829,18 +831,18 @@ function go()
 	//Tour = Tours[i];
 	Points = Tour.points;
 	var nbpoints = Points.length;
-	////console.log("nbpoints:"+nbpoints);
+	//console.log("nbpoints:"+nbpoints);
 	
 	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
 	var T0 = getObjTime(Points[0].timestamp);
 	var T1 = getObjTime(Points[1].timestamp);
 	var dT = T1.getTime() - T0.getTime();
-	console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
+	//console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
 	Frequence = 1000/dT;
 
 	latitude = Points[0].lat1;
 	longitude = Points[0].lon1;
-	////console.log("lat:"+latitude+",lon:"+longitude)
+	//console.log("lat:"+latitude+",lon:"+longitude)
 	
 	var trackfound = scanCircuit();
 	
@@ -865,7 +867,7 @@ function go()
 		return;
 	el.innerHTML = "";
 	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
-		////console.log("Tour:"+Tours[i].id);
+		//console.log("Tour:"+Tours[i].id);
 		var tour = Tours[i].id;
 		
 		if (Tours[i].valid) {
@@ -887,7 +889,7 @@ function initCircuit(track) {
 		thisCircuit = new Object();
 	//console.log(JSON.stringify(track));
 	for (property in track) {
-		////console.log(`${property}: ${track[property]}`);
+		//console.log(`${property}: ${track[property]}`);
 		if (!thisCircuit[property])
 			thisCircuit[property] = track[property];
 	}
@@ -1135,7 +1137,7 @@ function designLap(lap) {
 	//
 	// Pour construire le polygone on traite les points, point par point
 	for (var i=0; i < Points.length; i++) {
-		////console.log(JSON.stringify(Points[i]));
+		//console.log(JSON.stringify(Points[i]));
 		var pcoord = new Object();
 		pcoord.lat = Points[i].lat1;
 		pcoord.lng = Points[i].lon1;
@@ -1189,9 +1191,9 @@ function designLap(lap) {
 				time_start = Tcut.tdeb;
 				time_arrival = Tcut.tfin;
 				time_prev[0] = time_start;
-				console.log('temps départ:'+time_start);
-				console.log('temps fin:'+time_arrival);
-				console.log('temps de coupure:'+JSON.stringify(Tcut));
+				//console.log('temps départ:'+time_start);
+				//console.log('temps fin:'+time_arrival);
+				//console.log('temps de coupure:'+JSON.stringify(Tcut));
                 Points[i].timecut = time_arrival - time_start;		
 				// s'il s'agit d'un point de coupure, on l'indique dans le chemin
 				//var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
@@ -1323,22 +1325,22 @@ function designCut(parm) {
 	//if (linecut) {
 	if (pointCut != false) {
 		linecut = true;
-		////console.log('ligne franchie');
+		//console.log('ligne franchie');
 		// On va calculer les distances entre le point, le point b et la ligne franchie
-		////console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
-		////console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
+		//console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
+		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
-		////console.log('dist0:'+dist0);
+		//console.log('dist0:'+dist0);
 		var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
-		////console.log('distseg:'+distseg);
+		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
-		////console.log('dist1:'+dist1);
-		////console.log('somme d0 d1:'+(dist0+dist1));
+		//console.log('dist1:'+dist1);
+		//console.log('somme d0 d1:'+(dist0+dist1));
 		
 		//var pointCut = getIntersection(linecoord,segcoords);
 
 		var corrtime = dt1.getTime() - dt0.getTime();
-		console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
+		//console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
 		
 		var vs0 = (v0*1000)/3600;
 		var vs1 = (v1*1000)/3600;
@@ -1534,7 +1536,7 @@ function showLap(lap) {
 //		}
 //	}
 //	var markerpoint = Tours[il].pathRun[0];
-//	////console.log(markerpoint);
+//	//console.log(markerpoint);
 //	Tours[il].markerD1 = new google.maps.Marker({
 //		position: markerpoint, title: 'D1 '+Tours[il].points[0].timestamp
 //		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
@@ -1559,7 +1561,7 @@ function showLap(lap) {
 //	Tours[il].segment0.setMap(map);
 	
 	var l = Tours[il].pathRun.length-1;
-	////console.log(l);
+	//console.log(l);
 				
 //	// affichage du point de fin du tour (après passage de la ligne)
 //	if (Tours[il].markerD2) {
@@ -1569,7 +1571,7 @@ function showLap(lap) {
 //		}
 //	}
 //	var markerpoint = Tours[il].pathRun[l];
-//	////console.log(markerpoint);
+//	//console.log(markerpoint);
 //	Tours[il].markerD2 = new google.maps.Marker({
 //		position: markerpoint, title: 'D2 '+Tours[il].points[l].timestamp
 //		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
@@ -1581,7 +1583,7 @@ function showLap(lap) {
 //	//	markerDB = '';
 //	//}
 //	//var markerpoint = Tours[il].pathRun[0];
-//	//////console.log(markerpoint);
+//	//console.log(markerpoint);
 //	//markerDB = new google.maps.Marker({
 //	//	position: markerpoint, title: 'DB'
 //	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
@@ -2596,7 +2598,7 @@ function getObjTime(t) {
 		if (d < 10)
 			d = '0'+d;
 		dateSession = d+'/'+months[i]+'/'+dtnow.getFullYear();
-		////console.log('Date session générée:'+dateSession);
+		//console.log('Date session générée:'+dateSession);
 	}
 	var dt = dateSession;
 	syy = dt.substr(6,4);
@@ -2727,7 +2729,7 @@ Number.prototype.toDegrees = function() { return this * 180 / π; };
 	var S = D;
     // distance entre les 2 points, comptée sur un arc de grand cercle
 	var distance = S*RT;
-	//////console.log('distance='+distance);
+	//console.log('distance='+distance);
     return distance;
 }
 
@@ -2981,11 +2983,11 @@ function resizeMap() {
 		return;
 	//var center = map.getCenter(); 
 	////var b1 = map.getBounds();
-	////console.log('lat centre='+center.lat);
+	//console.log('lat centre='+center.lat);
 	////var bn = b1.getNorth();
-	////console.log('lat nord='+bn);
+	//console.log('lat nord='+bn);
 	////var bs = b1.getSouth();
-	////console.log('lat sud='+bs);
+	//console.log('lat sud='+bs);
 	////var ratio = (bn-bs)*0.8;
 	////var corner1 = b1._northEast;
 	////var corner2 = b1._southWest;

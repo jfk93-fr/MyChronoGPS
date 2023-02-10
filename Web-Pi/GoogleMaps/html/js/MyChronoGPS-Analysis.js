@@ -654,20 +654,22 @@ function go()
 		//console.log('ne ratons pas le dernier tour');
 		// on va ajouter le points 0 & 1 à la fin du tour précédent
 		nt = Tours.length-1;
-		//console.log(JSON.stringify(Tours[nt-1]))
-		//console.log(JSON.stringify(Tours[nt]))
-		for (var np=0; np < 2; np++) {
-			Point = new Object();
-			Point.timestamp = Tours[nt].points[np].timestamp;
-			Point.lat1 = Tours[nt].points[np].lat1;
-			Point.lon1 = Tours[nt].points[np].lon1;
-			Point.vitesse = Tours[nt].points[np].vitesse;
-			Point.altitude = Tours[nt].points[np].altitude;
-			Point.cap = Tours[nt].points[np].cap;
-			Tours[nt-1].points.push(Point);
+		if (nt > 0) {
+			//console.log(JSON.stringify(Tours[nt-1]))
+			//console.log(JSON.stringify(Tours[nt]))
+			for (var np=0; np < 2; np++) {
+				Point = new Object();
+				Point.timestamp = Tours[nt].points[np].timestamp;
+				Point.lat1 = Tours[nt].points[np].lat1;
+				Point.lon1 = Tours[nt].points[np].lon1;
+				Point.vitesse = Tours[nt].points[np].vitesse;
+				Point.altitude = Tours[nt].points[np].altitude;
+				Point.cap = Tours[nt].points[np].cap;
+				Tours[nt-1].points.push(Point);
+			}
+			//console.log(JSON.stringify(Tours[nt-1]))
+			//console.log(JSON.stringify(Tours[nt]))
 		}
-		//console.log(JSON.stringify(Tours[nt-1]))
-		//console.log(JSON.stringify(Tours[nt]))
 	}
 
 	// dès la première ligne du fichier, on va chercher le circuit correspondant
@@ -1119,7 +1121,7 @@ function designCut(parm) {
 		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
 		//console.log('dist0:'+dist0);
-		var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
+		//var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
 		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
 		//console.log('dist1:'+dist1);

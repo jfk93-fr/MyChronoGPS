@@ -1206,8 +1206,9 @@ class IpControl(threading.Thread):
         #logger.info("begin write Infos")
         NomCircuit = "inconnu"
         #logger.info(str(self.chrono.circuit))
-        if "NomCircuit" in self.chrono.circuit:
-            NomCircuit = self.chrono.circuit["NomCircuit"]
+        if self.chrono.circuit != False:
+            if "NomCircuit" in self.chrono.circuit:
+                NomCircuit = self.chrono.circuit["NomCircuit"]
         #logger.info("build Infos")
         self.Infos = '[{"nbsats":"'+str(self.gps.gpsnbsat)+'"'
         self.Infos += ',"tempcpu":"'+str(round(get_thermal()))+'"'
@@ -1501,8 +1502,9 @@ class LiveSession(threading.Thread):
         line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         NomCircuit = "inconnu"
         #logger.debug("circuit:"+str(type(self.chrono.circuit)))
-        if "NomCircuit" in self.chrono.circuit:
-            NomCircuit = self.chrono.circuit["NomCircuit"]
+        if self.chrono.circuit != False:
+            if "NomCircuit" in self.chrono.circuit:
+                NomCircuit = self.chrono.circuit["NomCircuit"]
         line += ',"NomCircuit":"'+NomCircuit+'"'
         line += ',"FL":['+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+","+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]"
         if self.chrono.pitin != False and self.chrono.pitout != False:
@@ -1567,7 +1569,7 @@ class AnalysisControl():
         #line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         line = '[{"date":"'+formatGpsDate(self.gps)+'"'
         NomCircuit = ""
-        if self.chrono.circuit != "":
+        if chrono.circuit != False and chrono.circuit != "":
             NomCircuit = self.chrono.circuit["NomCircuit"]
         line += ',"NomCircuit":"'+NomCircuit+'"'
         line += ',"FL":['+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+","+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]"
