@@ -93,7 +93,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-#logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
