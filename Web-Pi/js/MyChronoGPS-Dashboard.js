@@ -403,6 +403,22 @@ function request_reboot() {
 	}
 }
 
+function clear_autodef() {
+	if (Dashboard) {
+		clearTimeout(dashboard_timer);
+	}
+	if (timer) {
+		clearTimeout(timer);
+	}
+	if (confirm("clear autodef track, do you want to continue ?")) {
+	    ajax_cmd('clear_autodef.py');
+		setInactiv(5000); // on temporise 5 secondes, le temps de voir la réponse ajax
+	}
+	else {
+		setInactiv(8000); // on refuse la confirmation, on recalibre le délai d'inaction à 8 secondes
+	}
+}
+
 function ajax_cmd(cmd) {
 	if (timer) {
 		clearTimeout(timer);

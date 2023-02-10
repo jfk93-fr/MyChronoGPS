@@ -310,7 +310,7 @@
 	height: 36px;
 	/**/
 	position: relative;
-	left: 0%;
+	/*left: 0%;*/
 	top: 0%;
 	/**/
 	background-color: grey;
@@ -351,6 +351,11 @@
 }
 .btngpsquest {
 	background-image: url(../img/white/crosshairs-question.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnclearlayer {
+	background-image: url(../img/white/layers-off.png) ; 
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }

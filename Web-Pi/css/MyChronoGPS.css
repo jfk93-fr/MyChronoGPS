@@ -904,6 +904,22 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }
+.btnreboot {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/restart.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnclearlayer {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/layers-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
 .btnchart {
 	padding:8px 20px;
 	width:  36px;

@@ -91,47 +91,58 @@
 			</div>
 			<!-- Menu -->
 			<div id="Menu" style="display:none;background:yellow; color:black; padding:8px 2px 8px 2px;">
-				<div id="gpsstart" class="linebtn">
+				<div id="gpsstart" class="w3-row w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btngpson" onclick="ajax_cmd('start_gps.py')"></button>
 					</span>
 					<span>
-					Démarrage MyChronoGPS
+					Démarrage
 					</span>
 				</div>
-				<div id="gpsstop" class="linebtn">
+				<div id="gpsstop" class="w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btngpsoff" onclick="ajax_cmd('stop_gps.py')"></button>
 					</span>
 					<span>
-					Arrêt MyChronoGPS
+					Arrêt
 					</span>
 				</div>
-				<div id="gpsquest" class="linebtn">
-					<span>
-					<a href="MyChronoGPS-Status.html" class="w3-button btnmenu btngpsquest" onclick="displayMenu()"></a>
-					</span>
-					<span>
-						Etat MyChronoGPS
-					</span>
-				</div>
-				<div id="poweroff" class="linebtn">
+				<div class="w3-row w3-padding linebtn"></div>
+				<div id="poweroff" class="w3-row w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btnpwroff" onclick="request_shutdown()"></button>
 					</span>
 					<span>
-					Arrêt complet (Shutdown)
+					Arrêt RPi
 					</span>
 				</div>
-				<div id="reboot" class="linebtn">
+				<div id="reboot" class="w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btnreboot" onclick="request_reboot()"></button>
 					</span>
 					<span>
-					Redémarrage complet (Reboot)
+					Redémarrage
 					</span>
 				</div>
-				<div id="gpsmenu" class="linebtn">
+				<div class="w3-row w3-padding linebtn"></div>
+				<div id="gpsquest" class="linebtn w3-row">
+					<span>
+					<a href="MyChronoGPS-Status.html" class="w3-button btnmenu btngpsquest" onclick="displayMenu()"></a>
+					</span>
+					<span>
+						Etat
+					</span>
+				</div>
+				<div id="cleartrack" class="w3-col s6 linebtn">
+					<span>
+					<button type="button" class="w3-button btnmenu btnclearlayer" onclick="clear_autodef()"></button>
+					</span>
+					<span>
+					Efface Piste
+					</span>
+				</div>
+				<div class="w3-row w3-padding linebtn"></div>
+				<div id="gpsmenu" class="linebtn w3-row">
 					<span>
 					<a href="MyChronoGPS.html" ><button type="button" class="w3-button btnmenu btnmainmenu"></button>
 					</a>

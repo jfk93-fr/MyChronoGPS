@@ -6,6 +6,7 @@
 	<title>MyChronoGPS - Version 1</title>
 	<link rel="stylesheet" href="./css/w3.css">
 	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<!--<link rel="stylesheet" href="./css/MyChronoGPS-Cmd.css">-->
 </head>
 <body>
 <div class="w3-main LCD35">
@@ -68,11 +69,37 @@
 				</div>
 				
 				<div class="w3-col l4 LCD35-hide">
-					<button type="button" class="w3-button w3-border w3-round" onclick="ajax_cmd('shutdown_pi.py')">Arrêt Complet</button>
-					<p class="LCD35-hide">Arrête le système MyChronoGPS</p>
+					<button type="button" class="w3-button w3-border w3-round" onclick="clear_autodef()">Efface Autodef</button>
+					<p class="LCD35-hide">Efface la piste Autodef</p>
 				</div>
 				<div class="w3-col l4 s12 LCD35-show">
-					<a href="#" class="w3-button w3-border w3-round" onclick="ajax_cmd('shutdown_pi.py')">
+					<a href="#" class="w3-button w3-border w3-round" onclick="clear_autodef()">
+						<span class="btnclearlayer"></span>
+					</a>
+					<span>
+					Clear Autodef
+					</span>
+				</div>
+				
+				<div class="w3-col l4 LCD35-hide">
+					<button type="button" class="w3-button w3-border w3-round" onclick="request_reboot()">Redémarrage RPi</button>
+					<p class="LCD35-hide">Redémarre le système RPi</p>
+				</div>
+				<div class="w3-col l4 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="request_reboot()">
+						<span class="btnreboot"></span>
+					</a>
+					<span>
+					Reboot
+					</span>
+				</div>
+				
+				<div class="w3-col l4 LCD35-hide">
+					<button type="button" class="w3-button w3-border w3-round" onclick="request_shutdown()">Arrêt RPi</button>
+					<p class="LCD35-hide">Arrête le système RPi</p>
+				</div>
+				<div class="w3-col l4 s12 LCD35-show">
+					<a href="#" class="w3-button w3-border w3-round" onclick="request_shutdown()">
 						<span class="btnpwroff"></span>
 					</a>
 					<span>
