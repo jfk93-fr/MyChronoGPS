@@ -93,7 +93,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-logger.setLevel(logging.INFO)
+#logger.setLevel(logging.INFO)
 logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
@@ -409,8 +409,8 @@ class GpsControl(threading.Thread):
                 if True:
                     logger.info("write command E to fifo GPSCMD")
                     os.write(pipe, "EEEEE\r\n".encode())
-                    os.close(pipe)
-                    logger.info("end gps command,pipe "+str(self.gpscmd)+" closed")
+                    #os.close(pipe)
+                    #logger.info("end gps command,pipe "+str(self.gpscmd)+" closed")
             except OSError as err:
                 logger.error("cannot use named pipe GPS OS error: {0}".format(err))
                 pass
@@ -1569,7 +1569,7 @@ class AnalysisControl():
         #line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         line = '[{"date":"'+formatGpsDate(self.gps)+'"'
         NomCircuit = ""
-        if chrono.circuit != False and chrono.circuit != "":
+        if self.chrono.circuit != False and self.chrono.circuit != "":
             NomCircuit = self.chrono.circuit["NomCircuit"]
         line += ',"NomCircuit":"'+NomCircuit+'"'
         line += ',"FL":['+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+","+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]"
@@ -2068,6 +2068,7 @@ class ChronoControl():
                                 self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,20)
                             
                             self.nblap += 1
+                            logger.info("nblap:"+str(self.nblap))
 
                         else: # we'll see if we've crossed an intermediate line
                             i = 0
@@ -2260,6 +2261,7 @@ class ChronoControl():
                                     #logger.info('is prox track cut:'+str(cut))
                                     self.begin()
                                     self.nblap = 1 # we start with the first lap
+                                    logger.info("nblap:"+str(self.nblap))
                                     self.chrono_started = True
                                     
                                     dt0 = self.getTime(self.gps_last_time)
@@ -2303,16 +2305,16 @@ class ChronoControl():
                                     temps = timedelta(microseconds=corrmic)
                                     self.temps_t = temps #
                                     self.temps_i = temps #
-                                    #logger.info('temps_t:'+str(temps))
+                                    #logger.debug('temps_t:'+str(temps))
 		
                                     
 
-                                    #logger.info('chronoStartTime:'+str(self.chronoStartTime.seconds)+' sec,'+str(self.chronoStartTime.microseconds)+' mic')
+                                    #logger.debug('chronoStartTime:'+str(self.chronoStartTime.seconds)+' sec,'+str(self.chronoStartTime.microseconds)+' mic')
                                     #micro_seconds = self.chronoStartTime.seconds*1000000+self.chronoStartTime.microseconds
                                     #micro_seconds = getMicroseconds(self.chronoStartTime)
-                                    #logger.info('start micro_seconds:'+str(micro_seconds))
-                                    #logger.info('auto_start_line lap:'+str(self.nblap))
-                                    #logger.info('start_line:'+str(self.start_line))
+                                    #logger.debug('start micro_seconds:'+str(micro_seconds))
+                                    #logger.debug('auto_start_line lap:'+str(self.nblap))
+                                    #logger.debug('start_line:'+str(self.start_line))
                            
                                     self.lat0 = self.gps_prevlat
                                     self.lon0 = self.gps_prevlon
@@ -2456,47 +2458,47 @@ class AcqControl(threading.Thread):
                 # on peuple le premier élément du tableau
                 self.getline()
                 self.acqlines.append(self.acqline) # la toute première ligne
-                #logger.info(str(self.acqlines))
+                #logger.debug(str(self.acqlines))
                 self.sleep = 1
                 if self.vit > 0:
                     self.sleep = self.pulse/self.vit
                 if self.sleep > self.maxsleep:
                     self.sleep = self.maxsleep
-                logger.debug("sleep for "+str(self.sleep)+" secondes")
+                #logger.debug("sleep for "+str(self.sleep)+" secondes")
                 time.sleep(self.sleep)
-                #logger.info("Acq gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
+                #logger.debug("Acq gps latitude:"+str(self.gps.latitude)+" gps longitude:"+ str(self.gps.longitude))
             else:
                 # only processed if the timestamp has changed
                 #logger.debug("Acq gps gpstime:"+str(self.gps.gpstime)+" timestamp:"+ str(self.timestamp))
                 #if self.timestamp != self.gps.gpstime:
                 if (self.measurement() == True):
                     self.timestamp = self.gps.gpstime
-                    #logger.info("len acqlines before:"+str(len(self.acqlines)))
+                    #logger.debug("len acqlines before:"+str(len(self.acqlines)))
                     #j = len(self.acqlines) - 1
                     self.acqlines.append(self.acqline) # ligne suivante
                     #logger.debug("len acqlines after:"+str(len(self.acqlines)))
-                    #logger.info(str(self.acqlines))
+                    #logger.debug(str(self.acqlines))
                     
                     max = len(self.acqlines)
                     i = max - 2 # avant dernier point              
                     j = max - 1 # dernier point
                     self.seglat2 = self.acqlines[j]["lat"]
                     self.seglon2 = self.acqlines[j]["lon"]
-                    #logger.info("i:"+str(i))
-                    #logger.info("j:"+str(j))
-                    #logger.info("max:"+str(max))
-                    #logger.info("Last acqline["+str(j)+"]:"+str(self.acqlines[j]))
-                    #logger.info("Last acqline - 1:"+str(self.acqlines[i]))
+                    #logger.debug("i:"+str(i))
+                    #logger.debug("j:"+str(j))
+                    #logger.debug("max:"+str(max))
+                    #logger.debug("Last acqline["+str(j)+"]:"+str(self.acqlines[j]))
+                    #logger.debug("Last acqline - 1:"+str(self.acqlines[i]))
                     while i > -1:
                         #j = i + 1
-                        #logger.info("i:"+str(i))
-                        #logger.info("j:"+str(j))
+                        #logger.debug("i:"+str(i))
+                        #logger.debug("j:"+str(j))
                         if j - i > 2: # il faut au moins 3 points
-                            #logger.info(str(self.acqlines[i]["lat"])+" "+str(self.acqlines[i]["lon"])+" "+str(self.acqlines[j]["lat"])+" "+str(self.acqlines[j]["lon"]))
+                            #logger.debug(str(self.acqlines[i]["lat"])+" "+str(self.acqlines[i]["lon"])+" "+str(self.acqlines[j]["lat"])+" "+str(self.acqlines[j]["lon"]))
                             dist = distanceGPS(self.acqlines[i]["lat"], self.acqlines[i]["lon"], self.acqlines[j]["lat"], self.acqlines[j]["lon"])
-                            #logger.info("dist "+str(dist))
+                            #logger.debug("dist "+str(dist))
                             if dist < self.dist2points: # moins de 90m (+ de 300 km/h) entre les 2 points, on regarde s'il y a une coupure
-                                #logger.info("Acq line["+str(i)+"]:"+str(self.acqlines[i]))
+                                #logger.debug("Acq line["+str(i)+"]:"+str(self.acqlines[i]))
                                 lat1 = self.acqlines[i]["lat1"]
                                 lon1 = self.acqlines[i]["lon1"]
                                 lat2 = self.acqlines[i]["lat2"]
@@ -2504,16 +2506,16 @@ class AcqControl(threading.Thread):
                                 self.cut = self.chrono.is_lineCut(lat1,lon1,lat2,lon2,self.seglat1,self.seglon1,self.seglat2,self.seglon2)
                                 if self.cut == True:
                                     k = j - 1
-                                    logger.debug("timestamp:"+str(self.acqlines[k]["time"])+"pointgps:["+str(self.acqlines[k]["lat"])+","+str(self.acqlines[k]["lon"])+"]")
-                                    logger.debug("timestamp:"+str(self.acqlines[j]["time"])+"pointgps:["+str(self.acqlines[j]["lat"])+","+str(self.acqlines[j]["lon"])+"]")
-                                    #logger.info("line cut "+str(self.acqlines[i]))
+                                    #logger.debug("timestamp:"+str(self.acqlines[k]["time"])+"pointgps:["+str(self.acqlines[k]["lat"])+","+str(self.acqlines[k]["lon"])+"]")
+                                    #logger.debug("timestamp:"+str(self.acqlines[j]["time"])+"pointgps:["+str(self.acqlines[j]["lat"])+","+str(self.acqlines[j]["lon"])+"]")
+                                    #logger.debug("line cut "+str(self.acqlines[i]))
                                     self.chrono.getGpsData();
                                     # we cut a line, we will draw the line from the calculated coordinates
                                     # instead of drawing the line, we could indicate that we are ready to draw it
                                     self.chrono.define_start_wcap(self.acqlines[i]["lat"], self.acqlines[i]["lon"], self.acqlines[i]["cap"])
                                     # creation of the self-defined track
                                     self.chrono.create_sfTrack()
-                                    logger.debug("coords start line:["+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+"],["+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]")
+                                    #logger.debug("coords start line:["+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+"],["+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]")
                                     
                                     self.chrono.dD = 0 # no need for distance correction
                                     self.chrono.dD = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
@@ -2522,16 +2524,18 @@ class AcqControl(threading.Thread):
                                     #time.sleep(3)
                                     self.chrono.begin()
                                     self.chrono.nblap = 1 # we start with the first lap
+                                    #logger.debug("nblap:"+str(self.chrono.nblap))
+                                    
                                     self.chrono.chrono_started = True
                                     # debug #
                                     # self.chronoStartTime = self.getTime(gps.gpstime)
-                                    logger.debug("comparaison des start time")
-                                    logger.debug("chronoStartTime:"+str(self.chrono.chronoStartTime))
-                                    logger.debug("gpstime (chrono):"+str(self.chrono.gps.gpstime))
-                                    logger.debug("acqlines time k:"+str(self.acqlines[k]["time"]))
-                                    logger.debug("acqlines getTime k:"+str(self.chrono.getTime(self.acqlines[k]["time"])))
-                                    logger.debug("acqlines time j:"+str(self.acqlines[j]["time"]))
-                                    logger.debug("acqlines getTime j:"+str(self.chrono.getTime(self.acqlines[j]["time"])))
+                                    #logger.debug("comparaison des start time")
+                                    #logger.debug("chronoStartTime:"+str(self.chrono.chronoStartTime))
+                                    #logger.debug("gpstime (chrono):"+str(self.chrono.gps.gpstime))
+                                    #logger.debug("acqlines time k:"+str(self.acqlines[k]["time"]))
+                                    #logger.debug("acqlines getTime k:"+str(self.chrono.getTime(self.acqlines[k]["time"])))
+                                    #logger.debug("acqlines time j:"+str(self.acqlines[j]["time"]))
+                                    #logger.debug("acqlines getTime j:"+str(self.chrono.getTime(self.acqlines[j]["time"])))
 
                                     self.chrono.chronoStartTime = self.chrono.getTime(self.acqlines[k]["time"])
                                     # end debug #
@@ -2559,9 +2563,9 @@ class AcqControl(threading.Thread):
                                     self.chrono.temps_t = temps #
                                     self.chrono.temps_i = temps #
                                     
-                                    #logger.info("start time i:"+str(self.acqlines[i]["time"]))
-                                    #logger.info("start time j:"+str(self.acqlines[j]["time"]))
-                                    #logger.info("start time k:"+str(self.acqlines[k]["time"]))
+                                    #logger.debug("start time i:"+str(self.acqlines[i]["time"]))
+                                    #logger.debug("start time j:"+str(self.acqlines[j]["time"]))
+                                    #logger.debug("start time k:"+str(self.acqlines[k]["time"]))
                                     
                                     self.chrono.lat0   = self.acqlines[k]["lat"]
                                     self.chrono.lon0   = self.acqlines[k]["lon"]
@@ -2573,10 +2577,11 @@ class AcqControl(threading.Thread):
                                     
                                     # peut-être recalculer le start time par extrapolation
                                     #self.chrono.chronoStartTime = self.chrono.getTime(self.acqlines[j]["time"])
-                                    #logger.info("sleep from "+str(self.sleep)+" secondes")
-                                    #logger.info("start time "+str(self.chrono.chronoStartTime))
-                                    self.chrono.nblap = 1 # we start with the first lap
-                                    
+                                    #logger.debug("sleep from "+str(self.sleep)+" secondes")
+                                    #logger.debug("start time "+str(self.chrono.chronoStartTime))
+                                    #self.chrono.nblap = 1 # we start with the first lap
+                                    #logger.debug(str(self.chrono.nblap))
+                                                                      
                                     i = -1 # pour sortir de la boucle
                                     self.stop();
                         i = i - 1
@@ -2586,11 +2591,11 @@ class AcqControl(threading.Thread):
                             self.sleep = self.pulse/self.vit
                         if self.sleep > self.maxsleep:
                             self.sleep = self.maxsleep
-                        logger.debug("sleep for "+str(self.sleep)+" secondes")
+                        #logger.debug("sleep for "+str(self.sleep)+" secondes")
                         time.sleep(self.sleep)
                 else:
                     self.sleep = 1
-                    logger.debug("sleep for "+str(self.sleep)+" secondes")
+                    #logger.debug("sleep for "+str(self.sleep)+" secondes")
                     time.sleep(self.sleep)
         #logger.info("AcqControl cancel ?"+str(self.__cancel))
         if self.__cancel == True: #the thread, has been aborted
@@ -2639,7 +2644,7 @@ class AcqControl(threading.Thread):
         
     def measurement(self):
         if self.timestamp == self.gps.gpstime:
-            logger.debug(str(self.timestamp)+"="+str(self.gps.gpstime))
+            #logger.debug(str(self.timestamp)+"="+str(self.gps.gpstime))
             return False
         self.timestamp = self.gps.gpstime
         #logger.info("len acqlines before:"+str(len(self.acqlines)))
@@ -2649,9 +2654,9 @@ class AcqControl(threading.Thread):
         self.getline()
         dist = distanceGPS(self.seglat1, self.seglon1, self.acqline["lat"], self.acqline["lon"])
         if dist < self.md2m: # at least 15m between 2 measurements
-            logger.debug("dist between 2 segments:"+str(dist))
+            #logger.debug("dist between 2 segments:"+str(dist))
             return False
-        logger.debug("dist between 2 segments:"+str(dist))
+        #logger.debug("dist between 2 segments:"+str(dist))
         return True
         
     
