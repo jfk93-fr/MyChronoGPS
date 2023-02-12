@@ -455,6 +455,7 @@ function setInactiv(delai=delai_inactiv) {
 }
 
 function restartDisplay() {
+    document.getElementById("info-cmd").innerHTML = "";
 	getNextDisplay();
 	getInfos()
 }

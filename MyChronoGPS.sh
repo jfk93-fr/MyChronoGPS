@@ -74,6 +74,8 @@ then
 	fi
 fi
 echo "creation of folders and web files"
+sudo rm -rf /var/www/html/userdata
+sudo mkdir /var/www/html/userdata
 sudo cp ./Web-Pi/index.html /var/www/html/index.html         
 sudo cp ./Web-Pi/MyChronoGPS.html /var/www/html/MyChronoGPS.html
 sudo cp ./Web-Pi/MyChronoGPS-Cmd.html /var/www/html/MyChronoGPS-Cmd.html

@@ -714,34 +714,156 @@ function go()
 		return false;
 	}
 
-	thisCircuit = Ev[0]; //jfk
+	thisCircuit = Ev[0]; // La première ligne contient toujours le nom du circuit
 
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
 	
-	var is_FL = thisCircuit.hasOwnProperty('FL');
+	//var is_FL = thisCircuit.hasOwnProperty('FL');
 	//
+	// on va construire le tableau des Tours à partir de FL
+	FL = new Array(thisCircuit.FL[0]*1,thisCircuit.FL[1]*1,thisCircuit.FL[2]*1,thisCircuit.FL[3]*1);
+	buildTours(FL);
+	// le tableau des Tours est construit
+
+	// dès la première ligne du fichier, on va chercher le circuit correspondant
+	nb_tours = Tours.length;
+	var i = 0;
+	Tour = Tours[i];
+	Points = Tour.points;
+	//var nbpoints = Points.length;
+	//console.log("nbpoints:"+nbpoints);
+	
+	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
+	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
+	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
+	var dT = T1.getTime() - T0.getTime();
+	//console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
+	Frequence = 1000/dT;
+
+	latitude = Points[0].lat1;
+	longitude = Points[0].lon1;
+	//console.log("lat:"+latitude+",lon:"+longitude)
+	
+	var trackfound = scanCircuit();
+	
+	//
+	// si le circuit existe dans la première ligne du fichier et qu'on a trouvé la définition de la ligne de départ/arrivée,
+	// on prend les coordonnées inscrites pour afficher la map.
+	// sinon, on utilise le point gps indiqué dans la première ligne du fichier pour rechercher le circuit.
+	//if (!is_FL) {
+	//	if (!trackfound)
+	//		return;
+	//}
+	
+	if (trackfound)
+		initCircuit(trackfound); // on complète les informations du circuit avec les données lues dans la base
+
+	initMap();
+	
+	// Maintenant, on va construire le menu des tours
+	// et créer les éléments de design
+	var el = document.getElementById("Tours")
+	if (!el)
+		return;
+	el.innerHTML = "";
+	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
+		//console.log("Tour:"+Tours[i].id);
+		var tour = Tours[i].id;
+		
+		if (Tours[i].valid) {
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour;
+			el.innerHTML += "<span id=\"timelap"+tour+"\"></span>"+"</a>";
+		}
+		else {
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour+" invalide"+"</a>";
+		}
+	}
+	
+	displayMap()
+}
+
+function buildTours(FL) {
 	// on va stocker les données lues tour par tour
 	Tours = new Array();
-	tour = 0;
+	var tour = 0;
 	var np = 0;
 	var nt = 0;
 	Tour = false;
 	curr_coord++;
 	var prevTimestamp = false;
+	var Point0 = false;
+	var Point1 = false;
+	//var is_FL = thisCircuit.hasOwnProperty('FL');
+	
+	//console.log('FL:+'+FL);
+	
 	// traitement de tous les points gps
 	while (curr_coord < nb_coords-1) {
-		// si la ligne 1 (thisCircuit) contient timestamp, çà veut dire que les informations circuit sont absentes,
-		// il faut commencer par cette ligne
-		if (!thisCircuit.timestamp) {
-			Ev = eval(Coords[curr_coord]);
-			Point1 = Ev[0]
+		Point0 = Point1;
+		Ev = eval(Coords[curr_coord]);
+		Point1 = Ev[0];
+		if (!Point0) {
+			//console.log('Point0 absent');
+			curr_coord++
+			continue;
 		}
-		else {
-			Point1 = Ev[0];
-			Ev = eval(Coords[curr_coord]);
+		//console.log(JSON.stringify(Point0));
+		var segcoords = new Array(Point0.pointgps[0]*1,Point0.pointgps[1]*1,Point1.pointgps[0]*1,Point1.pointgps[1]*1)
+		var pointCut = getIntersection(FL,segcoords);
+		
+		if (pointCut) {
+			if (tour > 0) {
+				// on stocke le point après la coupure dans le tour actuel
+				Point = new Object();
+				Point.timestamp = Point1.timestamp;
+				Point.lat1 = Point1.pointgps[0];
+				Point.lon1 = Point1.pointgps[1];
+				Point.vitesse = Point1.vitesse;
+				Point.altitude = Point1.altitude;
+				Point.cap = Point1.cap;
+		
+				Tour.points.push(Point);
+			}
+
+			++tour;
+			// On stocke le tour dans le tableau
+			if (Tour) {
+				Tours.push(Tour);
+			}
+			// On prépare le nouveau tour
+		    Tour = new Object();
+			Tour.id = tour;
+			Tour.points = new Array()
+			Tour.line = '';
+			Tour.show = false;
+			Tour.valid = true; // le tour est valide s'il contient des points gps à fréquence régulière, un écart de +20" environ invalide le tour
+			nt = Tours.length-1;
+			np = 0;
+
+			Point = new Object();
+			Point.timestamp = Point0.timestamp;
+			Point.lat1 = Point0.pointgps[0];
+			Point.lon1 = Point0.pointgps[1];
+			Point.vitesse = Point0.vitesse;
+			Point.altitude = Point0.altitude;
+			Point.cap = Point1.cap;
+	
+			Tour.points.push(Point);
 		}
+
+		if (tour == 0) {
+			//console.log('tour non commencé, n coord:'+curr_coord);
+			curr_coord++
+			continue;
+		}
+
+
+		Point1.tour = tour;
 			
+
+			
+		/*
 		if (Point1.tour != tour) {
 			tour = Point1.tour;
 			// On stocke le tour dans le tableau
@@ -758,6 +880,7 @@ function go()
 			nt = Tours.length-1;
 			np = 0;
 		}
+		*/
 
 		if (!prevTimestamp)
 			prevTimestamp = Point1.timestamp;
@@ -767,10 +890,10 @@ function go()
 		var T0 = getObjTime(prevTimestamp);
 		var T1 = getObjTime(Point1.timestamp);
 		var dT = T1.getTime() - T0.getTime();
-		if (dT > 20000) {
-			//console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
-			Tour.valid = false;
-		}
+		//if (dT > 20000) {
+		//	//console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
+		//	Tour.valid = false;
+		//}
 		prevTimestamp = Point1.timestamp;
 
 		Point = new Object();
@@ -824,62 +947,6 @@ function go()
 			//console.log(JSON.stringify(Tours[nt]))
 		}
 	}
-
-	// dès la première ligne du fichier, on va chercher le circuit correspondant
-	nb_tours = Tours.length;
-	var i = 0;
-	//Tour = Tours[i];
-	Points = Tour.points;
-	var nbpoints = Points.length;
-	//console.log("nbpoints:"+nbpoints);
-	
-	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
-	var T0 = getObjTime(Points[0].timestamp);
-	var T1 = getObjTime(Points[1].timestamp);
-	var dT = T1.getTime() - T0.getTime();
-	//console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
-	Frequence = 1000/dT;
-
-	latitude = Points[0].lat1;
-	longitude = Points[0].lon1;
-	//console.log("lat:"+latitude+",lon:"+longitude)
-	
-	var trackfound = scanCircuit();
-	
-	//
-	// si le circuit existe dans la première ligne du fichier et qu'on a trouvé la définition de la ligne de départ/arrivée,
-	// on prend les coordonnées inscrites pour afficher la map.
-	// sinon, on utilise le point gps indiqué dans la première ligne du fichier pour rechercher le circuit.
-	if (!is_FL) {
-		if (!trackfound)
-			return;
-	}
-	
-	if (trackfound)
-		initCircuit(trackfound); // on complète les informations du circuit avec les données lues dans la base
-
-	initMap();
-	
-	// Maintenant, on va construire le menu des tours
-	// et créer les éléments de design
-	var el = document.getElementById("Tours")
-	if (!el)
-		return;
-	el.innerHTML = "";
-	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
-		//console.log("Tour:"+Tours[i].id);
-		var tour = Tours[i].id;
-		
-		if (Tours[i].valid) {
-			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour;
-			el.innerHTML += "<span id=\"timelap"+tour+"\"></span>"+"</a>";
-		}
-		else {
-			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour+" invalide"+"</a>";
-		}
-	}
-	
-	displayMap()
 }
 
 function initCircuit(track) {
@@ -900,18 +967,19 @@ function scanCircuit() {
 	var trackfound = false;
 	if (Circuit == false)
 		return trackfound
-	if (Circuit.msgerr != '')
-		return trackfound
+	if (Circuit.hasOwnProperty('msgerr')) {
+		if (Circuit.msgerr != '')
+			return trackfound
+	}
+	//console.log(JSON.stringify(thisCircuit))
+	//console.log(JSON.stringify(Circuit))
 	// on scrute les circuits
 	for (var i=0; i < Circuit.circuits.length; i++) {
-		if (Circuit.circuits[i].Latitude) {
-			distcir = distanceGPS(new Array(latitude,longitude),new Array(Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude));
-			if (distcir < 1000) {
-				trackfound = Circuit.circuits[i];
-				var el = document.getElementById('NomCircuit');
-				if (el)
-					el.innerHTML = Circuit.circuits[i].NomCircuit;
-			}
+		if (Circuit.circuits[i].NomCircuit == thisCircuit.NomCircuit) {
+			trackfound = Circuit.circuits[i];
+			var el = document.getElementById('NomCircuit');
+			if (el)
+				el.innerHTML = Circuit.circuits[i].NomCircuit;
 		}
 	}
 	return trackfound;
@@ -2776,6 +2844,16 @@ function pointDroite(A,B,d) { // coordonnées du point A, point B et distance à
 }
 
 function getIntersection(SegAB,SegCD) {
+	//var pinter = getIntersectionSphere(SegAB,SegCD)
+	////var new_pinter = new Array(pinter.latitude,pinter.longitude)
+	//var new_pinter = new Array(pinter.latitude,pinter.longitude)
+	//  
+	////var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
+	////return new Array(Sx,Sy)
+	//return new_pinter
+	
+	/////////////////////////////////////////////////
+	
 	var Ax = SegAB[0]*1;
 	var Ay = SegAB[1]*1;
 	var Bx = SegAB[2]*1;
@@ -2785,6 +2863,14 @@ function getIntersection(SegAB,SegCD) {
 	var Cy = SegCD[1]*1;
 	var Dx = SegCD[2]*1;
 	var Dy = SegCD[3]*1;
+	
+//function getIntersectionSphere(line1 ,line2) {
+//   //console.log("segment1:"+JSON.stringify(line1));
+//   //console.log("segment2:"+JSON.stringify(line2));
+//   // find the plane of the line in cartesian coordinates
+//   var p1 = findPlane(line1[0],line1[1],line1[2],line1[3]);
+//   var p2 = findPlane(line2[0],line2[1],line2[2],line2[3])
+	
 
 	var Sx;
 	var Sy;
@@ -2817,11 +2903,83 @@ function getIntersection(SegAB,SegCD) {
 			Sy = pCD*Sx+oCD;
 		}
 	}
+	// limité à 14 chiffres après la virgule
+	Sx = precis14(Sx);
+	Ax = precis14(Ax);
+	Bx = precis14(Bx);
+	Cx = precis14(Cx);
+	Dx = precis14(Dx);
+	Sy = precis14(Sy);
+	Ay = precis14(Ay);
+	By = precis14(By);
+	Cy = precis14(Cy);
+	Dy = precis14(Dy);
+	
+	//console.log('Sx:'+Sx);
+	//console.log('Ax:'+Ax);
+	//console.log('Bx:'+Bx);
+	//console.log('Cx:'+Cx);
+	//console.log('Dx:'+Dx);
+	//console.log('Sy:'+Sy);
+	//console.log('Ay:'+Ay);
+	//console.log('By:'+By);
+	//console.log('Cy:'+Cy);
+	//console.log('Dy:'+Dy);
+	//var v = false;
+	//if (Sx<Ax && Sx<Bx)
+	//	v = true;
+	//console.log('v1:'+v);
+	//
+	//var v = false;
+	//if (Sx>Ax && Sx>Bx)
+	//	v = true;
+	//console.log('v2:'+v);
+	//
+	//var v = false;
+	//if (Sx<Cx && Sx<Dx)
+	//	v = true;
+	//console.log('v3:'+v);
+	//
+	//var v = false;
+	//if (Sx>Cx && Sx>Dx)
+	//	v = true;
+	//console.log('v4:'+v);
+	//
+	//var v = false;
+	//if (Sy<Ay && Sy<By)
+	//	v = true;
+	//console.log('v5:'+v);
+	//
+	//var v = false;
+	//if (Sy>Ay && Sy>By)
+	//	v = true;
+	//console.log('v6:'+v);
+	//
+	//var v = false;
+	//if (Sy<Cy && Sy<Dy)
+	//	v = true;
+	//console.log('v7:'+v);
+	//
+	//var v = false;
+	//if (Sy>Cy && Sy>Dy)
+	//	v = true;
+	//console.log('v8:'+v);
+
 	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
 			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
 	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
-	  return new Array(Sx,Sy)
+	  
+	//var new_pinter = new Array(pinter.latitude,pinter.longitude)
+	//  
+	var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
+	//return new Array(Sx,Sy)
+	//return new_pinter
+	return ret
 }
+function precis14(x) {
+  return Number.parseFloat(x).toFixed(14);
+}
+
 /*
 */
 function getIntersectionSphere(line1 ,line2) {
