@@ -2562,8 +2562,8 @@ function getIntersection(SegAB,SegCD) {
 	Dy = precis14(Dy);
 	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
 			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
-	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
-	  return new Array(Sx,Sy)
+	var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
+	return ret
 }
 function precis14(x) {
   return Number.parseFloat(x).toFixed(14);

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS Analysis</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+</head>
+<!--<body onkeydown="ActionTouche(event)">-->
+<body>
+<div id="zone-info" class="w3-container zone-info"></div>
+<div class="w3-main LCD35">
+	<textarea id="clipboard" cols=50 style="display:none"></textarea>
+	<div class="w3-container">
+		<div id="div-up LCD35-show">
+			<button id="up" class="w3-button btnup LCD35-show" onclick="window.scroll(0, 0);"></button>
+		</div>
+		<div id="div-down LCD35-show">
+			<button id="down" class="w3-button btndown LCD35-show" onclick="window.scrollBy(0, window.innerHeight);"></button>
+		</div>
+	</div>
+	<!--<textarea id="clipboard" cols=50></textarea>-->
+	<div class="w3-col LCD35-hide"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+		<span class="w3-coll l3 s6 LCD35-show">
+			<a href="MyChronoGPS.html" class="w3-button w3-border w3-round">
+			<span class="btnmainmenu"></span>
+			</a>
+			Menu
+		</span>
+
+	<div class="wrapper w3-container header LCD35-hide">
+		<h1>MyChronoGPS - Version 1</h1>
+		<p>Recherchez les sessions collect&eacute;es par MyChronoGPS et d&eacute;butez leurs analyses.</p>
+	</div>
+
+	<div id="div-refresh">
+		<button id="refresh" class="w3-button btnrefresh" onclick="document.location.reload(false)"></button>
+	</div>
+
+	<div id="sessions" class="w3-container">
+		<div class="w3-responsive">
+			<table id="tabsessions"class="w3-table-all">
+			<!--
+				<tr>
+					<th>Date</th>
+					<th>Heure</th>
+					<th>Circuit</th>
+					<th></th>
+				</tr>
+			-->
+			</table>
+		</div>
+    </div>
+
+	<div class="wrapper w3-container header LCD35-show">
+		<div class="w3-row w3-row-padding">&nbsp;
+		</div>
+		<div class="w3-row w3-row-padding">&nbsp;
+		</div>
+    </div>
+	
+
+</div>
+<!--
+<script src="ajax.js" type="text/javascript"></script>
+<script src="parse_url.js" type="text/javascript"></script>
+<script src="./js/MyChronoGPS-Sessions-ajax.js"></script>
+-->
+<script src="./js/MyChronoGPS-Sessions.js"></script>
+
+</body>
+</html>

@@ -2967,7 +2967,13 @@ function getIntersection(SegAB,SegCD) {
 
 	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
 			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
+	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
+	  
+	//var new_pinter = new Array(pinter.latitude,pinter.longitude)
+	//  
 	var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
+	//return new Array(Sx,Sy)
+	//return new_pinter
 	return ret
 }
 function precis14(x) {

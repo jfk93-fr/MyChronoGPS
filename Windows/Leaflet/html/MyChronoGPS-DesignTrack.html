@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS Design Track</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+	integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+	crossorigin=""/>
+    <style>
+       /* Set the size of the div element that contains the map */
+      #map {
+        height: 700px;
+        width: 100%;
+       }
+    </style>
+</head>
+<!--<body onkeydown="ActionTouche(event)">-->
+<body>
+<div class="w3-main">
+	<div class="w3-container w3-row">
+		<div class="w3-col l1 m1 s2"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+		<div class="w3-col l1 m1 s2"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Tracks.html" >Circuits</a></div>
+		<span id="zone-info"></span>&nbsp;
+		<textarea id="clipboard" cols=50></textarea>
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(0);" >FL</a>
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(1);" >Int1</a>		
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(2);" >Int2</a>		
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(3);" >Int3</a>		
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(-1);" >PitIn</a>		
+		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(-2);" >PitOut</a>		
+		<!--<a class="w3-button w3-border w3-round" href="#"  onClick="constructLine();" >Marks</a>-->	
+		<a class="w3-button w3-border w3-round" href="#"  onClick="resetScreen();" >Reset</a>		
+		<a class="w3-button w3-border w3-round" href="#"  onClick="copyTrack();" >Save</a>
+		<a class="w3-button w3-border w3-round" href="#"  onClick="copyTrack(1);" >Copy</a>		
+	</div>
+	<div class="w3-row">
+		<div class="w3-col s4 m4 l2">
+			<div class="w3-row"><input id="NomCircuit" value="Nom Circuit" onchange="changeValue(this.id);"></input></div>
+			<div class="w3-row"><input id="Adresse" value="Adresse Circuit"></input></div>
+			<div class="w3-row"><input id="CodePostal" value="Code Postal"></input></div>
+			<div class="w3-row"><input id="Ville" value="Ville"></input></div>
+			<div class="w3-row"><input id="URL" value="URL"></input></div>
+			<div class="w3-row">Coordonnées GPS</input></div>
+			<div class="w3-row"><input id="Latitude" value="Latitude"></input></div>
+			<div class="w3-row"><input id="Longitude" value="Longitude"></input></div>
+			<div class="w3-row">Centrer sur</input></div>
+			<div class="w3-row"><input id="Latcenter" value="Latitude de centrage"></input></div>
+			<div class="w3-row"><input id="Loncenter" value="Longitude de centrage"></input></div>
+			<div class="w3-row">Longueur Circuit, Zoom, VMax Pit</input></div>
+			<div class="w3-row"><input id="LongCircuit" value="Longueur de piste"></input></div>
+			<div class="w3-row"><input id="Zoom" value="Zoom" onchange="changeValue(this.id);"></input></div>
+			<div class="w3-row"><input id="PitMaxSpeed" value="PitMaxSpeed" onchange="changeValue(this.id);"></input></div>
+			<div class="w3-row">FL (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="FLLat1" value="Latitude FL1"></input></div>
+			<div class="w3-row"><input id="FLLon1" value="Longitude FL1"></input></div>
+			<div class="w3-row"><input id="FLLat2" value="Latitude FL2"></input></div>
+			<div class="w3-row"><input id="FLLon2" value="Longitude FL2"></input></div>
+			<div class="w3-row">FL (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatFL" value="Latitude FL"></input></div>
+			<div class="w3-row"><input id="LonFL" value="Longitude FL"></input></div>
+			<div class="w3-row"><input id="CapFL" value="Cap FL"></input></div>
+			<div class="w3-row">Int1 (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="Int1Lat1" value="Int1 Latitude1"></input></div>
+			<div class="w3-row"><input id="Int1Lon1" value="Int1 Longitude1"></input></div>
+			<div class="w3-row"><input id="Int1Lat2" value="Int1 Latitude2"></input></div>
+			<div class="w3-row"><input id="Int1Lon2" value="Int1 Longitude2"></input></div>
+			<div class="w3-row">Int1 (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatInt1" value="Latitude Int1"></input></div>
+			<div class="w3-row"><input id="LonInt1" value="Longitude Int1"></input></div>
+			<div class="w3-row"><input id="CapInt1" value="Cap Int1"></input></div>
+			<div class="w3-row">Int2 (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="Int2Lat1" value="Int2 Latitude1"></input></div>
+			<div class="w3-row"><input id="Int2Lon1" value="Int2 Longitude1"></input></div>
+			<div class="w3-row"><input id="Int2Lat2" value="Int2 Latitude2"></input></div>
+			<div class="w3-row"><input id="Int2Lon2" value="Int2 Longitude2"></input></div>
+			<div class="w3-row">Int2 (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatInt2" value="Latitude Int2"></input></div>
+			<div class="w3-row"><input id="LonInt2" value="Longitude Int2"></input></div>
+			<div class="w3-row"><input id="CapInt2" value="Cap Int2"></input></div>
+			<div class="w3-row">Int3 (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="Int3Lat1" value="Int3 Latitude1"></input></div>
+			<div class="w3-row"><input id="Int3Lon1" value="Int3 Longitude1"></input></div>
+			<div class="w3-row"><input id="Int3Lat2" value="Int3 Latitude2"></input></div>
+			<div class="w3-row"><input id="Int3Lon2" value="Int3 Longitude2"></input></div>
+			<div class="w3-row">Int3 (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatInt3" value="Latitude Int3"></input></div>
+			<div class="w3-row"><input id="LonInt3" value="Longitude Int3"></input></div>
+			<div class="w3-row"><input id="CapInt3" value="Cap Int3"></input></div>
+			<div class="w3-row">PitIn (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="PitInLat1" value="PitIn Latitude1"></input></div>
+			<div class="w3-row"><input id="PitInLon1" value="PitIn Longitude1"></input></div>
+			<div class="w3-row"><input id="PitInLat2" value="PitIn Latitude2"></input></div>
+			<div class="w3-row"><input id="PitInLon2" value="PitIn Longitude2"></input></div>
+			<div class="w3-row">PitIn (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatPitIn" value="Latitude PitIn"></input></div>
+			<div class="w3-row"><input id="LonPitIn" value="Longitude PitIn"></input></div>
+			<div class="w3-row"><input id="CapPitIn" value="Cap PitIn"></input></div>
+			<div class="w3-row">PitOut (Lat1,Lon1,Lat2,Lon2)</input></div>
+			<div class="w3-row"><input id="PitOutLat1" value="PitOut Latitude1"></input></div>
+			<div class="w3-row"><input id="PitOutLon1" value="PitOut Longitude1"></input></div>
+			<div class="w3-row"><input id="PitOutLat2" value="PitOut Latitude2"></input></div>
+			<div class="w3-row"><input id="PitOutLon2" value="PitOut Longitude2"></input></div>
+			<div class="w3-row">PitOut (Lat,Lon,Cap)</input></div>
+			<div class="w3-row"><input id="LatPitOut" value="Latitude PitOut"></input></div>
+			<div class="w3-row"><input id="LonPitOut" value="Longitude PitOut"></input></div>
+			<div class="w3-row"><input id="CapPitOut" value="Cap PitOut"></input></div>
+		</div>
+		<div class="w3-col s8 m8 l10">
+			<div id="map" style="display:none"></div>
+		</div>
+	</div>
+	<!-- -->
+	<script src="./js/parse_url.js" type="text/javascript"></script>
+	<script src="./js/ajax.js" type="text/javascript"></script>
+	<script src="./js/MyChronoGPS-DesignTrack.js"></script>
+	<!-- Make sure you put this AFTER Leaflet's CSS -->
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin="">
+	</script>	
+	<script src="js/leaflet-providers.js"></script>	
+</div>
+</body>
+</html>

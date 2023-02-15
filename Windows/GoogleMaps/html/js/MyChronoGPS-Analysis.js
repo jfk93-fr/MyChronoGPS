@@ -87,9 +87,6 @@ const gravit = 9.80665;
 var gkmh = (gravit * 3600)/ 1000;
 var Frequence = 1; // fréquence d'échantillonage du GPS
 
-document.getElementById('map').style.display = 'block';
-map = true;
-
 loadCircuits();
 
 function dataCircuitsReady() {
@@ -118,11 +115,11 @@ function is_map_ready()
 	}
 }
 
-//// Initialize API Googlemap
-//function initGooglemap() {
-//  document.getElementById('map').style.display = 'block';
-//  map = true;
-//}
+// Initialize API Googlemap
+function initGooglemap() {
+  document.getElementById('map').style.display = 'block';
+  map = true;
+}
 // Initialize and add the map
 function initMap() {
 	if (!thisCircuit.Latcenter) {
@@ -148,34 +145,24 @@ function initMap() {
 		thisCircuit.Zoom = 16;
 	var zoom = thisCircuit.Zoom*1;
 
-    //optionsMap = {
-    //     zoom: zoom,
-    //     center: new google.maps.LatLng(lat,lon),
-    //     draggableCursor:"crosshair",
-    //     mapTypeId: google.maps.MapTypeId.SATELLITE
-    //};
-	//
-	//map = new google.maps.Map(document.getElementById('map'), optionsMap);
-	map = L.map('map').setView([lat,lon],zoom);
+    optionsMap = {
+         zoom: zoom,
+         center: new google.maps.LatLng(lat,lon),
+         draggableCursor:"crosshair",
+         mapTypeId: google.maps.MapTypeId.SATELLITE
+    };
 	
-	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-	});
-	Esri_WorldImagery.addTo(map);	
-	
-	// Assumes your Leaflet map variable is 'map'..
-	L.DomUtil.addClass(map._container,'crosshair-cursor-enabled');
+	map = new google.maps.Map(document.getElementById('map'), optionsMap);
 
 	lat = thisCircuit.Latitude*1;
 	lon = thisCircuit.Longitude*1;
 	//var point = {lat: lat, lng: lon};
-	var markerpoint = L.latLng(lat,lon);
-	//var markerpoint = {lat: lat, lng: lon};
-	//currentmarker = new google.maps.Marker({
-	//	position: markerpoint, title: thisCircuit.NomCircuit
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
-	//	,draggable: true
-	//});
+	var markerpoint = {lat: lat, lng: lon};
+	currentmarker = new google.maps.Marker({
+		position: markerpoint, title: thisCircuit.NomCircuit
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
+		,draggable: true
+	});
 	var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
 				'	<table align="center">' +
 				'		<tr>' +
@@ -203,59 +190,44 @@ function initMap() {
 	info +=		'	</table>' +
 				'</div>';
 	
-	//infoBulle = new google.maps.InfoWindow({
-	//	content: info
-	//});
-	//
-	//google.maps.event.addListener(currentmarker, 'mouseover', function() {
-	//	document.getElementById("zone-info").innerHTML = '<B>'+thisCircuit.NomCircuit+'</B>';
-	//});
-	//
-	//google.maps.event.addListener(currentmarker, 'click', function() {
-  	//    infoBulle.open(map, currentmarker);
-	//});
-	//
-	//google.maps.event.addListener(map, 'mousemove', function(event) {
-	//	mouseMove(event);
-	//});
-	//
-	//google.maps.event.addListener(map, 'rightclick', function(event) {
-	//	copyClipboard(event);
-	//});
-
-	currentmarker = new L.Marker(markerpoint,{draggable:true}).bindPopup(info);
-	map.addLayer(currentmarker);	
+	infoBulle = new google.maps.InfoWindow({
+		content: info
+	});
 	
-	currentmarker.on('mouseover', function() {
+	google.maps.event.addListener(currentmarker, 'mouseover', function() {
 		document.getElementById("zone-info").innerHTML = '<B>'+thisCircuit.NomCircuit+'</B>';
 	});
-	//
-	map.on('mousemove', function(ev) {
-		mouseMove(ev);
+
+	google.maps.event.addListener(currentmarker, 'click', function() {
+  	    infoBulle.open(map, currentmarker);
 	});
-	//
-	map.on('contextmenu', function(event) {
+
+	google.maps.event.addListener(map, 'mousemove', function(event) {
+		mouseMove(event);
+	});
+
+	google.maps.event.addListener(map, 'rightclick', function(event) {
 		copyClipboard(event);
 	});
 
-	//google.maps.event.addListener(map, 'center_changed', function(event) {
-	//	var center = map.getCenter();
-	//	el = document.getElementById("Latcenter");
-	//	if (el)
-	//		el.value = center.lat();
-	//	el = document.getElementById("Loncenter");
-	//	if (el)
-	//		el.value = center.lng();
-	//});
-	//
-	//google.maps.event.addListener(map, 'zoom_changed', function(event) {
-	//	var zoom = map.getZoom();
-	//	el = document.getElementById("Zoom");
-	//	if (el)
-	//		el.value = zoom;
-	//});
-	//
-	//currentmarker.setMap(map);
+	google.maps.event.addListener(map, 'center_changed', function(event) {
+		var center = map.getCenter();
+		el = document.getElementById("Latcenter");
+		if (el)
+			el.value = center.lat();
+		el = document.getElementById("Loncenter");
+		if (el)
+			el.value = center.lng();
+	});
+
+	google.maps.event.addListener(map, 'zoom_changed', function(event) {
+		var zoom = map.getZoom();
+		el = document.getElementById("Zoom");
+		if (el)
+			el.value = zoom;
+	});
+
+	currentmarker.setMap(map);
 	
 	showLines();
 	
@@ -269,30 +241,6 @@ function showData() {
 	}
 	else el.style.display = 'none';
 
-	//el = document.getElementById("Adresse");
-	//if (thisCircuit.Adresse) {
-	//	el.value = thisCircuit.Adresse;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CodePostal");
-	//if (thisCircuit.CodePostal) {
-	//	el.value = thisCircuit.CodePostal;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Ville");
-	//if (thisCircuit.Ville) {
-	//	el.value = thisCircuit.Ville;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("URL");
-	//if (thisCircuit.URL) {
-	//	el.value = thisCircuit.URL;
-	//}
-	//else el.style.display = 'none';
-
 	el = document.getElementById("Latitude");
 	if (thisCircuit.Latitude) {
 		el.value = thisCircuit.Latitude;
@@ -304,18 +252,6 @@ function showData() {
 		el.value = thisCircuit.Longitude;
 	}
 	else el.style.display = 'none';
-
-	//el = document.getElementById("Latcenter");
-	//if (thisCircuit.Latcenter) {
-	//	el.value = thisCircuit.Latcenter;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Loncenter");
-	//if (thisCircuit.Loncenter) {
-	//	el.value = thisCircuit.Loncenter;
-	//}
-	//else el.style.display = 'none';
 
 	el = document.getElementById("LongCircuit");
 	if (thisCircuit.LongCircuit) {
@@ -351,79 +287,6 @@ function showData() {
 		el.value = thisCircuit.FL[3];
 	}
 	else el.style.display = 'none';
-
-	/* FL en lat,lon,cap */
-	//el = document.getElementById("LatFL");
-	//if (thisCircuit.LatFL) {
-	//	el.value = thisCircuit.LatFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonFL");
-	//if (thisCircuit.LonFL) {
-	//	el.value = thisCircuit.LonFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapFL");
-	//if (thisCircuit.CapFL) {
-	//	el.value = thisCircuit.CapFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt1");
-	//if (thisCircuit.LatInt1) {
-	//	el.value = thisCircuit.LatInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt1");
-	//if (thisCircuit.LonInt1) {
-	//	el.value = thisCircuit.LonInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt1");
-	//if (thisCircuit.CapInt1) {
-	//	el.value = thisCircuit.CapInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt2");
-	//if (thisCircuit.LatInt2) {
-	//	el.value = thisCircuit.LatInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt2");
-	//if (thisCircuit.LonInt2) {
-	//	el.value = thisCircuit.LonInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt2");
-	//if (thisCircuit.CapInt2) {
-	//	el.value = thisCircuit.CapInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt3");
-	//if (thisCircuit.LatInt3) {
-	//	el.value = thisCircuit.LatInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt3");
-	//if (thisCircuit.LonInt3) {
-	//	el.value = thisCircuit.LonInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt3");
-	//if (thisCircuit.CapInt3) {
-	//	el.value = thisCircuit.CapInt3;
-	//}
-	//else el.style.display = 'none';
 }
 
 function showLines() {
@@ -582,10 +445,6 @@ function showLines() {
 }
 
 function point2Line(line) {
-	//var center = map.getCenter(); // on met de côté le centrage actuel
-	//// On recentre la map avec le zoom d'origine
-	//resetScreen();
-	
 	var obj = false;
 	if (line > 0) {
 		if (Tabint[line-1])
@@ -599,7 +458,6 @@ function point2Line(line) {
 		obj = objPitOut;
 	
 	if (obj.line) {
-		//setMaxZoom(obj.coord[0],obj.coord[1]); // recentrage sur les coordonnées at zoom max
 		setCenter(obj.coord[0],obj.coord[1]); // maintenant, on fait juste un recentrage sans changer le zoom
 		return;
 	}	
@@ -639,41 +497,30 @@ function getCoord() {
 function resetScreen() {
 	// On recentre la map avec le zoom d'origine
 	var zoom = thisCircuit.Zoom*1;
-	//map.setZoom(zoom);
-	L.setZoom(zoom);
+	map.setZoom(zoom);
 	lat = thisCircuit.Latcenter*1;
 	lon = thisCircuit.Loncenter*1;
-	//var googleLatLng = new google.maps.LatLng(lat,lon); 
-	var LatLng = L.latLng(lat,lon); 
-	//map.setCenter(googleLatLng);
-	map.panTo(LatLng);
+	var googleLatLng = new google.maps.LatLng(lat,lon); 
+	map.setCenter(googleLatLng);
 }
 
 function setCenter(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1) {
-	//var googleLatLng = new google.maps.LatLng(zlat,zlon); 
-	var LatLng = L.latLng(zlat,zlon); 
-	//map.setCenter(googleLatLng);
-	map.panTo(LatLng);
+	var googleLatLng = new google.maps.LatLng(zlat,zlon); 
+	map.setCenter(googleLatLng);
 }
 function setMaxZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
-	//setCenter(zlat,zlon);
-	var LatLng = L.latLng(zlat,zlon); 
-	map.panTo(LatLng);
+	setCenter(zlat,zlon);
 	var oldz = map.getZoom();
 	var newz = oldz + max;
 	if (newz !='NaN') {
-		//map.setZoom(newz);
-		L.setZoom(newz);
+		map.setZoom(newz);
 	}
 }
 function setOriginZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
 	var newz = thisCircuit.Zoom*1;
-	//setCenter(zlat,zlon);
-	var LatLng = L.latLng(zlat,zlon); 
-	map.panTo(LatLng);
+	setCenter(zlat,zlon);
 	if (newz !='NaN') {
-		//map.setZoom(newz);
-		L.setZoom(newz);
+		map.setZoom(newz);
 	}
 }
 
@@ -714,7 +561,7 @@ function go()
 		return false;
 	}
 
-	thisCircuit = Ev[0]; // La première ligne contient toujours le nom du circuit
+	thisCircuit = Ev[0]; //jfk
 
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
@@ -963,6 +810,7 @@ function initCircuit(track) {
 	//console.log(JSON.stringify(thisCircuit));
 }
 
+
 function scanCircuit() {
 	var trackfound = false;
 	if (Circuit == false)
@@ -999,17 +847,15 @@ function drawLineWithCoord(objline) {
 
 	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
 	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
-	//objline.line = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: objline.color,
-	//	//strokeColor: "black",
-	//	strokeOpacity: 1.0,
-	//	strokeWeight: 5
-	//});
-	//objline.line.setMap(map);
-	objline.line = new L.polyline(pathCoordinates, {color: objline.color});
-	map.addLayer(objline.line);	
+	objline.line = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: objline.color,
+		//strokeColor: "black",
+		strokeOpacity: 1.0,
+		strokeWeight: 5
+	});
+	objline.line.setMap(map);
 }
 
 function drawLineWithCap(objline) {
@@ -1028,34 +874,17 @@ function drawLineWithCap(objline) {
 
 	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de
 	if (Array.isArray(icoord)) {
-		//var pathCoordinates = [{lat: coord1[0], lng: coord1[1]},{lat: coord2[0], lng: coord2[1]}];
-		//objline.line = new google.maps.Polyline({
-		//	path: pathCoordinates,
-		//	geodesic: true,
-		//	strokeColor: objline.color,
-		//	strokeOpacity: 1.0,
-		//	strokeWeight: 5
-		//});
-		//objline.line.setMap(map);
-		objline.linecap = new L.polyline(pathCoordinates, {color: objline.color});
-		map.addLayer(objline.linecap);	
+		var pathCoordinates = [{lat: coord1[0], lng: coord1[1]},{lat: coord2[0], lng: coord2[1]}];
+		objline.line = new google.maps.Polyline({
+			path: pathCoordinates,
+			geodesic: true,
+			strokeColor: objline.color,
+			strokeOpacity: 1.0,
+			strokeWeight: 5
+		});
+		objline.line.setMap(map);
 	}
-	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);
-	
-	//// Pour les test on va rajouter un marqueur sur la perpendiculaire passant par la droite point de départ, bord de départ
-	//var ncoord = getPerpendiculaire(new Array(objline.lat, objline.lon),new Array(objline.coord[2], objline.coord[3]));
-	//var markerpoint = {lat: ncoord[0], lng: ncoord[1]};
-	//objline.markerP1 = new google.maps.Marker({
-	//	position: markerpoint, title: objline.title+' - P1'
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/4.png'
-	//	,draggable: true
-	//	});
-	//objline.markerP1.setMap(map);
-	
-	//displayAngle(objline);
-	
-	//displayCercleTrigo(objline);
-	
+	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);	
 }
 
 function drawCut() {
@@ -1066,121 +895,86 @@ function drawCut() {
 	var markerpoint = {lat: A[0], lng: A[1]};
 	
 	if (markerA1 != '') {
-		//markerA1.setMap(null);
-		map.removeLayer(objline.markerA1)
+		markerA1.setMap(null);
 		markerA1 = '';
 	}
-	//markerA1 = new google.maps.Marker({
-	//	position: markerpoint, title: 'A1-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
-	//	});
-	//markerA1.setMap(map);
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	objline.markerA1 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'A1-'+A[0]+','+A[1]});
-	map.addLayer(objline.markerA1);
+	markerA1 = new google.maps.Marker({
+		position: markerpoint, title: 'A1-'+A[0]+','+A[1]
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
+		});
+	markerA1.setMap(map);
 	//
 	// On marque les extrémités du deuxième segment de droite
 	var A = new Array(coord[2],coord[3]);
 	var markerpoint = {lat: A[0], lng: A[1]};
 		
 	if (markerA2 != '') {
-		//markerA2.setMap(null);
-		map.removeLayer(objline.markerA2)
+		markerA2.setMap(null);
 		markerA2 = '';
 	}
-	//markerA2 = new google.maps.Marker({
-	//	position: markerpoint, title: 'A2-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
-	//	});
-	//markerA2.setMap(map);
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	objline.markerA2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'A2-'+A[0]+','+A[1]});
-	map.addLayer(objline.markerA2);
+	markerA2 = new google.maps.Marker({
+		position: markerpoint, title: 'A2-'+A[0]+','+A[1]
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
+		});
+	markerA2.setMap(map);
 	
 	// On trace une ligne pour matérialiser le segment de droite
 	if (segment1 != '') {
-		//segment1.setMap(null);
-		map.removeLayer(segment1);
+		segment1.setMap(null);
 		segment1 = '';
 	}
 	var pathCoordinates = [{lat: coord[0], lng: coord[1]},{lat: coord[2], lng: coord[3]}];
-	//segment1 = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "white",
-	//	strokeOpacity: 0.2,
-	//	strokeWeight: 6
-	//});
-	//segment1.setMap(map);
-	segment1 = new L.polyline(pathCoordinates, {color: "white"});
-	map.addLayer(segment1);
+	segment1 = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: "white",
+		strokeOpacity: 0.2,
+		strokeWeight: 6
+	});
+	segment1.setMap(map);
 	
 	// On marque les extrémités du premier segment de droite
 	var A = new Array(coord[4],coord[5]);
 	var markerpoint = {lat: A[0], lng: A[1]};
 	
 	if (markerB1 != '') {
-		//markerB1.setMap(null);
-		map.removeLayer(markerB1);
+		markerB1.setMap(null);
 		markerB1 = '';
 	}
-	//markerB1 = new google.maps.Marker({
-	//	position: markerpoint, title: 'B1-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-	//	});
-	//markerB1.setMap(map);
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	objline.markerB1 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'B1-'+A[0]+','+A[1]});
-	map.addLayer(objline.markerB1);
-	
+	markerB1 = new google.maps.Marker({
+		position: markerpoint, title: 'B1-'+A[0]+','+A[1]
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
+		});
+	markerB1.setMap(map);
 	//
 	// On marque les extrémités du deuxième segment de droite
 	var A = new Array(coord[6],coord[7]);
 	var markerpoint = {lat: A[0], lng: A[1]};
 		
 	if (markerB2 != '') {
-		//markerB2.setMap(null);
-		map.removeLayer(markerB2);
+		markerB2.setMap(null);
 		markerB2 = '';
 	}
-	//markerB2 = new google.maps.Marker({
-	//	position: markerpoint, title: 'B2-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-	//	});
-	//markerB2.setMap(map);
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'B2-'+A[0]+','+A[1]});
-	map.addLayer(objline.markerB2);	
+	markerB2 = new google.maps.Marker({
+		position: markerpoint, title: 'B2-'+A[0]+','+A[1]
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
+		});
+	markerB2.setMap(map);
 	
 	// On trace une ligne pour matérialiser le segment de droite
 	if (segment2 != '') {
-		//segment2.setMap(null);
-		map.removeLayer(segment2);
+		segment2.setMap(null);
 		segment2 = '';
 	}
 	var pathCoordinates = [{lat: coord[4], lng: coord[5]},{lat: coord[6], lng: coord[7]}];
-	//segment2 = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "pink",
-	//	strokeOpacity: 1.0,
-	//	strokeWeight: 2
-	//});
-	//segment2.setMap(map);
-	segment2 = new L.polyline(pathCoordinates, {color: "pink"});
-	map.addLayer(segment2);
+	segment2 = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: "pink",
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	segment2.setMap(map);
 }
 
 function designLap(lap) {
@@ -1264,16 +1058,14 @@ function designLap(lap) {
 				//console.log('temps de coupure:'+JSON.stringify(Tcut));
                 Points[i].timecut = time_arrival - time_start;		
 				// s'il s'agit d'un point de coupure, on l'indique dans le chemin
-				//var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
-				var latlng = L.latLng(pointCut[0], pointCut[1]);
+				var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
 				var CP = getIntersectionSphere(parmCut.linecoord,parmCut.segcoords);
 				Points[i].CP = CP;
 				//console.log('geocoords CP:'+geocoords.length);
 				//console.log('pointCut:'+JSON.stringify(Tcut.pointCut)+';CP:'+JSON.stringify(CP));
 			}
 			else {
-				//var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
-				var latlng = L.latLng(pcoord.lat, pcoord.lng);
+				var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
 			}
 			geocoords.push(latlng);
 
@@ -1353,8 +1145,7 @@ function designLap(lap) {
 	Tours[il].pathRun = geocoords;
 
 	//console.log(JSON.stringify(geocoords));
-	//var lenLap = google.maps.geometry.spherical.computeLength(geocoords);
-	var lenLap = 0; // on va calculer une autre fois
+	var lenLap = google.maps.geometry.spherical.computeLength(geocoords);
 	//console.log(JSON.stringify(lenLap));
 	Tours[il].lenLap = lenLap;
 	Tours[il].geocoords = geocoords;
@@ -1399,7 +1190,7 @@ function designCut(parm) {
 		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
 		//console.log('dist0:'+dist0);
-		var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
+		//var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
 		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
 		//console.log('dist1:'+dist1);
@@ -1448,7 +1239,7 @@ function showLap(lap) {
 		var el = document.getElementById("simu");
 		el.style.display = "block";
 	}		
-
+	
 	// on sauvegarde le n° du tour dans la page
 	var el = document.getElementById("HiddenLap");
 	if (el)
@@ -1461,41 +1252,35 @@ function showLap(lap) {
 		
 	if (Tours[il].polyline) {
 		if (Tours[il].polyline != '') {
-			//Tours[il].polyline.setMap(null);
-			map.removeLayer(Tours[il].polyline);
+			Tours[il].polyline.setMap(null);
 			Tours[il].polyline = '';
 			if (Tours[il].markerPC) {
 				if (Tours[il].markerPC != '') {
-					//Tours[il].markerPC.setMap(null);
-					map.removeLayer(Tours[il].markerPC);
+					Tours[il].markerPC.setMap(null);
 					Tours[il].markerPC = '';
 				}
 			}
 			if (Tours[il].markerD1) {
 				if (Tours[il].markerD1 != '') {
-					//Tours[il].markerD1.setMap(null);
-					map.removeLayer(Tours[il].markerD1);
+					Tours[il].markerD1.setMap(null);
 					Tours[il].markerD1 = '';
 				}
 			}
 			if (Tours[il].markerD2) {
 				if (Tours[il].markerD2 != '') {
-					//Tours[il].markerD2.setMap(null);
-					map.removeLayer(Tours[il].markerD2);
+					Tours[il].markerD2.setMap(null);
 					Tours[il].markerD2 = '';
 				}
 			}
 			if (Tours[il].segment0) {
 				if (Tours[il].segment0 != '') {
-					//Tours[il].segment0.setMap(null);
-					map.removeLayer(Tours[il].segment0);
+					Tours[il].segment0.setMap(null);
 					Tours[il].segment0 = '';
 				}
 			}
 			if (Tours[il].segment1) {
 				if (Tours[il].segment1 != '') {
-					//Tours[il].segment1.setMap(null);
-					map.removeLayer(Tours[il].segment1);
+					Tours[il].segment1.setMap(null);
 					Tours[il].segment1 = '';
 				}
 			}
@@ -1557,24 +1342,34 @@ function showLap(lap) {
 		if (el.className.indexOf(colorLap) < 0)
 			el.className += " "+colorLap;
 	}
+	//console.log(il);
+	//console.log('il:'+il+' Tours:'+JSON.stringify(Tours[il]));
+	/*
+	for (var pr=0; pr < Tours[il].pathRun.length; pr++) {
+		//console.log('il:'+il+' paths:'+pr+'='+JSON.stringify(Tours[il].pathRun[pr]));
+	}
+	//console.log(il);
+	for (var pr=0; pr < Tours[il].geocoords.length; pr++) {
+		//console.log('il:'+il+' coords:'+pr+'='+JSON.stringify(Tours[il].geocoords[pr]));
+	}
+	*/
 
-	//Tours[il].polyline = new google.maps.Polyline({
-	//	path: Tours[il].pathRun,
-	//	geodesic: true,
-	//	//strokeColor: 'blue',
-	//	strokeColor: Tours[il].linecolor,
-	//	strokeOpacity: 1.0,
-	//	strokeWeight: 2
-	//});
-	//Tours[il].polyline.setMap(map);
-	Tours[il].polyline = new L.polyline(Tours[il].pathRun, {color: Tours[il].linecolor});
-	map.addLayer(Tours[il].polyline);	
+	Tours[il].polyline = new google.maps.Polyline({
+		path: Tours[il].pathRun,
+		geodesic: true,
+		//strokeColor: 'blue',
+		strokeColor: Tours[il].linecolor,
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	
+	
+	Tours[il].polyline.setMap(map);
 		
 	// affichage du point de franchissement de la ligne
 	if (Tours[il].markerPC) {
 		if (Tours[il].markerPC != '') {
-			//Tours[il].markerPC.setMap(null);
-			map.removeLayer(Tours[il].markerPC)
+			Tours[il].markerPC.setMap(null);
 			Tours[il].markerPC = '';
 		}
 	}
@@ -1583,97 +1378,15 @@ function showLap(lap) {
 	markerpoint.lat = Tours[il].pointCut[0];
 	markerpoint.lng = Tours[il].pointCut[1];
 	//console.log(markerpoint);
-	//Tours[il].markerPC = new google.maps.Marker({
-	//	position: markerpoint, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'
-	//	//,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-	//	,visible: true
-	//	});
-	//Tours[il].markerPC.setMap(map);
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	Tours[il].markerPC = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'});
-	map.addLayer(Tours[il].markerPC);
-//		
-//	// affichage du point de début du tour (avant passage de la ligne)
-//	if (Tours[il].markerD1) {
-//		if (Tours[il].markerD1 != '') {
-//			Tours[il].markerD1.setMap(null);
-//			Tours[il].markerD1 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[0];
-//	//console.log(markerpoint);
-//	Tours[il].markerD1 = new google.maps.Marker({
-//		position: markerpoint, title: 'D1 '+Tours[il].points[0].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-//		});
-//	Tours[il].markerD1.setMap(map);
-//		
-//	if (Tours[il].segment0) {
-//		if (Tours[il].segment0 != '') {
-//			Tours[il].segment0.setMap(null);
-//			Tours[il].segment0 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[0],Tours[il].pathRun[1]);
-//	Tours[il].segment0 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'white',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment0.setMap(map);
+	Tours[il].markerPC = new google.maps.Marker({
+		position: markerpoint, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'
+		//,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
+		,visible: true
+		});
+	Tours[il].markerPC.setMap(map);
 	
 	var l = Tours[il].pathRun.length-1;
 	//console.log(l);
-				
-//	// affichage du point de fin du tour (après passage de la ligne)
-//	if (Tours[il].markerD2) {
-//		if (Tours[il].markerD2 != '') {
-//			Tours[il].markerD2.setMap(null);
-//			Tours[il].markerD2 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[l];
-//	//console.log(markerpoint);
-//	Tours[il].markerD2 = new google.maps.Marker({
-//		position: markerpoint, title: 'D2 '+Tours[il].points[l].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//		});
-//	Tours[il].markerD2.setMap(map);
-//		
-//	//if (markerDB != '') {
-//	//	markerDB.setMap(null);
-//	//	markerDB = '';
-//	//}
-//	//var markerpoint = Tours[il].pathRun[0];
-//	//console.log(markerpoint);
-//	//markerDB = new google.maps.Marker({
-//	//	position: markerpoint, title: 'DB'
-//	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//	//	});
-//	//markerDB.setMap(map);
-//		
-//	if (Tours[il].segment1) {
-//		if (Tours[il].segment1 != '') {
-//			Tours[il].segment1.setMap(null);
-//			Tours[il].segment1 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[l],Tours[il].pathRun[l-1]);
-//	Tours[il].segment1 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'black',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment1.setMap(map);
 	
 	displayMap();
 	
@@ -2085,19 +1798,16 @@ function simuRelease() {
 		el.style.display = "block";
 	// on efface la ligne représentant le mobile
 	if (simuline != '') {
-		//simuline.setMap(null);
-		map.removeLayer(simuline);
+		simuline.setMap(null);
 		simuline = '';
 	}
 	// on efface la représentation du mobile
 	if (simup0 != '') {
-		//simup0.setMap(null);
-		map.removeLayer(simup0);
+		simup0.setMap(null);
 		simup0 = '';
 	}
 	if (simup1 != '') {
-		//simup1.setMap(null);
-		map.removeLayer(simup1);
+		simup1.setMap(null);
 		simup1 = '';
 	}
 	
@@ -2187,13 +1897,11 @@ function showMobile() {
 	
 	// On va matérialiser les 2 points du segment de droite
 	if (simup0 != '') {
-		//simup0.setMap(null);
-		map.removeLayer(simup0)
+		simup0.setMap(null);
 		simup0 = '';
 	}
 	if (simup1 != '') {
-		//simup1.setMap(null);
-		map.removeLayer(simup1)
+		simup1.setMap(null);
 		simup1 = '';
 	}
 
@@ -2201,89 +1909,65 @@ function showMobile() {
 
 	var markerpoint = {lat: Tours[il].points[i0].lat1, lng: Tours[il].points[i0].lon1};
 	//console.log(markerpoint);
-	//simup0 = new google.maps.Marker({
-	//	position: markerpoint,
-	//	title: 'T:'+Tours[il].points[i0].timestamp+'\r\n'+
-	//	       'v:'+Math.round(Tours[il].points[i0].vitesse)+'km/h\r\n'+
-	//	       'alt:'+Math.round(Tours[il].points[i0].altitude)+'m\r\n'+
-	//		   'cap:'+Math.round(Tours[il].points[i0].cap*10)/10+'° '
-	//	,icon: {
-	//		path: google.maps.SymbolPath.CIRCLE,
-	//		rotation: cap,
-	//		fillColor: "yellow",
-	//		fillOpacity: 0.6,
-	//		scale: 5,
-	//		strokeColor: "gold",
-	//		strokeWeight: 2,
-	//
-	//		}
-	//	});
-	//simup0.setMap(map);
-	//$$$$var	title = 'T:'+Tours[il].points[i0].timestamp+'\r\n'+
-	//$$$$	       'v:'+Math.round(Tours[il].points[i0].vitesse)+'km/h\r\n'+
-	//$$$$	       'alt:'+Math.round(Tours[il].points[i0].altitude)+'m\r\n'+
-	//$$$$		   'cap:'+Math.round(Tours[il].points[i0].cap*10)/10+'° ';
-	//$$$$var localIcon = L.icon({
-	//$$$$	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
-	//$$$$	iconAnchor: [8, 16]
-	//$$$$});	
-	//$$$$simup0 = new L.Marker(markerpoint,{draggable:true, title: title, rotationAngle:cap});
-	//$$$$map.addLayer(simup0);
+	simup0 = new google.maps.Marker({
+		position: markerpoint,
+		title: 'T:'+Tours[il].points[i0].timestamp+'\r\n'+
+		       'v:'+Math.round(Tours[il].points[i0].vitesse)+'km/h\r\n'+
+		       'alt:'+Math.round(Tours[il].points[i0].altitude)+'m\r\n'+
+			   'cap:'+Math.round(Tours[il].points[i0].cap*10)/10+'° '
+		,icon: {
+			path: google.maps.SymbolPath.CIRCLE,
+			rotation: cap,
+			fillColor: "yellow",
+			fillOpacity: 0.6,
+			scale: 5,
+			strokeColor: "gold",
+			strokeWeight: 2,
+
+			}
+		});
+	simup0.setMap(map);
 
 	var cap = Tours[il].points[i1].cap;
 
 	var markerpoint = {lat: Tours[il].points[i1].lat1, lng: Tours[il].points[i1].lon1};
 	//console.log(markerpoint);
-	//simup1 = new google.maps.Marker({
-	//	position: markerpoint, 
-	//	title: 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
-	//	       'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
-	//	       'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
-    //           'cap:'+Math.round(Tours[il].points[i1].cap*10)/10+'° '
-	//	,icon: {
-	//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-	//		rotation: cap,
-	//		fillColor: "cyan",
-	//		fillOpacity: 0.8,
-	//		scale: 5,
-	//		strokeColor: "gold",
-	//		strokeWeight: 2,
-	//
-	//		}
-	//	});
-	//simup1.setMap(map);
-	var	title = 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
-		        'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
-		        'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
-                'cap:'+Math.round(Tours[il].points[i1].cap*10)/10+'° ';
-	var localIcon = L.icon({
-		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
-		iconAnchor: [8, 16]
-	});	
-	simup1 = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
-	map.addLayer(simup1);
+	simup1 = new google.maps.Marker({
+		position: markerpoint, 
+		title: 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
+		       'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
+		       'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
+               'cap:'+Math.round(Tours[il].points[i1].cap*10)/10+'° '
+/*			,icon: iconm*/
+		,icon: {
+			path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+			rotation: cap,
+			fillColor: "cyan",
+			fillOpacity: 0.8,
+			scale: 5,
+			strokeColor: "gold",
+			strokeWeight: 2,
+
+			}
+		});
+	simup1.setMap(map);
 
 	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
 	// on commence par effacer l'ancienne ligne
 	if (simuline != '') {
-		//simuline.setMap(null);
-		map.removeLayer(simuline)
+		simuline.setMap(null);
 		simuline = '';
 	}
 	var pathCoordinates = [{lat: Tours[il].points[i0].lat1, lng: Tours[il].points[i0].lon1},{lat: Tours[il].points[i1].lat1, lng: Tours[il].points[i1].lon1}];
-	//simuline = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "cyan",
-	//	strokeOpacity: 0.6,
-	//	strokeWeight: 12
-	//});
-	//simuline.setMap(map);
-	//setCenter(Tours[il].points[i0].lat1, Tours[il].points[i0].lon1);
-	simuline = new L.polyline(pathCoordinates, {color: "cyan"});
-	map.addLayer(simuline);
-	var LatLng = L.latLng(Tours[il].points[i0].lat1, Tours[il].points[i0].lon1);
-	map.panTo(LatLng);
+	simuline = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: "cyan",
+		strokeOpacity: 0.6,
+		strokeWeight: 12
+	});
+	simuline.setMap(map);
+	setCenter(Tours[il].points[i0].lat1, Tours[il].points[i0].lon1);
 	
 	// calcul de l'accélération
 	var accel = (((Tours[il].points[i1].vitesse - Tours[il].points[i0].vitesse)) * Frequence) / gkmh;
@@ -2359,8 +2043,7 @@ function showMobile() {
 		for (var m=0; m < i1; m++) {
 			geodist.push(Tours[il].geocoords[m]);
 		}
-		//var dist =	google.maps.geometry.spherical.computeLength(geodist);
-		var dist =	0;
+		var dist =	google.maps.geometry.spherical.computeLength(geodist);
 		el.innerHTML = Math.round(dist)+"m";
 	}
 
@@ -2413,8 +2096,7 @@ function showMobile() {
 	// Si on est en mode pas à pas, on marque le point d'intersection du segment avec la ligne
 	if (!playmotion) {
 		if (marktemp != '') {
-			//marktemp.setMap(null);
-			map.removeLayer(marktemp);
+			marktemp.setMap(null);
 			marktemp = '';
 		}
 		var lat = Tours[il].points[i1].CP.latitude;
@@ -2422,13 +2104,11 @@ function showMobile() {
 		if (lat > 0 && lng > 0) {
 			var markerpoint = {lat: lat, lng: lng};
 			var l = tabMarktemp.length-1;
-			//marktemp = new google.maps.Marker({
-			//	position: markerpoint, title: 'Intersection'
-			//	,draggable: true
-			//	});
-			//marktemp.setMap(map);
-			marktemp = new L.Marker(markerpoint,{draggable:true, title: 'Intersection'});
-			map.addLayer(marktemp);
+			marktemp = new google.maps.Marker({
+				position: markerpoint, title: 'Intersection'
+				,draggable: true
+				});
+			marktemp.setMap(map);
 		}
 	}
 
@@ -2495,8 +2175,7 @@ function showInputPoint(elem) {
 	var zoom = map.getZoom();
 		
 	if (marktemp != '') {
-		//marktemp.setMap(null);
-		map.removeLayer(marktemp);
+		marktemp.setMap(null);
 		marktemp = '';
 	}
 	clearMultiPoints();
@@ -2520,16 +2199,12 @@ function showInputPoint(elem) {
 	var lng = A[1]*1;
 
 	var markerpoint = {lat: lat, lng: lng};
-	//marktemp = new google.maps.Marker({
-	//	position: markerpoint, title: 'D2'
-	//	});
-	//marktemp.setMap(map);
-	marktemp = new L.Marker(markerpoint,{draggable:false, title: 'D2'});
-	map.addLayer(marktemp);
+	marktemp = new google.maps.Marker({
+		position: markerpoint, title: 'D2'
+		});
+	marktemp.setMap(map);
 	
-	//setCenter(lat,lng);	
-	var LatLng = L.latLng(lat,lng);
-	map.panTo(LatLng);
+	setCenter(lat,lng);	
 
 }
 
@@ -2543,11 +2218,9 @@ function markMultiPoints(tabPoints) {
 		var lat = tabPoints[i]*1;
 		var lng = tabPoints[i+1]*1;
 		var markerpoint = {lat: lat, lng: lng};
-		//var marker = new google.maps.Marker({
-		//	position: markerpoint, title: 'Point'
-		//	});
-		markter = new L.Marker(markerpoint,{draggable:false, title: 'Point'});
-		map.addLayer(marker);
+		var marker = new google.maps.Marker({
+			position: markerpoint, title: 'Point'
+			});
 		tabMarktemp.push(marker);
 		var l = tabMarktemp.length-1;
 		tabMarktemp[l].setMap(map);
@@ -2569,29 +2242,25 @@ function markMultiPoints(tabPoints) {
 					var markerpoint = {lat: lat, lng: lng};
 					tabMarktemp.push();
 					var l = tabMarktemp.length-1;
-					//tabMarktemp[l] = new google.maps.Marker({
-					//	position: markerpoint, title: 'X'
-					//	,draggable: true
-					//	});
-					//tabMarktemp[l].setMap(map);
-					tabMarktemp[l] = new L.Marker(markerpoint,{draggable:false, title: 'X'});
-					map.addLayer(tabMarktemp[l]);
+					tabMarktemp[l] = new google.maps.Marker({
+						position: markerpoint, title: 'X'
+						,draggable: true
+						});
+					tabMarktemp[l].setMap(map);
 				}
-				var spinter = getIntersectionSphere(seg1,seg2);
-				if (spinter) {
-					var lat = spinter.latitude;
-					var lng = spinter.longitude;
-					var markerpoint = {lat: lat, lng: lng};
-					tabMarktemp.push();
-					var l = tabMarktemp.length-1;
-					//tabMarktemp[l] = new google.maps.Marker({
-					//	position: markerpoint, title: 'Y'
-					//	,draggable: true
-					//	});
-					//tabMarktemp[l].setMap(map);
-					tabMarktemp[l] = new L.Marker(markerpoint,{draggable:false, title: 'Y'});
-					map.addLayer(tabMarktemp[l]);
-				}
+				//var spinter = getIntersectionSphere(seg1,seg2);
+				//if (spinter) {
+				//	var lat = spinter.latitude;
+				//	var lng = spinter.longitude;
+				//	var markerpoint = {lat: lat, lng: lng};
+				//	tabMarktemp.push();
+				//	var l = tabMarktemp.length-1;
+				//	tabMarktemp[l] = new google.maps.Marker({
+				//		position: markerpoint, title: 'Y'
+				//		,draggable: true
+				//		});
+				//	tabMarktemp[l].setMap(map);
+				//}
 			}
 		}
 	}
@@ -2603,15 +2272,13 @@ function markMultiPoints(tabPoints) {
 
 function designSegment(seg) {
 	var pathCoordinates = [{lat: seg[0], lng: seg[1]},{lat: seg[2], lng: seg[3]}];
-	//segment = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "cyan",
-	//	strokeOpacity: 1,
-	//	strokeWeight: 1
-	//});
-	segment = new L.polyline(pathCoordinates, {color: "cyan"});
-	map.addLayer(segment);	
+	segment = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: "cyan",
+		strokeOpacity: 1,
+		strokeWeight: 1
+	});
 	tabLinetemp.push(segment);
 	var l = tabLinetemp.length-1;
 	tabLinetemp[l].setMap(map);
@@ -2621,8 +2288,7 @@ function clearMultiPoints() {
 	// on efface les anciens points
 	for (var i=0; i < tabMarktemp.length; i++) {
 		if (tabMarktemp[i] != "") {
-			//tabMarktemp[i].setMap(null);
-			map.removeLayer(tabMarktemp[i]);
+			tabMarktemp[i].setMap(null);
 			tabMarktemp[i] = '';
 		}
 	}
@@ -2630,8 +2296,7 @@ function clearMultiPoints() {
 	// on efface les anciens segments
 	for (var i=0; i < tabLinetemp.length; i++) {
 		if (tabLinetemp[i] != "") {
-			//tabLinetemp[i].setMap(null);
-			map.removeLayer(tabLinetemp[i]);
+			tabLinetemp[i].setMap(null);
 			tabLinetemp[i] = '';
 		}
 	}
@@ -2680,7 +2345,6 @@ function getObjTime(t) {
 	ObTime = new Date(syy*1, (smm*1)-1, sdd*1, sh*1, sm*1, ss*1, sms*1);
 	return ObTime;
 }
-
 
 function isLineCut(SegAB, SegCD) {
 	var intersec = getIntersection(SegAB,SegCD)
@@ -2844,16 +2508,6 @@ function pointDroite(A,B,d) { // coordonnées du point A, point B et distance à
 }
 
 function getIntersection(SegAB,SegCD) {
-	//var pinter = getIntersectionSphere(SegAB,SegCD)
-	////var new_pinter = new Array(pinter.latitude,pinter.longitude)
-	//var new_pinter = new Array(pinter.latitude,pinter.longitude)
-	//  
-	////var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
-	////return new Array(Sx,Sy)
-	//return new_pinter
-	
-	/////////////////////////////////////////////////
-	
 	var Ax = SegAB[0]*1;
 	var Ay = SegAB[1]*1;
 	var Bx = SegAB[2]*1;
@@ -2863,14 +2517,6 @@ function getIntersection(SegAB,SegCD) {
 	var Cy = SegCD[1]*1;
 	var Dx = SegCD[2]*1;
 	var Dy = SegCD[3]*1;
-	
-//function getIntersectionSphere(line1 ,line2) {
-//   //console.log("segment1:"+JSON.stringify(line1));
-//   //console.log("segment2:"+JSON.stringify(line2));
-//   // find the plane of the line in cartesian coordinates
-//   var p1 = findPlane(line1[0],line1[1],line1[2],line1[3]);
-//   var p2 = findPlane(line2[0],line2[1],line2[2],line2[3])
-	
 
 	var Sx;
 	var Sy;
@@ -2914,66 +2560,18 @@ function getIntersection(SegAB,SegCD) {
 	By = precis14(By);
 	Cy = precis14(Cy);
 	Dy = precis14(Dy);
-	
-	//console.log('Sx:'+Sx);
-	//console.log('Ax:'+Ax);
-	//console.log('Bx:'+Bx);
-	//console.log('Cx:'+Cx);
-	//console.log('Dx:'+Dx);
-	//console.log('Sy:'+Sy);
-	//console.log('Ay:'+Ay);
-	//console.log('By:'+By);
-	//console.log('Cy:'+Cy);
-	//console.log('Dy:'+Dy);
-	//var v = false;
-	//if (Sx<Ax && Sx<Bx)
-	//	v = true;
-	//console.log('v1:'+v);
-	//
-	//var v = false;
-	//if (Sx>Ax && Sx>Bx)
-	//	v = true;
-	//console.log('v2:'+v);
-	//
-	//var v = false;
-	//if (Sx<Cx && Sx<Dx)
-	//	v = true;
-	//console.log('v3:'+v);
-	//
-	//var v = false;
-	//if (Sx>Cx && Sx>Dx)
-	//	v = true;
-	//console.log('v4:'+v);
-	//
-	//var v = false;
-	//if (Sy<Ay && Sy<By)
-	//	v = true;
-	//console.log('v5:'+v);
-	//
-	//var v = false;
-	//if (Sy>Ay && Sy>By)
-	//	v = true;
-	//console.log('v6:'+v);
-	//
-	//var v = false;
-	//if (Sy<Cy && Sy<Dy)
-	//	v = true;
-	//console.log('v7:'+v);
-	//
-	//var v = false;
-	//if (Sy>Cy && Sy>Dy)
-	//	v = true;
-	//console.log('v8:'+v);
-
 	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
 			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
+	  //return true; //or :     return new Point2D.Float((float)Sx,(float)Sy)
 	var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
+	//return new Array(Sx,Sy)
+	//return new_pinter
 	return ret
+	  
 }
 function precis14(x) {
   return Number.parseFloat(x).toFixed(14);
 }
-
 /*
 */
 function getIntersectionSphere(line1 ,line2) {
@@ -3084,17 +2682,17 @@ function rad2deg(rd) {
 }
 	
 function mouseMove(mousePt) {
-	mouseLatLng = mousePt.latlng;
-	//var mouseCoord = mouseLatLng.toUrlValue();
-	var mouseLat = mouseLatLng.lat;
-	var mouseLon = mouseLatLng.lng;
+	mouseLatLng = mousePt.latLng;
+	var mouseCoord = mouseLatLng.toUrlValue();
+	var mouseLat = mouseLatLng.lat();
+	var mouseLon = mouseLatLng.lng();
 	
 	//var oStatusDiv = document.getElementById("mouseTrack")	
 	var oStatusDiv = document.getElementById("LatLng")	
 	if (oStatusDiv) {
 		oStatusDiv.value  = mouseLat + ',' + mouseLon;
 	}
-	//document.getElementById("zone-info").innerHTML = '';
+	document.getElementById("zone-info").innerHTML = '';
 }
 	
 function copyClipboard(mousePt) {
@@ -3133,29 +2731,6 @@ function writeMessage(text_mess,time_mess=1) {
 function resizeMap() {
 	if (!map)
 		return;
-	//var center = map.getCenter(); 
-	////var b1 = map.getBounds();
-	//console.log('lat centre='+center.lat);
-	////var bn = b1.getNorth();
-	//console.log('lat nord='+bn);
-	////var bs = b1.getSouth();
-	//console.log('lat sud='+bs);
-	////var ratio = (bn-bs)*0.8;
-	////var corner1 = b1._northEast;
-	////var corner2 = b1._southWest;
-	////var newsouth = bn-ratio;
-	////corner2.lat = newsouth;
-	////var latc = corner1.lat+((corner1.lat-corner2.lat)/2);
-	////var lngc = corner1.lng+((corner1.lng-corner2.lng)/2);
-	////var newcenter = L.latLng(latc,lngc);
-	//
-	////var nb = L.latLngBounds(corner1,corner2)
-	////map.setView(newcenter);
-	////L.setBounds(nb);
-	//map.setView(center);
-	
-	
-	
 	//
 	var el = document.getElementById("map");
 	var html = "";
@@ -3180,7 +2755,5 @@ function resizeMap() {
 		el.style.height = hopt+'px';
 		el.style.maxHeight = hopt+'px';
 	}
-	//var center2 = map.getCenter(); 
-	//map.panTo(center);
 }
 window.addEventListener('resize', resizeMap);

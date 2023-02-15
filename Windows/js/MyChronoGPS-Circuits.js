@@ -1,5 +1,5 @@
-//var fname = 'ajax/get_circuits.php';
 var fname = 'ajax/get_circuits.py';
+//var fname = 'cgi-bin/get_circuits.py';
 var data_ready = false;
 var Circuit = false;
 
@@ -39,7 +39,7 @@ function loadCircuitsAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
+				console.log(this.responseText);
 				try {Circuit = JSON.parse(this.responseText);}
 				catch(e) {Circuit = this.responseText;}
 			}

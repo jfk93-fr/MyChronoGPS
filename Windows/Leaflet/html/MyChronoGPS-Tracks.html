@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MyChronoGPS Tracks</title>
+	<link rel="stylesheet" href="./css/w3.css">
+	<link rel="stylesheet" href="./css/MyChronoGPS.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+	integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+	crossorigin=""/>
+    <style>
+       /* Set the size of the div element that contains the map */
+      #map {
+        height: 700px;
+        width: 100%;
+       }
+    </style>
+</head>
+<body>
+<div class="w3-main">
+	<div class="w3-container w3-row">
+		<div class="w3-col s3"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
+		<div class="w3-col s3"><button class="w3-button w3-border w3-round" onclick="document.getElementById('trackslist').style.display='block'">Show List</button> </div>
+		<div>
+			<span id="zone-info"></span>&nbsp;
+			<input id="mouseTrack" size=40>
+			<button class="w3-button w3-border w3-round" onclick="showPoint()">Show Point</button>
+		</div>
+	</div>
+	<div class="w3-container w3-row">
+		<div id="trackslist" class="w3-col s3 m3 l3" style="display:none">
+			<span onclick="this.parentElement.style.display='none'"
+			class="w3-button">x</span>
+			<div id="liste_circuits"></div>
+		</div>		
+		<div class="w3-rest">
+			<div id="map" style="display:none;"></div>
+		</div>		
+	</div>
+	<!-- -->
+	<script src="./js/parse_url.js" type="text/javascript"></script>
+	<script src="./js/ajax.js" type="text/javascript"></script>
+	<script src="./js/MyChronoGPS-Circuits.js"></script>
+	<script src="./js/MyChronoGPS-Tracks.js"></script>
+	<!-- Make sure you put this AFTER Leaflet's CSS -->
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+		integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+		crossorigin="">
+	</script>	
+	<script src="js/leaflet-providers.js"></script>	
+<!-- -->
+</div>
+</body>
+</html>

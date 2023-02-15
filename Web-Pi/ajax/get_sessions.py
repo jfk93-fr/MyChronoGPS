@@ -18,6 +18,9 @@ def listdirectory(path):
     return fichier
 
 result = []
+#session = dict()
+#session["dir"] = dir
+#result.append(session)
 
 listfic = listdirectory(dir)
 for fic in listfic:
