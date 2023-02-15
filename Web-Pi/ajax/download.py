@@ -3,21 +3,56 @@
 from MyChronoGPS_WebPaths import Paths
 Path = Paths();
 
-dira = Path.pathweb+"/userdata/"
+diru = Path.pathweb+"/userdata/"
 dirf = Path.pathdata
+dira = Path.pathdata+"/analysis"
+dirt = Path.pathdata+"/tracks"
+
 import glob 
 import os
 import json
 import cgi
 import zipfile
 
+def listdirectory(path): 
+    fichier=[] 
+    l = glob.glob(path+'/*') 
+    for i in l: 
+        if os.path.isdir(i): fichier.extend(listdirectory(i)) 
+        else: fichier.append(i) 
+    return fichier
+    
 dataurl = cgi.FieldStorage()
+fileid = str(dataurl.getvalue('file'))
+#print(str(dataurl))
 
 os.chdir(dirf)
 
-fileid = dataurl.getvalue('file')
+# lecture du fichier analysis, la première ligne contient le nom du circuit
+filea = str("analysis-"+dataurl.getvalue('file'))
+
+fic = dira+"/"+filea+".json"
+lines = "erreur json"
+try:
+    handle = open(fic, "r")
+    infos = handle.read()
+    lines = infos.split('\n')
+    handle.close()
+except:
+    print('fichier '+fic+' non trouvé')
+
 zipid = fileid+".zip"
-zip = zipfile.ZipFile(dira+zipid,'w')
+zip = zipfile.ZipFile(diru+zipid,'w')
+
+fl = json.loads(lines[0])
+NomCircuit = fl[0]["NomCircuit"]
+if NomCircuit == "":
+    NomCircuit = "autotrack"
+filename = NomCircuit+".trk"
+filetrack = dirt+"/"+filename
+
+if os.path.isfile(filetrack): 
+    zip.write("tracks/"+str(filename))
 
 zip.write("analysis/analysis-"+fileid+".json")
 zip.write("sessions/session-"+fileid+".txt")
