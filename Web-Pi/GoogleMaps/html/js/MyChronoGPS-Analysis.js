@@ -1199,7 +1199,6 @@ function designCut(parm) {
 		//var pointCut = getIntersection(linecoord,segcoords);
 
 		var corrtime = dt1.getTime() - dt0.getTime();
-		//console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
 		
 		var vs0 = (v0*1000)/3600;
 		var vs1 = (v1*1000)/3600;

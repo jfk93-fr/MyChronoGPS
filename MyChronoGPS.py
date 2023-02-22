@@ -93,7 +93,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-#logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
@@ -1758,7 +1758,10 @@ class ChronoControl():
         #logger.info('begin chrono_begin:'+str(self.chrono_begin))
         self.chrono_begin = True
         self.nblap = 0
+        
         self.chronoStartTime = self.getTime(gps.gpstime)
+        #self.chronoStartTime = self.getTime(gps.prevtime)
+        
         self.chronoPrevTime = timedelta(seconds=0)
         self.chronoGpsTime = timedelta(seconds=0)
         self.dDprev = 0
@@ -1890,7 +1893,7 @@ class ChronoControl():
         self.gps_gpsvitesse = gps.gpsvitesse
         self.gps_gpsaltitude = gps.gpsaltitude
         self.gps_gpscap      = gps.gpscap
-        self.Freq           = gps.Freq
+        self.Freq           = gps.Freq        
         self.corrFreq       = 1000000/self.Freq # correction to be applied to the time according to the frequency
         
     def compute(self):
@@ -1970,10 +1973,6 @@ class ChronoControl():
                             
                         # is the start-finish line crossed ?
                         if self.startLineCut == True:
-                            #logger.debug("coords line:["+str(self.startlat1)+","+str(self.startlon1)+"],["+str(self.startlat2)+","+str(self.startlon2)+"]")
-                            #logger.debug("coords ppos:["+str(self.gps_prevlat)+","+str(self.gps_prevlat)+"]")
-                            #logger.debug("coords apos:["+str(self.gps_latitude)+","+str(self.gps_longitude)+"]")
-                            # calculation of the distance between the previous point and the start-finish line
                             dDp0 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_prevlat,self.gps_prevlon)
                             # calculation of the distance between the current point and the start-finish line
                             dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
@@ -1985,39 +1984,26 @@ class ChronoControl():
                             dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
                                 
                             corrtime = self.chronoGpsTime - self.chronoPrevTime
-                            #distAB = self.dDprev + self.dD
-                            #logger.debug("ditances:["+str(dDp0)+","+str(dDp1)+"]")
-                            #logger.debug("vitesses:["+str(v0)+","+str(v1)+"]")
-                            #logger.debug("dit corr:["+str(dc0)+","+str(dc1)+"]")
-                            #logger.debug("time cor before:["+str(corrtime)+"]")
 
                             if distseg > 0: # distseg = 0 is possible, if the gps remains static
-                                cormic = corrtime.microseconds + (self.corrFreq * (dDp0/distseg))
-                                #logger.debug("cormic (dDp0/distseg) :["+str(timedelta(microseconds=cormic))+"]")
-
-                                #logger.info('corrtime:'+str(corrtime.seconds)+' sec,'+str(corrtime.microseconds)+' mic')
-                                #micro_seconds = corrtime.seconds*1000000+corrtime.microseconds
-                                #logger.info('start micro_seconds:'+str(micro_seconds))
-
-                                cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
-                                #logger.debug("cormic (dc0/(dc0+dc1)) :["+str(timedelta(microseconds=cormic))+"]")
-                                cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
-                                #logger.debug("cormic rounded (dc0/(dc0+dc1)) :["+str(timedelta(microseconds=cormic))+"]")
-
+                                cormic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
                                 if self.ils != False:
                                     self.ils.set_ilstime(cormic)
                                 corrtime = timedelta(microseconds=cormic)
-                            #logger.debug("time cor after:["+str(corrtime)+"]")
+                            
+                            #logger.debug("temps corrigé:["+str(corrtime)+"]")
+                            
                             temps_estime = self.chronoPrevTime + corrtime
                             
                             temps = temps_estime - self.chronoStartTime # temps = time passed since the start 
                             if self.nblap == 0:
+                                #logger.debug("temps_t :["+str(self.temps_t)+"]")
                                 self.temps_t = temps
 
-                            #logger.debug("chronoStartTime :["+str(self.chronoStartTime)+"]")
-                            #logger.debug("temps_estime :["+str(temps_estime)+"]")
-                            #logger.debug("temps :["+str(temps)+"]")
-                            #logger.debug("temps_t :["+str(self.temps_t)+"]")
+                            #logger.debug("nblap :"+str(self.nblap))
+                            #logger.debug('gps_last_time:'+str(self.gps_last_time))
+                            #logger.debug('gps_gpstime:'+str(self.gps_gpstime))
+                            #logger.debug('correction temps:'+str(corrtime))
 
                             self.temps_tour = temps - self.temps_t
                             #logger.debug("temps_tour :["+str(self.temps_tour)+"]")
@@ -2097,10 +2083,18 @@ class ChronoControl():
                                 #if distAB > 0: # distAB = 0 is possible, if the gps remains static
                                 if distseg > 0: # distAB = 0 is possible, if the gps remains static
                                     #cormic = corrtime.microseconds + (1000000 * (dDprev/distAB)) # on ne pondère pas selon la vitesse
-                                    cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
+                                    #cormic = round(corrtime.microseconds + (self.corrFreq * (dc0/(dc0+dc1))))
+                                    cormic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
                                     corrtime = timedelta(microseconds=cormic)
 
                                 temps_estime = self.chronoPrevTime + corrtime
+
+                                #logger.debug("Freq:["+str(self.Freq)+"]")
+                                #logger.debug("corrFreq:["+str(self.corrFreq)+"]")
+                                dt0 = self.getTime(self.gps_last_time)
+                                dt1 = self.getTime(self.gps_gpstime)
+                                diffTime = dt1 - dt0
+                                #logger.debug("diffTime:["+str(diffTime)+"]")
                             
                                 temps = temps_estime - self.chronoStartTime # temps = time passed since the start
                                 self.temps_inter = temps - self.temps_i
@@ -2261,60 +2255,39 @@ class ChronoControl():
                                     #logger.info('is prox track cut:'+str(cut))
                                     self.begin()
                                     self.nblap = 1 # we start with the first lap
-                                    logger.info("nblap:"+str(self.nblap))
+                                    #logger.debug("nblap:"+str(self.nblap))
                                     self.chrono_started = True
                                     
                                     dt0 = self.getTime(self.gps_last_time)
                                     dt1 = self.getTime(self.gps_gpstime)
+                                    #logger.debug('gps_last_time:'+str(self.gps_last_time))
+                                    #logger.debug('gps_gpstime:'+str(self.gps_gpstime))
                                     
                                     # calculation of the distance between the previous point and the start-finish line
                                     dDp0 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_prevlat,self.gps_prevlon)
                                     # calculation of the distance between the current point and the start-finish line
                                     dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
                                 
-                                    #corrtime = self.chronoGpsTime - self.chronoPrevTime
-                                    
-                                    
-                                    #var corrtime = dt1.getTime() - dt0.getTime();
                                     corrtime = dt1 - dt0;
-                                    #logger.info('corrtime:'+str(corrtime))
 		
-                                    #var vs0 = (v0*1000)/3600;
-                                    #var vs1 = (v1*1000)/3600;
-                                    #var vmoy = (vs0+vs1)/2;
                                     v0 = self.gps.last_speed # speed at the previous point
                                     v1 = self.gps.gpsvitesse # speed at current point
                                     vmoy = (v0+v1)/2 # average speed to travel the straight line segment
                                     #
-                                    #var dc0 = dist0*(vs1/vmoy);
-                                    #var dc1 = dist1*(vs0/vmoy);                                    
                                     dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                                     dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
                                 #
-                                    #corrtime = corrtime * (dc0/(dc0+dc1));
-                                    #logger.info('corrtime (mic):'+str(getMicroseconds(corrtime)))
-                                    corrmic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
-                                    #logger.info('dc0:'+str(dc0))
-                                    #logger.info('dc1:'+str(dc1))
-                                    #logger.info('ratio:'+str((dc0/(dc0+dc1))))
-                                    #logger.info('corrmic:'+str(corrmic))
-                                    #corrtime = Math.round(corrtime);
-                                    #var temps = dt0.getTime() + corrtime;
+                                    corrtime = corrtime * (dc0/(dc0+dc1));
+                                    corrmic = getMicroseconds(corrtime)
                                     
-                                    #temps = dt0+timedelta(microseconds=corrmic)
                                     temps = timedelta(microseconds=corrmic)
+                                    #logger.debug('correction temps:'+str(temps))
+
+                                    self.chronoStartTime = dt0
+                                    #logger.debug('correction temps:'+str(temps))
+                                    
                                     self.temps_t = temps #
                                     self.temps_i = temps #
-                                    #logger.debug('temps_t:'+str(temps))
-		
-                                    
-
-                                    #logger.debug('chronoStartTime:'+str(self.chronoStartTime.seconds)+' sec,'+str(self.chronoStartTime.microseconds)+' mic')
-                                    #micro_seconds = self.chronoStartTime.seconds*1000000+self.chronoStartTime.microseconds
-                                    #micro_seconds = getMicroseconds(self.chronoStartTime)
-                                    #logger.debug('start micro_seconds:'+str(micro_seconds))
-                                    #logger.debug('auto_start_line lap:'+str(self.nblap))
-                                    #logger.debug('start_line:'+str(self.start_line))
                            
                                     self.lat0 = self.gps_prevlat
                                     self.lon0 = self.gps_prevlon
@@ -2557,9 +2530,16 @@ class AcqControl(threading.Thread):
                                     dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                                     dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
 
-                                    corrmic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
+                                    cormic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
 
-                                    temps = timedelta(microseconds=corrmic)
+                                    #logger.debug("Freq:["+str(self.Freq)+"]")
+                                    #logger.debug("corrFreq:["+str(self.corrFreq)+"]")
+                                    dt0 = self.getTime(self.gps_last_time)
+                                    dt1 = self.getTime(self.gps_gpstime)
+                                    diffTime = dt1 - dt0
+                                    #logger.debug("diffTime:["+str(diffTime)+"]")
+
+                                    temps = timedelta(microseconds=cormic)
                                     self.chrono.temps_t = temps #
                                     self.chrono.temps_i = temps #
                                     

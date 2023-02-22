@@ -1255,6 +1255,7 @@ function designLap(lap) {
 			parmCut.v1 = v1;
 			var Tcut = designCut(parmCut);
 			if (Tcut.linecut) {
+				//console.log(JSON.stringify(Points[i]));
 				pointCut = Tcut.pointCut;
 				time_start = Tcut.tdeb;
 				time_arrival = Tcut.tfin;
@@ -1420,6 +1421,8 @@ function designCut(parm) {
 		corrtime = corrtime * (dc0/(dc0+dc1));
 		corrtime = Math.round(corrtime);
 		var temps = dt0.getTime() + corrtime;
+		
+		//console.log('correction temps:'+corrtime)
 		
 		if (!tdeb) {
 			tdeb = temps;
