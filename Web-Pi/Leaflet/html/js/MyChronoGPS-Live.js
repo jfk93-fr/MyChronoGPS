@@ -810,11 +810,14 @@ function designCut(parm) {
 		var pointCut = getIntersection(linecoord,segcoords);
 		
 		var corrtime = dt1.getTime() - dt0.getTime();		
-		var vs0 = (v0*1000)/3600;
-		var vs1 = (v1*1000)/3600;
-		var vmoy = (vs0+vs1)/2;		
-		var dc0 = dist0*(vs1/vmoy);
-		var dc1 = dist1*(vs0/vmoy);
+		//var vs0 = (v0*1000)/3600;
+		//var vs1 = (v1*1000)/3600;
+		//var vmoy = (vs0+vs1)/2;
+		//var dc0 = dist0*(vs1/vmoy);
+		//var dc1 = dist1*(vs0/vmoy);
+		var vmoy = (v0+v1)/2;
+		var dc0 = dist0*(v1/vmoy);
+		var dc1 = dist1*(v0/vmoy);
 		corrtime = corrtime * (dc0/(dc0+dc1));
 		corrtime = Math.round(corrtime);
 		

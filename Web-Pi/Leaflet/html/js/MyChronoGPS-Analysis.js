@@ -1400,7 +1400,7 @@ function designCut(parm) {
 		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
 		//console.log('dist0:'+dist0);
-		var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
+		//var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
 		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
 		//console.log('dist1:'+dist1);
@@ -1411,12 +1411,15 @@ function designCut(parm) {
 		var corrtime = dt1.getTime() - dt0.getTime();
 		//console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
 		
-		var vs0 = (v0*1000)/3600;
-		var vs1 = (v1*1000)/3600;
-		var vmoy = (vs0+vs1)/2;
+		//var vs0 = (v0*1000)/3600;
+		//var vs1 = (v1*1000)/3600;
+		//var vmoy = (vs0+vs1)/2;
+		var vmoy = (v0+v1)/2;
 		
-		var dc0 = dist0*(vs1/vmoy);
-		var dc1 = dist1*(vs0/vmoy);
+		//var dc0 = dist0*(vs1/vmoy);
+		//var dc1 = dist1*(vs0/vmoy);
+		var dc0 = dist0*(v1/vmoy);
+		var dc1 = dist1*(v0/vmoy);
 	
 		corrtime = corrtime * (dc0/(dc0+dc1));
 		corrtime = Math.round(corrtime);
