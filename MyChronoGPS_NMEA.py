@@ -86,7 +86,6 @@ class NmeaControl():
         self.latitude = 0
         self.longitude = 0
         self.Freq = 0 # gps refresh rate
-        # self.gpstrames = []
         self.gpscomplete = False
         self.gpsrmcgga = 0
         
@@ -100,37 +99,23 @@ class NmeaControl():
         self.gpsvitesse = 0
         self.gpsnbsat = 0
         self.gpsalt = 0
+        self.datafifo = False
         
         self.fifo = pathcmd+'/pipes/GPSDATA' # the GPSDATA pipe contains the translated GPS data, it will be read by the Chrono program
         fileObj = os.path.exists(self.fifo)
         if fileObj == False:
             self.creer_fifo()
-            # fileObj = os.path.exists(self.fifo)
         
         self.buffer = ""
         
         self.gpsdict = dict() # data dictionary for the Chrono
         
-        self.track_mode = ON
+        self.fifo_mode = ON
 
         self.tracker = self.TrackerControl(self) # the class takes over the tracking
         self.write_busy = False
-        
-        self.GpsTrackerMode = 0
-        if "GpsTrackerMode" in self.parms.params:
-            self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
-        if self.GpsTrackerMode != 1:
-            self.track_mode = OFF
-        logger.info("GpsTrackerMode="+str(self.GpsTrackerMode))
-        # # "GpsTrackerEcoMode : fréquence d'acquisition du tracker. 0=OFF (acquisition=fréquence GPS), 1=ON(1 acquisition/seconde)"
-        # self.GpsTrackerEcoMode = 0
-        # if "GpsTrackerEcoMode" in self.parms.params:
-        #     self.GpsTrackerEcoMode = self.parms.params["GpsTrackerEcoMode"]
-        # GpsTrackerMinSpeed = 0
-        # if "GpsTrackerMinSpeed" in self.parms.params:
-        #     self.GpsTrackerMinSpeed = self.parms.params["GpsTrackerMinSpeed"]
-        # logger.info("GpsTrackerMinSpeed="+str(self.GpsTrackerMinSpeed))
-        logger.info("track_mode="+str(self.track_mode))
+
+        logger.info("fifo_mode="+str(self.fifo_mode))
 
         self.CoordsPrecision = 0
         self.precis = 1
@@ -154,8 +139,11 @@ class NmeaControl():
     def remove_fifo(self):
         fileObj = os.path.exists(self.fifo)
         if fileObj == True:
+            if self.datafifo == True:
+                self.read()
             logger.info("fifo GPSDATA is beeing removed")
             os.remove(self.fifo)
+            self.datafifo = False
         
     def parse(self,sentence):
         logger.debug("sentence to parse: "+str(sentence))
@@ -167,8 +155,6 @@ class NmeaControl():
         talker_indicator = self.NMEA[0]
         if str(talker_indicator)[0:1] != '$':
             print(("no talker indicator ("+str(talker_indicator)+")"))
-            # logger.setLevel(logging.DEBUG)
-            # logger.debug(str(self.NMEA))
             return
         self.idsender = talker_indicator[1:3]
         self.idtrame = talker_indicator[3:6]
@@ -321,7 +307,7 @@ class NmeaControl():
            self.write(self.buffer)
 
     def write(self,buff):
-        if self.track_mode == OFF:
+        if self.fifo_mode == OFF:
             return
         while self.write_busy == True:
             time.sleep(0.1)
@@ -332,9 +318,10 @@ class NmeaControl():
             if True:
                 os.write(pipe, str(buff+'\r\n').encode())
                 os.close(pipe)
+                self.datafifo = True # pour indiquer qu'il y a une donnée dans la file
         except OSError as err:
             logger.error("cannot use named pipe OS error: {0}".format(err))
-            self.track_mode = OFF
+            self.fifo_mode = OFF
             pass
         self.write_busy = False
         
@@ -365,11 +352,10 @@ class NmeaControl():
             self.gps = gps
             self.tracking = ON
             self.__current_state = self.CLOSED
+
             logger.info("TrackerControl init complete")
     
         def start(self):
-            # if self.gps.gpstime == 0:
-            #     return
             if self.__current_state != self.OPEN:
                 self.fileDescriptor = open(pathtraces+'/traces-'+formatDateTime(format="FILE")+'.nmea', 'a')
                 self.__current_state = self.OPEN
@@ -381,7 +367,6 @@ class NmeaControl():
             if self.__current_state != self.OPEN:
                 self.start()
             if self.__current_state == self.OPEN:
-                # logger.info(str(trames))
                 self.fileDescriptor.write(str(trames))
             else:
                 logger.info("unexcepted tracker file closed !")

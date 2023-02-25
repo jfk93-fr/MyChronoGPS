@@ -306,7 +306,6 @@ class GpsControl(threading.Thread):
         logger.info("end of GpsControl Thread of main program")
 
     def lire_fifo(self):
-        #logger.debug("lire_fifo GPSDATA")
         retour = ""
         if len(self.buffer) > 0:
             if self.buffer[0] == "":
@@ -322,12 +321,10 @@ class GpsControl(threading.Thread):
                 pass
         if len(self.buffer) > 0:
             retour = self.buffer.pop(0)
-        #logger.debug("GPSDATA lue")
         return retour
         
     def parse(self,sentence):
         self.buffstate = BUSY
-        #logger.debug("buffstate:"+str(self.buffstate))
         self.gpsdict = json.loads(sentence) 
         self.prevlat = self.latitude # prevlat and prevlon are used to calculate the last travelled line segment
         self.prevlon = self.longitude
@@ -401,7 +398,7 @@ class GpsControl(threading.Thread):
             return
             
         is_pipe = os.path.exists(self.gpscmd)
-        logger.info("is_pipe:"+str(is_pipe))
+        logger.debug("is_pipe:"+str(is_pipe))
         if is_pipe == True:
             try:
                 logger.info("try to open fifo GPSCMD")
@@ -409,16 +406,10 @@ class GpsControl(threading.Thread):
                 if True:
                     logger.info("write command E to fifo GPSCMD")
                     os.write(pipe, "EEEEE\r\n".encode())
-                    #os.close(pipe)
-                    #logger.info("end gps command,pipe "+str(self.gpscmd)+" closed")
             except OSError as err:
                 logger.error("cannot use named pipe GPS OS error: {0}".format(err))
                 pass
-
-        #if self.gpsactiv == False:
-        #    logger.info(str(self.fifo)+" gps not activ")
-        #    return
-
+        #
         try:
             pipe = os.open(self.fifo, os.O_WRONLY, os.O_NONBLOCK)
             if True:
@@ -1550,11 +1541,11 @@ class AnalysisControl():
         if self.Line1 == False:
             self.writeLine1()
         self.Line = '[{"timestamp":"'+str(self.chrono.time0)+'"'
-        self.Line += ',"tour":'+str(self.chrono.nblap)
+        #self.Line += ',"tour":'+str(self.chrono.nblap)
         self.Line += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
         #logger.debug("pointgps:"+str(self.chrono.lat0)+","+str(self.chrono.lon0))
         self.Line += '],"vitesse":'+str(self.chrono.speed0)
-        self.Line += ',"altitude":'+str(self.chrono.alt0)
+        #self.Line += ',"altitude":'+str(self.chrono.alt0)
         self.Line += ',"cap":'+str(self.chrono.cap0)+'}]'
         self.write(self.Line)
     #    

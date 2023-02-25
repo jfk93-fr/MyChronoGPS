@@ -19,7 +19,6 @@ import os
 import time
 from datetime import timedelta, datetime, tzinfo
 
-#from serial import Serial
 import serial
 
 import threading
@@ -111,6 +110,23 @@ class GpsControl(threading.Thread):
         self.nmea = NmeaControl()
         self.serialGps = serial.Serial()
 
+        self.GpsTrackerMode = 0
+        if "GpsTrackerMode" in self.parms.params:
+            self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
+        if self.GpsTrackerMode != 1:
+            self.nmea.tracker.set_tracking(OFF)
+        logger.info("GpsTrackerMode="+str(self.GpsTrackerMode))
+        # "GpsTrackerEcoMode : fréquence d'acquisition du tracker. 0=OFF (acquisition=fréquence GPS), 1=ON(1 acquisition/seconde)"
+        self.GpsTrackerEcoMode = 0
+        if "GpsTrackerEcoMode" in self.parms.params:
+            self.GpsTrackerEcoMode = self.parms.params["GpsTrackerEcoMode"]
+        logger.info("GpsTrackerEcoMode="+str(self.GpsTrackerEcoMode))
+    
+        GpsTrackerMinSpeed = 0
+        if "GpsTrackerMinSpeed" in self.parms.params:
+            self.GpsTrackerMinSpeed = self.parms.params["GpsTrackerMinSpeed"]
+        logger.info("GpsTrackerMinSpeed="+str(self.GpsTrackerMinSpeed))
+
         self.buffstate = BUSY
         self.activateGPS()
         self.gpsfix = self.VALID
@@ -178,19 +194,13 @@ class GpsControl(threading.Thread):
                 cpt = cpt + 1
                 time.sleep(0.01)
             if self.buffstate == FREE:
-                #self.gpsline = str(self.serialGps.readline().decode('UTF-8'))
                 gpsline = self.serialGps.readline()
-                # print(gpsline)
                 self.gpsline = str(gpsline)
-                # print(self.gpsline)
 
                 try:
                     self.gpsline = gpsline.decode()
-                    # self.nmea.tracker.write(self.gpsline) # write sentence in trace file
                 except: # si la fonction decode n'a pas marché, c'est que le gps a envoyé une séquence en binaire
                     logger.info("decode failed")
-                    # chkdata = gpsline.split("\r\n")
-                    # logger.info("chkdata:"+str(chkdata[0]))
                     self.gspline = str(gpsline)
                 
                 self.nmea.tracker.write(self.gpsline) # write sentence in trace file
@@ -199,7 +209,6 @@ class GpsControl(threading.Thread):
                 cksum = chksum_nmea(self.gpsline)
                 
                 if cksum != False:
-                    # self.gpstrames.append(self.gpsline)
                     self.nmea.parse(self.gpsline) # parse sentence to send to chrono
                 else:
                     logger.debug("bad checksum:"+self.gpsline)
@@ -207,21 +216,22 @@ class GpsControl(threading.Thread):
             else:
                 logger.debug("wait for buffer:"+str(self.buffstate))
                 time.sleep(0.01)
-            # logger.info("running:"+str(self.__running))
-
         #
-        self.nmea.remove_fifo()
+        #logger.setLevel(logging.DEBUG)
+        #logger.debug("try to remove GPSDATA fifo")
+        #self.nmea.remove_fifo()
 
         logger.info("end of GpsControl Thread of GPS program")
         
     def stop(self):
         self.gpsactiv = False
-        # logger.debug("stop gps, activ:"+str(self.gpsactiv))
         logger.info("stop gps, activ:"+str(self.gpsactiv))
-        #jfk
         self.__running = False
-        buffer = self.nmea.read()
-        print(str(buffer))
+        #buffer = self.nmea.read()
+        #print(str(buffer))
+        #logger.setLevel(logging.DEBUG)
+        #logger.debug("try to remove GPSDATA fifo")
+        self.nmea.remove_fifo()
         
     def disable(self):
         self.buffstate = BUSY
@@ -298,10 +308,16 @@ class GpsCommand(threading.Thread):
             self.lire_fifo()
             time.sleep(0.5) # wait            
 
-        self.gps.stop()
-        time.sleep(0.5) # wait            
-
+        #logger.setLevel(logging.DEBUG)
+        #logger.debug("end while run GpsCommand")
+        #
+        #logger.debug("try to remove GPSCMD fifo")
         self.remove_fifo()
+
+        #logger.debug("stop gps require")
+        self.gps.stop()
+        #logger.debug("wait for stop gps")
+        time.sleep(0.5) # wait            
         
         logger.info("end of GpsCommand Thread of GPS program")
 
@@ -330,7 +346,7 @@ class GpsCommand(threading.Thread):
             logger.info("gps stop")
             self.__running = False
             # self.gps.stop()
-            # self.stop()
+            self.stop()
             
         else:
             logger.error("invalid command:["+str(commande)+"]")
@@ -544,18 +560,23 @@ if __name__ == "__main__":
         while gps.gpsactiv:
             time.sleep(1)
 
+        #logger.setLevel(logging.DEBUG)
+        #logger.debug("end while gpsactiv")
+
         # if gps != False:
-        #     logger.info("gps not False")
+        #     logger.debug("gps not False")
         #     gps.stop()
         # if gpscmd != False:
         #     logger.info("gpscmd not False")
         #     gpscmd.stop()
-        if gps != False:
-            gps.stop()
-            gps.join()
         if gpscmd != False:
-            gpscmd.stop()
+            logger.debug("gpscmd not False")
+            #gpscmd.stop()
             gpscmd.join()
+        if gps != False:
+            logger.debug("gps not False")
+            #gps.stop()
+            gps.join()
                 
     except KeyboardInterrupt:
         print("User Cancelled (Ctrl C)")

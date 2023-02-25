@@ -820,7 +820,7 @@ function buildTours(FL) {
 				Point.lat1 = Point1.pointgps[0];
 				Point.lon1 = Point1.pointgps[1];
 				Point.vitesse = Point1.vitesse;
-				Point.altitude = Point1.altitude;
+				//Point.altitude = Point1.altitude;
 				Point.cap = Point1.cap;
 		
 				Tour.points.push(Point);
@@ -846,7 +846,7 @@ function buildTours(FL) {
 			Point.lat1 = Point0.pointgps[0];
 			Point.lon1 = Point0.pointgps[1];
 			Point.vitesse = Point0.vitesse;
-			Point.altitude = Point0.altitude;
+			//Point.altitude = Point0.altitude;
 			Point.cap = Point1.cap;
 	
 			Tour.points.push(Point);
@@ -901,7 +901,7 @@ function buildTours(FL) {
 		Point.lat1 = Point1.pointgps[0];
 		Point.lon1 = Point1.pointgps[1];
 		Point.vitesse = Point1.vitesse;
-		Point.altitude = Point1.altitude;
+		//Point.altitude = Point1.altitude;
 		Point.cap = Point1.cap;
 
 		curr_coord++
@@ -916,7 +916,7 @@ function buildTours(FL) {
 			Point.lat1 = Tours[nt].points[np].lat1;
 			Point.lon1 = Tours[nt].points[np].lon1;
 			Point.vitesse = Tours[nt].points[np].vitesse;
-			Point.altitude = Tours[nt].points[np].altitude;
+			//Point.altitude = Tours[nt].points[np].altitude;
 			Point.cap = Tours[nt].points[np].cap;
 			Tours[nt-1].points.push(Point);
 		}
@@ -939,7 +939,7 @@ function buildTours(FL) {
 				Point.lat1 = Tours[nt].points[np].lat1;
 				Point.lon1 = Tours[nt].points[np].lon1;
 				Point.vitesse = Tours[nt].points[np].vitesse;
-				Point.altitude = Tours[nt].points[np].altitude;
+				//Point.altitude = Tours[nt].points[np].altitude;
 				Point.cap = Tours[nt].points[np].cap;
 				Tours[nt-1].points.push(Point);
 			}
@@ -2260,7 +2260,7 @@ function showMobile() {
 	//simup1.setMap(map);
 	var	title = 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
 		        'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
-		        'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
+		        //'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
                 'cap:'+Math.round(Tours[il].points[i1].cap*10)/10+'° ';
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
@@ -2294,7 +2294,7 @@ function showMobile() {
 	// calcul de l'accélération
 	var accel = (((Tours[il].points[i1].vitesse - Tours[il].points[i0].vitesse)) * Frequence) / gkmh;
 	
-	var altitude = Tours[il].points[i1].altitude;
+	//var altitude = Tours[il].points[i1].altitude;
 	var cap = Tours[il].points[i1].cap;
 	
 	// affichage du compteur
@@ -2370,11 +2370,11 @@ function showMobile() {
 		el.innerHTML = Math.round(dist)+"m";
 	}
 
-	// affichage de l'altitude
-	var el = document.getElementById('altitude');
-	if (el) {
-		el.innerHTML = 'alt:'+Math.round(altitude)+"m";
-	}
+	//// affichage de l'altitude
+	//var el = document.getElementById('altitude');
+	//if (el) {
+	//	el.innerHTML = 'alt:'+Math.round(altitude)+"m";
+	//}
 
 	// affichage du cap
 	var el = document.getElementById('cap');
