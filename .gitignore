@@ -6,3 +6,4 @@ userdata/analysis/
 userdata/traces/
 userdata/sessions/
 userdata/savetracks/
+*.pyc
