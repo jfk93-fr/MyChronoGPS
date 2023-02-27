@@ -34,7 +34,7 @@ function loadParmsAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				try {Parms = JSON.parse(this.responseText);}
 				catch(e) {Parms = this.responseText;}
 			}
@@ -54,9 +54,9 @@ function loadParmsAjax(proc)
 loadParms();
 
 function dataParmsReady() {
-	console.log(JSON.stringify(Parms));
+	//console.log(JSON.stringify(Parms));
 	var myKey = Parms[0].GoogleMapsAPIKey;
-	console.log(myKey);
+	//console.log(myKey);
 	data_ready = true;
 	var mapl = document.getElementById("maploader");
 	if (myKey) {

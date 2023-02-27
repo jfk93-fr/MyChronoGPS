@@ -36,7 +36,7 @@ function loadParmsAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				try {Parms = JSON.parse(this.responseText);}
 				catch(e) {Parms = this.responseText;}
 			}
@@ -75,10 +75,10 @@ function go()
 	*/
 	var listeHTML = '<div class="w3-responsive"><table id="tabsessions"class="w3-table-all">';
 	if (Parms.length > 0) {
-		console.log(Parms[0]);
+		//console.log(Parms[0]);
 		Parms.params = Parms[0];
 		for (variable in Parms.params) {
-			console.log(variable);
+			//console.log(variable);
 			if (variable.substr(0,1) == "#") {
 				listeHTML += '<tr><td>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
 			}
@@ -91,10 +91,10 @@ function go()
 	/*
 	var listeHTML = '';
 	if (Parms.length > 0) {
-		console.log(Parms[0]);
+		//console.log(Parms[0]);
 		Parms.params = Parms[0];
 		for (variable in Parms.params) {
-			console.log(variable);
+			//console.log(variable);
 			if (variable.substr(0,1) == "#") {
 				listeHTML += '<li>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
 			}
@@ -141,7 +141,7 @@ function createNewParms() {
 	}
 
 	for (property in NewParms) {
-		console.log(property+':'+NewParms[property]);
+		//console.log(property+':'+NewParms[property]);
 	}
 }
 
@@ -153,7 +153,7 @@ function saveParms() {
 	dataPost = new FormData();
 	dataPost.append("parms", json);
 
-	console.log(JSON.stringify(dataPost));
+	//console.log(JSON.stringify(dataPost));
 	
 	upLoadParmsAjax(fname_save);
 	
@@ -169,7 +169,7 @@ function upLoadParmsAjax(proc)
 				//alert("responseText:"+this.responseText);
 				console.log(this.responseText);
 				try {dataReturn = JSON.parse(this.responseText);
-					console.log(JSON.stringify(dataReturn));
+					//console.log(JSON.stringify(dataReturn));
 					var el = document.getElementById("zone-info");
 					if (el)
 						el.innerHTML = "fichier paramètre sauvegard&eacute;";

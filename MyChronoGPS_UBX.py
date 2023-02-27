@@ -109,23 +109,34 @@ class GpsControl(threading.Thread):
 
         self.nmea = NmeaControl()
         self.serialGps = serial.Serial()
-
+        
+        self.gpstracker = False
         self.GpsTrackerMode = 0
         if "GpsTrackerMode" in self.parms.params:
             self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
         if self.GpsTrackerMode != 1:
             self.nmea.tracker.set_tracking(OFF)
         logger.info("GpsTrackerMode="+str(self.GpsTrackerMode))
-        # "GpsTrackerEcoMode : fréquence d'acquisition du tracker. 0=OFF (acquisition=fréquence GPS), 1=ON(1 acquisition/seconde)"
-        self.GpsTrackerEcoMode = 0
-        if "GpsTrackerEcoMode" in self.parms.params:
-            self.GpsTrackerEcoMode = self.parms.params["GpsTrackerEcoMode"]
-        logger.info("GpsTrackerEcoMode="+str(self.GpsTrackerEcoMode))
-    
-        GpsTrackerMinSpeed = 0
-        if "GpsTrackerMinSpeed" in self.parms.params:
-            self.GpsTrackerMinSpeed = self.parms.params["GpsTrackerMinSpeed"]
-        logger.info("GpsTrackerMinSpeed="+str(self.GpsTrackerMinSpeed))
+        ## "GpsTrackerEcoMode : fréquence d'acquisition du tracker. 0=OFF (acquisition=fréquence GPS), 1=ON(1 acquisition/seconde)"
+        #self.GpsTrackerEcoMode = 0
+        #if "GpsTrackerEcoMode" in self.parms.params:
+        #    self.GpsTrackerEcoMode = self.parms.params["GpsTrackerEcoMode"]
+        #logger.info("GpsTrackerEcoMode="+str(self.GpsTrackerEcoMode))
+        #
+        #self.GpsTrackerMinSpeed = 0
+        #if "GpsTrackerMinSpeed" in self.parms.params:
+        #    self.GpsTrackerMinSpeed = self.parms.params["GpsTrackerMinSpeed"]
+        #logger.info("GpsTrackerMinSpeed="+str(self.GpsTrackerMinSpeed))        
+        #
+        #self.TravelMode = 0
+        #if "TravelMode" in self.parms.params:
+        #    self.TravelMode = self.parms.params["TravelMode"]
+        #logger.info("TravelMode="+str(self.TravelMode))        
+        #
+        #self.TravelTrackingTime = 60
+        #if "TravelTrackingTime" in self.parms.params:
+        #    self.TravelTrackingTime = self.parms.params["TravelTrackingTime"]
+        #logger.info("TravelTrackingTime="+str(self.TravelTrackingTime))        
 
         self.buffstate = BUSY
         self.activateGPS()
@@ -280,7 +291,7 @@ class GpsCommand(threading.Thread):
         else:
             logger.info("fifo GPS already exists")
         
-        print("GpsCommand init complete")
+        logger.info("GpsCommand init complete")
 
     def creer_fifo(self):
         try:
@@ -432,6 +443,34 @@ class GpsCommand(threading.Thread):
     def stop(self):
         self.__running = False
 
+
+#class GpsTracker(threading.Thread):
+#        
+#    def __init__(self,gps):
+#        threading.Thread.__init__(self)
+#        self.gps = gps
+#        self.wait = 0.98
+#        if self.gps.TravelMode == 1:
+#            self.wait = self.gps.TravelTrackingTime - 0.02
+#        
+#        logger.info("GpsTracker init complete")
+#
+#    def run(self):
+#        self.__running = True
+#        logger.info("GpsTracker running:"+str(self.__running))
+#        while self.__running:
+#            self.gps.nmea.tracker.set_tracking(OFF)
+#            #logger.info("wait for "+str(self.wait)+"seconds")
+#            time.sleep(self.wait)
+#            self.gps.nmea.tracker.set_tracking(ON)
+#            while self.__running and self.gps.nmea.tracker.writed == 0:
+#                time.sleep(0.02)
+#        logger.info("end of GpsTracker Thread of GPS program")
+#        
+#    def stop(self):
+#        self.__running = False
+#        logger.info("GpsTracker running:"+str(self.__running))
+
 #        
 ## technical procedures 
 ########################
@@ -551,6 +590,14 @@ if __name__ == "__main__":
 
         gps = GpsControl()
         gps.start()
+        ##
+        ## on regarde si on a besoin d'un thread pour gérer le tracking
+        #logger.info("gps.GpsTrackerMode:"+str(gps.GpsTrackerMode))
+        #logger.info("gps.GpsTrackerEcoMode:"+str(gps.GpsTrackerEcoMode))
+        #logger.info("gps.gpstracker:"+str(gps.gpstracker))
+        #if gps.GpsTrackerMode == 1 and gps.GpsTrackerEcoMode == 1:
+        #    gps.gpstracker = GpsTracker(gps)
+        #    gps.gpstracker.start()
 
         gpscmd = False
 
@@ -569,6 +616,10 @@ if __name__ == "__main__":
         # if gpscmd != False:
         #     logger.info("gpscmd not False")
         #     gpscmd.stop()
+        #if gps.gpstracker != False:
+        #    logger.debug("gps.gpstracker not False")
+        #    gps.gpstracker.stop()
+        #    gps.gpstracker.join()
         if gpscmd != False:
             logger.debug("gpscmd not False")
             #gpscmd.stop()

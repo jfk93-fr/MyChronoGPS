@@ -17,6 +17,9 @@ class Parms(): # classe qui retient les informations paramètres
                 fparams = Path.pathdata+'/parms/params.json'
                 command = 'cp '+fparams+' '+fparmcache
                 proc_retval = subprocess.check_output(shlex.split(command))
+
+                command = 'sh '+Path.pathcmd+'/MyChronoGPS_Auth.sh'
+                proc_retval = subprocess.check_output(shlex.split(command))
             
             ParamsFD = open(fparmcache, 'r')
             self.params = json.loads(ParamsFD.read())

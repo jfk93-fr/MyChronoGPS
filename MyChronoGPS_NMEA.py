@@ -351,6 +351,8 @@ class NmeaControl():
         def __init__(self,gps):
             self.gps = gps
             self.tracking = ON
+            #self.writen = 0
+            #self.nmeatime = ""
             self.__current_state = self.CLOSED
 
             logger.info("TrackerControl init complete")
@@ -363,11 +365,16 @@ class NmeaControl():
                         
         def write(self,trames):
             if self.tracking != ON:
+                #self.writen = 0
                 return
             if self.__current_state != self.OPEN:
                 self.start()
             if self.__current_state == self.OPEN:
                 self.fileDescriptor.write(str(trames))
+                #self.writen = 1
+                #if self.gps.nmeatime != self.nmeatime:
+                #    self.writen = 1
+                #self.nmeatime = self.gps.nmeatime
             else:
                 logger.info("unexcepted tracker file closed !")
             

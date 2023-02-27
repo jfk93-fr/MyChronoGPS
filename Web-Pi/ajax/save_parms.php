@@ -5,12 +5,15 @@ $dcache = $ajaxroot.'MyChronoGPS/cache';
 
 $result = null;
 if (!is_dir ($dir)) {
-	die ('problème lecture répertoire '.$dir);
+	print('problème lecture répertoire '.$dir);
+	die;
 }
 
 // on récupère les données POST
-if (!array_key_exists("parms",$_POST))
-	die('problème d\'accès aux données POST');
+if (!array_key_exists("parms",$_POST)) {
+	print('problème d\'accès aux données POST');
+	die;
+}
 
 $Parms = $_POST["parms"];
 $data = json_decode($Parms);
@@ -19,28 +22,31 @@ $Parms = json_encode($data,JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
 $filename = $dir.'/params.json';
 $fichier=fopen($filename,"w+");
 if ($fichier == false) {
-	die ('problème ouverture fichier '.$filename);
+	print('problème ouverture fichier '.$filename);
+	die;
 }
 fputs($fichier,$Parms);
 fclose($fichier);
 $mode = 775;
-if (!chmod($filename, octdec($mode)))
-	die('problème changement droits d\'accès fichier '.$filename);
+if (!chmod($filename, octdec($mode))) {
+	print('problème changement droits d\'accès fichier '.$filename);
+	die;
+}
 
-$filename = $dcache.'/PARAMS';
+$filename = $dcache.'/PARMS';
 $fichier=fopen($filename,"w+");
 if ($fichier == false) {
-	echo ('problème ouverture fichier '.$filename);
+	print('problème ouverture fichier '.$filename);
 	die;
 }
 fputs($fichier,$Parms);
 fclose($fichier);
 $mode = 777;
 if (!chmod($filename, octdec($mode))) {
-	echo('problème changement droits d\'accès fichier '.$filename);
+	print('problème changement droits d\'accès fichier '.$filename);
 	die;
 }
 
-echo $Parms;
+print($Parms);
 exit;
 ?>
