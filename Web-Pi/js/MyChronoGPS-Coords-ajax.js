@@ -70,7 +70,7 @@ function loadCoordsAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				try {Coords = JSON.parse(this.responseText);
 					nb_coords = Coords.length;
 				}
@@ -132,7 +132,7 @@ function loadCoordsAjax(proc)
 //			if (FileContent[i] == "")
 //				FileContent.pop();
 //
-//			console.log(JSON.stringify(file));
+//			//console.log(JSON.stringify(file));
 //			//alert('name:'+file.name);
 //			var ext = file.name.split('.');
 //			var ie = ext.length-1;
@@ -161,25 +161,25 @@ function convertNMEA() {
 		parse_nmea(gpsline);
 	}
 	nb_coords = Coords.length;
-	console.log("Coords:"+Coords.length);
+	//console.log("Coords:"+Coords.length);
 }
 
 function parse_nmea(sentence) {
     NMEA = sentence.split(",");
 	// le premier élément commence par $, suivi de 2 caractères identifiant l'émetteur de la trame, suivi de 3 caractères identifiant la trame
 	if (NMEA[0].substr(0,1) != '$') {
-		console.log("no talker indicator ("+NMEA[0].substr(0,1)+")");
+		//console.log("no talker indicator ("+NMEA[0].substr(0,1)+")");
 		return;
 	}
 	idsender = NMEA[0].substr(1,2);
-	console.log("sender:"+idsender);
+	//console.log("sender:"+idsender);
 	idtrame = NMEA[0].substr(3,3);
-	console.log("idtrame:"+idtrame);
+	//console.log("idtrame:"+idtrame);
 	
 	getTimeNmea(); // on va rechercher un temps dans la trame
         
 	// on regarde si le temps à changer par rapport au temps du paquet
-	console.log("times nmea/packet:"+nmeatime+"/"+packettime);
+	//console.log("times nmea/packet:"+nmeatime+"/"+packettime);
 	if (nmeatime > 0) { //est-ce que la trame en cours possède 1 temps
 		if (packettime > 0) { // est-ce qu'il y a un temps associé au paquet
 			if (nmeatime != packettime) {
@@ -195,7 +195,7 @@ function parse_nmea(sentence) {
 	}
 	if (idtrame == "GGA") {
 		if (NMEA.length < 12) {
-			console.log("invalid GGA:"+sentence)
+			//console.log("invalid GGA:"+sentence)
 			gpsfix = INVALID
 		}
 		else {
@@ -221,7 +221,7 @@ function parse_nmea(sentence) {
 	
 	if (idtrame == "RMC") {
 		if (NMEA.length < 9) {
-			console.log("invalid RMC:"+sentence)
+			//console.log("invalid RMC:"+sentence)
 			gpsfix = INVALID;
 		}
 		else {
@@ -282,7 +282,7 @@ function getTimeNmea() {
 }
             
 function createPacket() {
-	console.log("gpsrmcgga:"+gpsrmcgga);
+	//console.log("gpsrmcgga:"+gpsrmcgga);
 	if (gpsrmcgga < 2) { // les données ne sont pas complètes, on ne crée pas le paquet
 		gpsrmcgga = 0;
 		packettime = nmeatime;
@@ -290,7 +290,7 @@ function createPacket() {
 	}
 	gpstime = packettime;
 	// on va calculer l'heure et la date locale
-	console.log("["+nmeatime+"/"+packettime+"]")
+	//console.log("["+nmeatime+"/"+packettime+"]")
 	JJ = gpsdate.substr(0,2);
 	MM = gpsdate.substr(2,2);
 	AA = "20"+gpsdate.substr(4,2);
@@ -353,7 +353,7 @@ function nmea_send() {
 		if (thisCircuit.Int3)
 			Coord.Int3 = thisCircuit.Int3;
 		Coord.date = gpsdate;
-		console.log(JSON.stringify(Coord));
+		//console.log(JSON.stringify(Coord));
 		Coords.push(new Array(Coord));
 		
 		Coord = new Object()

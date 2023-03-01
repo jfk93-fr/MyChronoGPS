@@ -174,7 +174,7 @@ function addTracks(mousePt) {
 	var mouseCoord = mouseLatLng.toUrlValue();
 	var mouseLat = mouseLatLng.lat();
 	var mouseLon = mouseLatLng.lng();
-	console.log("un circuit va être créer à "+mouseLat+","+mouseLon);
+	//console.log("un circuit va être créer à "+mouseLat+","+mouseLon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";
@@ -188,12 +188,12 @@ function addTracks(mousePt) {
 function markCircuit() {
 	var listeHTML = '<div class="w3-container"><ul>';
 	for (var i=0; i < Circuit.circuits.length; i++) {
-		console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
+		//console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
 		var dist = distanceGPS(lat,lng,Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude);
 		icon_image = icon_image_off;
 		//if (dist > rayon)
 		//	icon_image = icon_image_off;
-		console.log(Circuit.circuits[i].NomCircuit+' est situé à '+dist);
+		//console.log(Circuit.circuits[i].NomCircuit+' est situé à '+dist);
 		createMarker(Circuit.circuits[i]);
 		// remplissage de la liste des circuits
 		IdCircuit  = Circuit.circuits[i].IdCircuit;
@@ -287,7 +287,7 @@ function createMarker(circuit,newlat,newlon)
 		url = 'id='+circuit.NomCircuit;
 	}
 	else {
-		console.log("on va demander l'affichage d'un nouveau circuit");
+		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 
@@ -325,7 +325,7 @@ function showCircuit(nomcircuit) {
 		url = 'id='+nomcircuit;
 	}
 	else {
-		console.log("on va demander l'affichage d'un nouveau circuit");
+		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 	w = window.open (page+'?'+url,'popup', 'menubar=1, location=0, toolbar=1, directories=0, status=1, scrollbars=1, resizable=1, width=1055, height=700') ; 
@@ -348,13 +348,13 @@ function showCircuit(nomcircuit) {
 //	retour_geolocation = true;
 //	switch( error.code ) {
 //		case error.PERMISSION_DENIED:
-//			console.log( 'L\'utilisateur a refusé la demande' );
+//			//console.log( 'L\'utilisateur a refusé la demande' );
 //			break;     
 //		case error.POSITION_UNAVAILABLE:
-//			console.log( 'Position indéterminée' );
+//			//console.log( 'Position indéterminée' );
 //			break;
 //		case error.TIMEOUT:
-//			console.log( 'Réponse trop lente' );
+//			//console.log( 'Réponse trop lente' );
 //			break;
 //	}
 //	// Function alternative
@@ -438,7 +438,7 @@ function showPoint() {
 	
 	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 		return
-	console.log("un circuit va être créer à "+lat+","+lon);
+	//console.log("un circuit va être créer à "+lat+","+lon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";

@@ -77,10 +77,10 @@ function dataParmsReady() {
 //{
 //	var listeHTML = '';
 //	if (Parms.length > 0) {
-//		console.log(Parms[0]);
+//		//console.log(Parms[0]);
 //		Parms.params = Parms[0];
 //		for (variable in Parms.params) {
-//			console.log(variable);
+//			//console.log(variable);
 //			if (variable.substr(0,1) == "#") {
 //				listeHTML += '<li>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
 //			}

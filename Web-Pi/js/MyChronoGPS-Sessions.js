@@ -11,7 +11,7 @@ function loadSessions()
 {
 	var chaine = getSessions(fname);
 	isSessionsReady();
-	console.log(chaine);
+	//console.log(chaine);
 }
 
 function getSessions(proc) {
@@ -19,7 +19,7 @@ function getSessions(proc) {
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
 		    //alert("responseText:"+this.responseText);
-			console.log(this.responseText);
+			//console.log(this.responseText);
             try {Sessions = JSON.parse(this.responseText);}
 			catch(e) {Sessions = this.responseText;}
         }
@@ -46,7 +46,7 @@ loadSessions();
 function dataSessionsReady()
 {
 	var string2display = JSON.stringify(Sessions);
-	console.log(string2display);
+	//console.log(string2display);
 	if (Array.isArray(Sessions)) {
 		afficheListeSessions();
 	}

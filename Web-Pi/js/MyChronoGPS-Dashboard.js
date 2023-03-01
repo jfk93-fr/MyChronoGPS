@@ -60,8 +60,8 @@ function go()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('go() erreur');
-		console.log(Dashboard);
+		//console.log('go() erreur');
+		//console.log(Dashboard);
 			//el.innerHTML = Live;
 		return false;
 	}
@@ -315,8 +315,8 @@ function isDisplayReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('isDisplayReady() erreur');
-		console.log(Dashboard);
+		//console.log('isDisplayReady() erreur');
+		//console.log(Dashboard);
 		return false;
 	}
 
@@ -485,8 +485,8 @@ function isInfosReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('isInfosReady() erreur');
-		console.log(Infos);
+		//console.log('isInfosReady() erreur');
+		//console.log(Infos);
 		timerInfos = setTimeout(getInfos, 3000);
 		return false;
 	}
@@ -582,7 +582,7 @@ function isInfosReady()
 			}
 		}
 	}
-	catch(e) {console.log(JSON.stringify(Infos));}
+	catch(e) {//console.log(JSON.stringify(Infos));}
 /*
 
     def createPoint(self):

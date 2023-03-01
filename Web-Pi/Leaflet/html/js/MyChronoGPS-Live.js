@@ -656,6 +656,7 @@ function go()
 	displayMap();
 	
 	showMobile();
+	document.getElementById("zone-info").innerHTML = '';
 }
 
 function initCircuit(track) {
@@ -729,7 +730,7 @@ function drawLineWithCap(objline) {
 	// on recherche le point B à 50 mètres du point A selon le cap fourni
 	var dist = 50; // 50m
 	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);
-	console.log('destination:'+B);
+	//console.log('destination:'+B);
 	
 	var A = new Array(objline.lat,objline.lon);
 	// On marque le point actuel qui représente le milieu du segment de droite
@@ -758,7 +759,7 @@ function drawLineWithCap(objline) {
 	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
 	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
 	var icoord = getPerpendiculaire(A,B);
-	console.log(icoord);
+	//console.log(icoord);
 	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	
@@ -821,9 +822,9 @@ function designCut(parm) {
 		corrtime = corrtime * (dc0/(dc0+dc1));
 		corrtime = Math.round(corrtime);
 		
-		console.log('last time:'+Point0.timestamp)
-		console.log('gps  time:'+Point1.timestamp)
-		console.log('correction temps:'+corrtime)
+		//console.log('last time:'+Point0.timestamp)
+		//console.log('gps  time:'+Point1.timestamp)
+		//console.log('correction temps:'+corrtime)
 
 		if (!tdeb) {
 			tdeb = dt0.getTime() + corrtime;

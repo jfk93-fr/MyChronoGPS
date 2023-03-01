@@ -167,7 +167,7 @@ function upLoadParmsAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				try {dataReturn = JSON.parse(this.responseText);
 					//console.log(JSON.stringify(dataReturn));
 					var el = document.getElementById("zone-info");

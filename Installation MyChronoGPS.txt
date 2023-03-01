@@ -41,6 +41,7 @@ La suite de l'installation s'effectue à partir du rpi ou via une connexion ssh.
 			}
 		Remplacer "first access point" par le ssid du réseau wifi de votre box.
 		Remplacer "acces key" par le mot de passe wifi de votre box.
+		Ajouter autant de groupe network que vous avez de réseau wifi (box, smartphone en point d'accès, etc).
 		Sauvegarder le fichier.
 		Le raspberry sera configuré automatiquement pour démarrer avec le réseau wifi de votre box.
 		Il suffira ensuite de répérer l'adresse ip du raspberry pour s'y connecter en ssh

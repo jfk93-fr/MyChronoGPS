@@ -55,7 +55,7 @@ function switchGraph() {
 	var maxcols = tabShow.length;
 	// Boucle de construction des graphiques des tours sélectionnés
 	for (var i=0; i < maxcols; i++) {
-		console.log(tabShow);
+		//console.log(tabShow);
 		var il = tabShow[i]-1;
 		//drawChartLap(il);
 		datag.addColumn('number', 'T'+(il+1)); 
@@ -63,7 +63,7 @@ function switchGraph() {
 			maxrows = Tours[il].geocoords.length;
 		}
 	}
-	console.log(maxrows);
+	//console.log(maxrows);
 	// préparation du tableau graphe
 	tabGraph = new Array();
 	for (var i=0; i < maxrows; i++) {
@@ -84,7 +84,7 @@ function switchGraph() {
 			tabGraph[i][j] = lapGraph[i];
 		}
 	}
-	console.log(JSON.stringify(tabGraph));
+	//console.log(JSON.stringify(tabGraph));
 
 	for (var i=0; i < maxrows; i++) {
 		datag.setCell(i,0,i);
@@ -171,7 +171,7 @@ function setMarkerpoint(x,y) {
 	}
 	var cap = point2mark.cap;
 	var markerpoint = {lat: point2mark.lat(), lng: point2mark.lon()};
-	console.log(markerpoint);
+	//console.log(markerpoint);
 	graphmarker = new google.maps.Marker({
 		position: markerpoint, 
 		title: 'T:\t'+lap+'\r\n'+
@@ -197,12 +197,12 @@ function setMarkerpoint(x,y) {
 }
 
 function changeMobilePoint(ev) {
-	console.log(JSON.stringify(ev));
+	//console.log(JSON.stringify(ev));
 	var x = lieu[0].row;
 	var y = lieu[0].column-1;
 	var lap = tabShow[y];
 	var il = lap-1;
-	console.log(JSON.stringify(Tours[il].geocoords));
+	//console.log(JSON.stringify(Tours[il].geocoords));
 	// recherche du point le plus proche du marker mobile
 	var mindist = 999999;
 	var dist;
@@ -213,14 +213,14 @@ function changeMobilePoint(ev) {
 		var latb = Tours[il].geocoords[ip].lat();
 		var lngb = Tours[il].geocoords[ip].lng();
 		dist = distanceGPS(new Array(lata,lnga),new Array(latb,lngb));
-		console.log('dist:'+dist);
+		//console.log('dist:'+dist);
 		if (dist < mindist) {
 			mindist = dist;
 			im = ip;
 		}
 	}
-	console.log('mindist:'+mindist);
-	console.log('indice point:'+im);
+	//console.log('mindist:'+mindist);
+	//console.log('indice point:'+im);
 	// on place le mobile sur le point le plus près qu'on a trouvé
 	var point2mark = tabGraph[im][0];
 
@@ -278,7 +278,7 @@ function drawChartLap(il) {
 		
 		lapGraph.push(ograph);
 	}
-	console.log('longueur Graph'+lapGraph.length);
+	//console.log('longueur Graph'+lapGraph.length);
 }
 
 function graphRelease() {

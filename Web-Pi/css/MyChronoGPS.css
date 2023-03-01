@@ -929,6 +929,34 @@ html, body, h1, h2, h3, h4, h5, h6 {
 	background-repeat: no-repeat;
 }
 
+.btnpencil {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/pencil.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btndelete {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/delete.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btndraw {
+	padding:8px 20px;
+	width:  36px;
+	height: 36px;
+	background-image: url(../img/draw.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.minibtn {
+	background-size: 18px 18px;
+}
+
 
 .zone-info {
 	width:  90%;

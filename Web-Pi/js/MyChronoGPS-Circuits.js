@@ -25,9 +25,9 @@ function isCircuitsReady()
 		return;
 	}
 	clearTimeout(circuits_timer);
-	var el = document.getElementById("zone-info");
-	if (el)
-		el.innerHTML = '';
+	//var el = document.getElementById("zone-info");
+	//if (el)
+	//	el.innerHTML = '';
 
 	dataCircuitsReady();
 }

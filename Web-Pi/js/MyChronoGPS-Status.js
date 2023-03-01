@@ -51,7 +51,7 @@ function loadAjax(proc)
 				//console.log(this.responseText);
 				try {
 						Status = JSON.parse(this.responseText);
-						console.log(this.responseText)
+						//console.log(this.responseText)
 					}
 				catch(e) {Status = this.responseText;}
 			}
@@ -77,7 +77,7 @@ function dataStatusReady() {
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log(Status);
+		//console.log(Status);
 		return false;
 	}
 
@@ -110,8 +110,8 @@ function dataStatusReady() {
 	/*HTML += "<th>KILL</th>";*/
 	HTML += "</tr>";
 	for (var i=0; i < thisStatus.myprocess.length; i++) {
-		console.log(thisStatus.myprocess[i]);
-		console.log(thisStatus.myprocess[i].substr(48));
+		//console.log(thisStatus.myprocess[i]);
+		//console.log(thisStatus.myprocess[i].substr(48));
 		HTML += "<tr>";
 		var buf = thisStatus.myprocess[i];
 		for (var j=0; j < thisStatus.pheader.length-1; j++) {
@@ -140,7 +140,7 @@ function dataStatusReady() {
 	var zd;
 	var buf;
 	for (var i=1; i < thisStatus.disk.length; i++) {
-		console.log(thisStatus.disk[i]);
+		//console.log(thisStatus.disk[i]);
 		HTML += "<tr>";
 		buf = thisStatus.disk[i];
 		for (var j=0; j < 6; j++) {
@@ -388,8 +388,8 @@ function isPointReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('isPointReady() erreur');
-		console.log(Dashboard);
+		//console.log('isPointReady() erreur');
+		//console.log(Dashboard);
 		return false;
 	}
 
@@ -541,8 +541,8 @@ function isInfosReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		console.log('isInfosReady() erreur');
-		console.log(Infos);
+		//console.log('isInfosReady() erreur');
+		//console.log(Infos);
 		timerInfos = setTimeout(getInfos, 3000);
 		return false;
 	}
@@ -634,7 +634,7 @@ function isInfosReady()
 			}
 		}
 	}
-	catch(e) {console.log(JSON.stringify(Infos));}
+	catch(e) {//console.log(JSON.stringify(Infos));}
 /*
 
     def createPoint(self):

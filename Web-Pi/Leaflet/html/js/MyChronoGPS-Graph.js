@@ -23,6 +23,7 @@ function drawChart () {
 }
 
 function switchGraph() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (is_graph) {
 		// On arrête l'affichage du graphique
 		graphRelease();
@@ -55,7 +56,7 @@ function switchGraph() {
 	var maxcols = tabShow.length;
 	// Boucle de construction des graphiques des tours sélectionnés
 	for (var i=0; i < maxcols; i++) {
-		console.log(tabShow);
+		//console.log(tabShow);
 		var il = tabShow[i]-1;
 		//drawChartLap(il);
 		datag.addColumn('number', 'T'+(il+1)); 
@@ -63,7 +64,7 @@ function switchGraph() {
 			maxrows = Tours[il].geocoords.length;
 		}
 	}
-	console.log(maxrows);
+	//console.log(maxrows);
 	// préparation du tableau graphe
 	tabGraph = new Array();
 	for (var i=0; i < maxrows; i++) {
@@ -84,7 +85,7 @@ function switchGraph() {
 			tabGraph[i][j] = lapGraph[i];
 		}
 	}
-	console.log(JSON.stringify(tabGraph));
+	//console.log(JSON.stringify(tabGraph));
 
 	for (var i=0; i < maxrows; i++) {
 		datag.setCell(i,0,i);
@@ -178,11 +179,11 @@ function setMarkerpoint(x,y) {
 	}
 	var cap = point2mark.cap;
 	var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
-	console.log(markerpoint);
+	//console.log(markerpoint);
 	var title = 'T:\t'+lap+'\r\n'+
 			'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
 			'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
-			'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
+			//'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
 			'cap:\t'+Math.round(point2mark.cap*10)/10+'° ';
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
@@ -191,22 +192,28 @@ function setMarkerpoint(x,y) {
 	graphmarker = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: title, rotationAngle:cap});
 	map.addLayer(graphmarker);
 	//map.panTo(markerpoint);
-	map.setView(markerpoint);
-	
-	//graphmarker = new google.maps.Marker({
-	//	position: markerpoint, 
-	//	,icon: {
-	//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-	//		rotation: cap,
-	//		fillColor: "cyan",
-	//		fillOpacity: 0.8,
-	//		scale: 5,
-	//		strokeColor: "gold",
-	//		strokeWeight: 2,
-	//		}
-	//	});
-	//graphmarker.setMap(map);
-	//setCenter(markerpoint);
+
+	var viewpoint = {lat: markerpoint.lat, lng: markerpoint.lng};
+	var bounds = map.getBounds();
+
+	//console.log('markerpoint:'+JSON.stringify(markerpoint));
+	//console.log('bounds:'+JSON.stringify(bounds));
+
+	var lat1 = bounds._southWest.lat;
+	var lng1 = bounds._southWest.lng;
+	var lat2 = bounds._northEast.lat;
+	var lng2 = bounds._northEast.lng;
+	var difflat = Math.abs(lat2 - lat1);
+	var el = document.getElementById("map");
+	var ndifflat = (difflat-(difflat * (el.offsetHeight/632)))/2;
+	viewpoint.lat -= ndifflat;
+
+	//console.log('difflat:'+difflat);
+	//console.log('ndifflat:'+ndifflat);
+	//console.log('viewpoint:'+JSON.stringify(viewpoint));
+
+	map.setView(viewpoint);
+
 	graphmarker.on('dragend', function(ev) {
 		changeMobilePoint(ev);
 		});
@@ -218,7 +225,7 @@ function changeMobilePoint(ev) {
 	var y = lieu[0].column-1;
 	var lap = tabShow[y];
 	var il = lap-1;
-	console.log(JSON.stringify(Tours[il].geocoords));
+	//console.log(JSON.stringify(Tours[il].geocoords));
 	// recherche du point le plus proche du marker mobile
 	var mindist = 999999;
 	var dist;
@@ -229,14 +236,14 @@ function changeMobilePoint(ev) {
 		var latb = Tours[il].geocoords[ip].lat;
 		var lngb = Tours[il].geocoords[ip].lng;
 		dist = distanceGPS(new Array(lata,lnga),new Array(latb,lngb));
-		console.log('dist:'+dist);
+		//console.log('dist:'+dist);
 		if (dist < mindist) {
 			mindist = dist;
 			im = ip;
 		}
 	}
-	console.log('mindist:'+mindist);
-	console.log('indice point:'+im);
+	//console.log('mindist:'+mindist);
+	//console.log('indice point:'+im);
 	// on place le mobile sur le point le plus près qu'on a trouvé
 	var point2mark = tabGraph[im][0];
 
@@ -296,7 +303,7 @@ function drawChartLap(il) {
 		
 		lapGraph.push(ograph);
 	}
-	console.log('longueur Graph'+lapGraph.length);
+	//console.log('longueur Graph'+lapGraph.length);
 }
 
 function graphRelease() {

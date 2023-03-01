@@ -127,7 +127,7 @@ function loadCircuitAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				Circuit = false;
 				try {Circuit = JSON.parse(this.responseText);}
 				catch(e) {Circuit = this.responseText;}
@@ -192,7 +192,7 @@ function initMap() {
 		else {
 			// si c'est un circuit inconnu, on a récupéré, à minima, les coordonnées d'une ligne (auto définie par MyChronoGPS)
 			var LatLng = JSON.parse(CoordsCircuit);
-			console.log(JSON.stringify(CoordsCircuit));
+			//console.log(JSON.stringify(CoordsCircuit));
 			thisCircuit.Latitude = LatLng[0];
 			thisCircuit.Longitude = LatLng[1];
 			thisCircuit.Latcenter = LatLng[0];
@@ -228,7 +228,7 @@ function initMap() {
 	if (!lon)
 		lon = thisCircuit.Longitude;
 	var zoom = thisCircuit.Zoom*1;
-	console.log("lat:"+lat+",lon:"+lon+",zoom:"+zoom);
+	//console.log("lat:"+lat+",lon:"+lon+",zoom:"+zoom);
 
     //optionsMap = {
     //     zoom: zoom,
@@ -239,7 +239,7 @@ function initMap() {
 	//
 	//map = new google.maps.Map(document.getElementById('map'), optionsMap);
 	map = L.map('map').setView([lat,lon],zoom);
-	console.log('zoom:'+map.zoom);
+	//console.log('zoom:'+map.zoom);
 
 	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 		attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
@@ -564,7 +564,7 @@ function showData() {
 
 	/* FL en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("FLLat1");
-	console.log("FL:"+thisCircuit.FL)
+	//console.log("FL:"+thisCircuit.FL)
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[0];
 	}
@@ -606,7 +606,7 @@ function showData() {
 
 	/* Int1 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int1Lat1");
-	console.log("Int1:"+thisCircuit.Int1)
+	//console.log("Int1:"+thisCircuit.Int1)
 	if (thisCircuit.Int1) {
 		el.value = thisCircuit.Int1[0];
 	}
@@ -648,7 +648,7 @@ function showData() {
 
 	/* Int2 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int2Lat1");
-	console.log("Int2:"+thisCircuit.Int2)
+	//console.log("Int2:"+thisCircuit.Int2)
 	if (thisCircuit.Int2) {
 		el.value = thisCircuit.Int2[0];
 	}
@@ -690,7 +690,7 @@ function showData() {
 
 	/* Int3 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int3Lat1");
-	console.log("Int3:"+thisCircuit.Int3)
+	//console.log("Int3:"+thisCircuit.Int3)
 	if (thisCircuit.Int3) {
 		el.value = thisCircuit.Int3[0];
 	}
@@ -732,7 +732,7 @@ function showData() {
 
 	/* PitIn en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("PitInLat1");
-	console.log("PitIn:"+thisCircuit.PitIn)
+	//console.log("PitIn:"+thisCircuit.PitIn)
 	if (thisCircuit.PitIn) {
 		el.value = thisCircuit.PitIn[0];
 	}
@@ -774,7 +774,7 @@ function showData() {
 
 	/* PitOut en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("PitOutLat1");
-	console.log("PitOut:"+thisCircuit.PitOut)
+	//console.log("PitOut:"+thisCircuit.PitOut)
 	if (thisCircuit.PitOut) {
 		el.value = thisCircuit.PitOut[0];
 	}
@@ -1099,13 +1099,13 @@ function createNewTrack() {
 		Track.Zoom = 16;
 
 	for (property in Track) {
-		console.log(property+':'+Track[property]);
+		//console.log(property+':'+Track[property]);
 	}
 	return true;
 }
 
 function saveTrack(parm) {
-	console.log('parm saveTrack:'+parm);
+	//console.log('parm saveTrack:'+parm);
 	// on copy tous les input et on crée le fichier JSON de la piste
 	createNewTrack();
 
@@ -1143,7 +1143,7 @@ function saveTrack(parm) {
 		}
 		dataPost.append(property, valuePost);
 	}
-	console.log(JSON.stringify(dataPost));
+	//console.log(JSON.stringify(dataPost));
 	
 	upLoadCircuitAjax(fname_save);
 	
@@ -1157,9 +1157,9 @@ function upLoadCircuitAjax(proc)
         if (this.readyState == 4) {
 			if (this.status == 200) {
 				//alert("responseText:"+this.responseText);
-				console.log(this.responseText);
+				//console.log(this.responseText);
 				try {dataReturn = JSON.parse(this.responseText);
-					console.log(JSON.stringify(dataReturn));
+					//console.log(JSON.stringify(dataReturn));
 					var el = document.getElementById("zone-info");
 					if (el)
 						el.innerHTML = "fichier piste sauvegard&eacute;";
@@ -1193,7 +1193,7 @@ var xhr = new XMLHttpRequest();
 xhr.open('POST', 'somewhere', true);
 xhr.onload = function () {
     // do something to response
-    console.log(this.responseText);
+    //console.log(this.responseText);
 };
 xhr.send(data);*/
 
@@ -1220,7 +1220,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objStart);
 	}
 	
@@ -1246,7 +1246,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[0]);
 	}
 	
@@ -1272,7 +1272,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[1]);
 	}
 	
@@ -1298,7 +1298,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(Tabint[2]);
 	}
 	
@@ -1324,7 +1324,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objPitIn);
 	}
 	
@@ -1350,7 +1350,7 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		console.log("drawLine(objStart)")
+		//console.log("drawLine(objStart)")
 		drawLine(objPitOut);
 	}
 }
@@ -1476,7 +1476,7 @@ function drawLineWithCap(objline) {
 	// on recherche le point B à 50 mètres du point A selon le cap fourni
 	var dist = 50; // 50m
 	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);
-	console.log('destination:'+B);
+	//console.log('destination:'+B);
 	
 	var A = new Array(objline.lat,objline.lon);
 	// On marque le point actuel qui représente le milieu du segment de droite
@@ -1505,7 +1505,7 @@ function drawLineWithCap(objline) {
 	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
 	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
 	var icoord = getPerpendiculaire(A,B);
-	console.log(icoord);
+	//console.log(icoord);
 	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	
@@ -1775,7 +1775,7 @@ function changeMarkercap(ev,objline) {
 	
 //jfk
 	var icoord = getPerpendiculaire(A,B);
-	console.log(icoord);
+	//console.log(icoord);
 	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 
@@ -1826,7 +1826,7 @@ function changeMarkercap(ev,objline) {
 
 function refreshInput(objline) {
 	// on reporte les données recalculées dans les input
-	console.log("report des données")
+	//console.log("report des données")
 	/* FL en lat,lon,cap */
 	var el = document.getElementById("Lat"+objline.idelem)
 	if (el) {
@@ -1940,7 +1940,7 @@ function constructLine() {
 		var dist = largeur_piste * 2;
 		var cap = 90;
 		var B = getDestination(lat0,lon0,cap,dist,RT);
-		console.log('destination:'+B);
+		//console.log('destination:'+B);
 		var lat1 = B[0];
 		var lon1 = B[1];
 		var markerpoint = {lat: lat1, lng: lon1};
@@ -2019,13 +2019,13 @@ function displayAngle(objline) {
 	var P5 = new Array(latlon.lat, latlon.lng);
 
 	var angle = getAngle(P1,P2);
-	console.log('angle 1-2='+rad2deg(angle));
+	//console.log('angle 1-2='+rad2deg(angle));
 	var cap = initialBearingTo(P1,P2);
-	console.log('bearing='+cap);
+	//console.log('bearing='+cap);
 	var angle = 450-cap;
 	if (!(angle-360 < 0))
 		angle = angle-360;
-	console.log("cap:"+cap+",angle="+angle);
+	//console.log("cap:"+cap+",angle="+angle);
 	html += ',angle 1-2='+rad2deg(angle);
 
 	//var angle = getAngle(P2,P3);
@@ -2049,21 +2049,21 @@ function displayAngle(objline) {
 	//html += ',angle 1-4='+rad2deg(angle);
 
 	var angle = getAngle(P1,P5);
-	console.log('angle 1-5='+rad2deg(angle));
+	//console.log('angle 1-5='+rad2deg(angle));
 	var cap = initialBearingTo(P1,P5);
-	console.log('bearing='+cap);
+	//console.log('bearing='+cap);
 	var angle = 450-cap;
 	if (!(angle-360 < 0))
 		angle = angle-360;
-	console.log("cap:"+cap+",angle="+angle);
+	//console.log("cap:"+cap+",angle="+angle);
 	html += ',angle 1-5='+rad2deg(angle);
 	
 	var cap = deg2rad(objline.cap);
 	var angle = ((π*5)/2)-cap;
 	if (!angle-(π*2) < 0)
 		angle = angle+(π*2);
-	console.log("cap (rad):"+cap+",angle (rad)="+angle);
-	console.log("angle(rad)="+angle+",cos="+Math.cos(angle)+",sin="+Math.sin(angle));
+	//console.log("cap (rad):"+cap+",angle (rad)="+angle);
+	//console.log("angle(rad)="+angle+",cos="+Math.cos(angle)+",sin="+Math.sin(angle));
 	html += ',angle cap='+rad2deg(angle);
 	//var A = convCoord(gpslat,gpslatS,gpslon,gpslonS);
 	var A = new Array(objline.lat,objline.lon);
@@ -2071,13 +2071,13 @@ function displayAngle(objline) {
 	var B = new Array(A[0]+(d*Math.sin(angle)),A[1]+(d*Math.cos(angle)));
 	var r = distanceGPS(A,B);
 	var angle = getAngle(A,B);
-	console.log('angle du cap='+rad2deg(angle));
+	//console.log('angle du cap='+rad2deg(angle));
 	var cap = initialBearingTo(A,B);
-	console.log('bearing='+cap);
+	//console.log('bearing='+cap);
 	var angle = 450-cap;
 	if (!(angle-360 < 0))
 		angle = angle-360;
-	console.log("cap:"+cap+",angle="+angle);
+	//console.log("cap:"+cap+",angle="+angle);
 	html += ',angle cap calculé='+rad2deg(angle);
 /*
 Trouver la valeur de x'
@@ -2190,7 +2190,7 @@ function getPerpendiculaire(A,B) { // coordonnées du point A, point B
 	//console.log('coordonnées d\origine du point B='+Xb+','+Yb);
 	// le rayon du cerlce de centre A est égal à la distance A,B
 	var r = distanceGPS(A,B);
-	console.log('r='+r);
+	//console.log('r='+r);
 	
 	// coordonnées d'un point B sur un cercle de centre A: X, Y
 	var X = Xb-Xa; // X = côté Adjacent de l'angle a
@@ -2247,7 +2247,7 @@ function rad2deg(rd) {
 
 // retourne l'angle formés par la droite A,B (A=origine, B=destination)
 function getAngle(A,B) {
-	console.log('coordonnées='+A+','+B);
+	//console.log('coordonnées='+A+','+B);
 
 	var Ya = A[0];
 	var Xa = A[1];
@@ -2256,24 +2256,24 @@ function getAngle(A,B) {
 	
 	// coordonnées d'un point B sur un cercle de centre A: X, Y
 	var X = Xb-Xa; // X = côté Adjacent de l'angle a
-	console.log('côté adjacent='+X);
+	//console.log('côté adjacent='+X);
 	var Y = Yb-Ya; // Y = côté Opposé de l'angle a
-	console.log('côté opposé='+Y);
+	//console.log('côté opposé='+Y);
 	
 	// calcul sinus et cosinus avec les coordonnées lat, lon
 	var H = Math.sqrt((Y*Y)+(X*X));
-	console.log('hypoténuse='+H);
+	//console.log('hypoténuse='+H);
 	
 	var cosB = X/H;
 	var sinB = Y/H;
-	console.log('cosB:'+cosB+',sinB:'+sinB);
+	//console.log('cosB:'+cosB+',sinB:'+sinB);
 	
 	//if (X<0) cosB = cosB * -1;
 	//if (Y<0) sinB = sinB * -1;
-	console.log('cosB:'+cosB+',sinB:'+sinB);
+	//console.log('cosB:'+cosB+',sinB:'+sinB);
 	
 	var angleB = Math.acos(Math.abs(cosB)); // angle par rapport à l'horizontale
-	console.log('angle B='+angleB+'('+rad2deg(angleB)+')');
+	//console.log('angle B='+angleB+'('+rad2deg(angleB)+')');
 	if (Number.isNaN(angleB))
 		angleB = 0;
 	// valeur de l'angle en radian en fonction du signe du sinus et du signe du cosinus
@@ -2287,7 +2287,7 @@ function getAngle(A,B) {
 		else
 			angleB = π+angleB;
 	}
-	console.log('angle B (0-360)='+angleB+'('+rad2deg(angleB)+')');
+	//console.log('angle B (0-360)='+angleB+'('+rad2deg(angleB)+')');
 	
 	//var angle = rad2deg(angleB);
 	//console.log('angle='+angleB);
@@ -2318,18 +2318,18 @@ function getCap(objline) {
 	var Bcoord = new Array(objline.coord[2],objline.coord[3]);
 	
 	var angle = getAngle(Acoord,Bcoord);
-	console.log('angle='+angle);
+	//console.log('angle='+angle);
 	
 	var cap = initialBearingTo(Acoord,Bcoord);
-	console.log('bearing='+cap);
+	//console.log('bearing='+cap);
 
 	return cap;
 	
 	var cap =  (π) - angle;
-	console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
+	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
 	if (cap < 0)
 		cap = (π*2)+cap;
-	console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
+	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
 	objline.cap = rad2deg(cap);
 	
 /*
@@ -2338,7 +2338,7 @@ function getCap(objline) {
 	var angle = ((π*5)/2)-cap;
 	if (!angle-(π*2) < 0)
 		angle = angle+(π*2);
-	console.log("cap (rad):"+cap+",angle (rad)="+angle);
+	//console.log("cap (rad):"+cap+",angle (rad)="+angle);
 */	
 
 }

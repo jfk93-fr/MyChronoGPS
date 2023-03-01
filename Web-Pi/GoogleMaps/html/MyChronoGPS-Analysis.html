@@ -70,14 +70,71 @@
 				<div class="w3-bar" id="sousmenu-map">
 					<span id="zone-info"></span>&nbsp;
 					<span class="LCD35-hide">
-					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(0);" >FL</a>
-					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(1);" >Int1</a>		
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center" >FL</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(0);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(0);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center">Int1</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(1);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(1);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center">Int2</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(2);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(2);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center">Int3</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(3);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(3);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center">PitIn</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(-1);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(-1);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<div class="w3-row w3-center">PitOut</div>
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(-2);" ></a>
+								<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(-2);" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<!--<div class="w3-row w3-center">Save</div>-->
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btncopy" href="#" onClick="saveLines();" title="Save Lines" ></a>
+							</div>
+						</span>
+						<span class="w3-bar-item">
+							<!--<div class="w3-row w3-center">Save</div>-->
+							<div class="w3-row">
+								<a class="w3-bar-item w3-button btndraw" href="#" onClick="redraw();" title="Recalcul Session" ></a>
+							</div>
+						</span>
+					
+					<!--<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(0);" >FL</a>
+					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(1);" >Int1</a>
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(2);" >Int2</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(3);" >Int3</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-1);" >PitIn</a>		
-					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-2);" >PitOut</a>		
+					<a class="w3-bar-item w3-button" href="#"  onClick="point2Line(-2);" >PitOut</a>-->	
+					<!--
 					<a class="w3-bar-item w3-button" href="#"  onClick="setMaxZoom();" >Zoom+</a>		
 					<a class="w3-bar-item w3-button" href="#"  onClick="setOriginZoom();" >Zoom-</a>
+					-->
 					</span>
 					<span class="LCD35-hide"><input id="LatLng" value="" onchange="showInputPoint(this.id);"></input></span>
 					<span class="LCD35-hide"><input type="hidden" id="HiddenLatLng" value=""></input></span>
@@ -204,7 +261,7 @@
 			</div>
 		</div>
 
-</div>
+	</div>
 	<script src="./js/parse_url.js" type="text/javascript"></script>
 	<script src="./js/ajax.js" type="text/javascript"></script>
 	<script src="./js/MyChronoGPS-Circuits.js"></script>

@@ -4,7 +4,7 @@ function ajax_cmd(cmd) {
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
 		    //alert("responseText:"+this.responseText);
-			console.log(this.responseText);
+			//console.log(this.responseText);
         
             myObj = JSON.parse(this.responseText);
 			

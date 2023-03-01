@@ -90,6 +90,7 @@ var Frequence = 1; // fréquence d'échantillonage du GPS
 loadCircuits();
 
 function dataCircuitsReady() {
+	document.getElementById("zone-info").innerHTML = 'les données sont chargées, calcul en cours, veuillez patienter';
 	loadCoords();
 	//console.log(JSON.stringify(Coords))
 }	
@@ -444,6 +445,149 @@ function showLines() {
 	}
 }
 
+function deleteLine(line) {
+	document.getElementById("zone-info").innerHTML = '';
+	var center = map.getCenter(); // on met de côté le centrage actuel
+	// On recentre la map avec le zoom d'origine
+	resetScreen();
+	
+	var obj = getObjLine(line)
+	if (!obj)
+		return;
+	if (!confirm("vous êtes sur le point de supprimer la ligne "+obj.idelem+", voulez-vous ontinuer ?"))
+		return;
+
+	// on efface tous les marqueurs
+	if (typeof(obj.marker1) != 'undefined') {
+		if (obj.marker1 != '') {
+			//map.removeLayer(obj.marker1);
+			objline.marker1.setMap(null);
+			obj.marker1 = '';
+		}
+	}
+		
+	if (typeof(obj.marker2) != 'undefined') {
+		if (obj.marker2 != '') {
+			//map.removeLayer(obj.marker2);
+			objline.marker2.setMap(null);
+			obj.marker2 = '';
+		}
+	}
+
+	if (typeof(obj.line) != 'undefined') {
+		if (obj.line != '') {
+			//map.removeLayer(obj.line);
+			objline.line.setMap(null);
+			obj.line = '';
+		}
+	}
+	// On récrée les objets
+	if (line > 0) {
+		if (Tabint[line-1])
+			Tabint[line-1] = new Object();
+	}
+	if (line == 0)
+		objStart = new Object();
+	if (line == -1)
+		objPitIn = new Object();
+	if (line == -2)
+		objPitOut = new Object();
+}
+	
+
+function designLine(line) {
+	var center = map.getCenter(); // on met de côté le centrage actuel
+	// On recentre la map avec le zoom d'origine
+	resetScreen();
+	
+	var obj = getObjLine(line)
+
+	if (obj.coord) {
+		var newobj = drawLine(obj);
+		/*
+		if (line > 0) {
+			if (Tabint[line-1])
+				Tabint[line-1] = obj;
+		}
+		if (line == 0)
+			objStart = obj;
+		if (line == -1)
+			objPitIn = obj;
+		if (line == -2)
+			objPitOut = obj;
+		*/
+		//setMaxZoom(obj.lat,obj.lon,2);
+		return;
+	}
+
+	if (obj.marker) {
+		//if (!confirm("la ligne est déjà active, voulez-vous la changer ?"))
+		//	return;
+		setMaxZoom(obj.lat,obj.lon);
+		return;
+	}
+	if (obj.marker1) {
+		//if (!confirm("la ligne est déjà active, voulez-vous la changer ?"))
+		//	return;
+		setMaxZoom(obj.coord[0],obj.coord[1]);
+		return;
+	}
+
+	obj = new Object();
+	// SI la ligne n'existe pas on va la placer là où on était centré
+	obj.lat = center.lat();
+	obj.lon = center.lng();
+	obj.cap = 0;
+	if (line == 0) {
+		obj.title = "Ligne de départ/arrivée";
+		obj.color = "yellow";
+		obj.idelem = "FL";
+	}
+	if (line > 0) {
+		obj.title = "Intermédiaire "+line;
+		obj.color = "blue";
+		obj.idelem = "Int"+line;
+	}
+	if (line == -1) {
+		obj.title = "Pit In";
+		obj.color = "orange";
+		obj.idelem = "PitIn";
+	}
+	if (line == -2) {
+		obj.title = "Pit Out";
+		obj.color = "green";
+		obj.idelem = "PitOut";
+	}
+
+	var newobj = drawLine(obj);
+	if (line > 0) {
+		Tabint[line-1] = obj;
+	}
+	if (line == 0)
+		objStart = obj;
+	if (line == -1)
+		objPitIn = obj;
+	if (line == -2)
+		objPitOut = obj;
+
+	setMaxZoom(obj.lat,obj.lon,2);
+}
+
+function getObjLine(line) {
+	var obj = false;
+	if (line > 0) {
+		if (Tabint[line-1])
+			obj = Tabint[line-1];
+	}
+	if (line == 0)
+		obj = objStart;
+	if (line == -1)
+		obj = objPitIn;
+	if (line == -2)
+		obj = objPitOut;
+	return obj;
+}
+/*
 function point2Line(line) {
 	var obj = false;
 	if (line > 0) {
@@ -462,7 +606,7 @@ function point2Line(line) {
 		return;
 	}	
 }
-
+*/
 function nextCut() {
 	if (nb_coords > curr_coord+1) {
 		curr_coord++;
@@ -561,7 +705,7 @@ function go()
 		return false;
 	}
 
-	thisCircuit = Ev[0]; //jfk
+	thisCircuit = Ev[0]; // La première ligne contient toujours le nom du circuit
 
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
@@ -628,6 +772,7 @@ function go()
 	}
 	
 	displayMap()
+	document.getElementById("zone-info").innerHTML = '';
 }
 
 function buildTours(FL) {
@@ -796,6 +941,45 @@ function buildTours(FL) {
 	}
 }
 
+// Fonction de reconstruction du tableau des Tours en cas de modification des lignes (départ ou intermédiaires)
+function redraw() {
+	document.getElementById("zone-info").innerHTML = 'recalcul en cours, veuillez patienter';
+	curr_coord = 0;
+	//
+	// on va construire à nouveau le tableau des Tours à partir de objStart
+	if (typeof(objStart.coord) == 'undefined') {
+		document.getElementById("zone-info").innerHTML = 'recalcul impossible, ligne de départ-arrivée manquante.';
+		return;
+	}
+	FL = new Array(objStart.coord[0],objStart.coord[1],objStart.coord[2],objStart.coord[3]);
+	buildTours(FL);
+	nb_tours = Tours.length;
+	var i = 0;
+	Tour = Tours[i];
+	Points = Tour.points;
+	
+	// Maintenant, on va construire le menu des tours
+	// et créer les éléments de design
+	var el = document.getElementById("Tours")
+	if (!el)
+		return;
+	el.innerHTML = "";
+	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
+		//console.log("Tour:"+Tours[i].id);
+		var tour = Tours[i].id;
+		
+		if (Tours[i].valid) {
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour;
+			el.innerHTML += "<span id=\"timelap"+tour+"\"></span>"+"</a>";
+		}
+		else {
+			el.innerHTML += "<a class=\"w3-bar-item w3-button w3-border w3-round\" href=\"#\" onClick=\"showLap("+tour+");\" id=\"buttonlap"+tour+"\">T "+tour+" invalide"+"</a>";
+		}
+	}
+	
+	displayMap()
+}
+
 function initCircuit(track) {
 	//console.log(JSON.stringify(thisCircuit));
 	//if (!thisCircuit.NomCircuit) // si le nom du circuit est absent alors on réinitialise complètement l'objet circuit
@@ -809,7 +993,6 @@ function initCircuit(track) {
 	}
 	//console.log(JSON.stringify(thisCircuit));
 }
-
 
 function scanCircuit() {
 	var trackfound = false;
@@ -837,16 +1020,110 @@ function drawLine(objline) {
 	// si les coodonnées du segment de droite sont fournies, on trace le segment de droite avec ces coordonnées
 	// sinon, on trace un segment de droite avec les coordonnées de son milieu selon le cap fourni
 	if (objline.coord)
-		drawLineWithCoord(objline)
+		obj = drawLineWithCoord(objline)
 	else
-		drawLineWithCap(objline)
+		obj = drawLineWithCap(objline)
+	return obj
 }
 
 function drawLineWithCoord(objline) {
+	var obj = objline
+	if (typeof(objline.marker1) != 'undefined') {
+		return obj;
+	}
+	// on efface les précédents marqueurs "with cap"
+	if (typeof(objline.marker) != 'undefined') {
+		if (objline.marker != '') {
+			//map.removeLayer(objline.marker)
+			objline.marker.setMap(null);
+			objline.marker = '';
+		}
+	}
+	if (typeof(objline.markerB) != 'undefined') {
+		if (objline.markerB != '') {
+			//map.removeLayer(objline.markerB)
+			objline.markerB.setMap(null);
+			objline.markerB = '';
+		}
+	}
+	if (typeof(objline.markerB2) != 'undefined') {
+		if (objline.markerB2 != '') {
+			//map.removeLayer(objline.markerB2)
+			objline.markerB2.setMap(null);
+			objline.markerB2 = '';
+		}
+	}
+	if (typeof(objline.markercap) != 'undefined') {
+		if (objline.markercap != '') {
+			//map.removeLayer(objline.markercap)
+			objline.markercap.setMap(null);
+			objline.markercap = '';
+		}
+	}
+	if (typeof(objline.linecap) != 'undefined') {
+		if (objline.linecap != '') {
+			//map.removeLayer(objline.linecap);
+			objline.linecap.setMap(null);
+			objline.linecap = '';
+		}
+	}
+
 	// on va tracer un segment de droite à partir des coordonnées de ses extrémités
+	
+	var A = new Array(objline.coord[0],objline.coord[1]);
+	// On marque une des extrémités du segment de droite
+	var markerpoint = {lat: A[0], lng: A[1]};
+	
+	if (typeof(objline.marker1) != 'undefined') {
+		if (objline.marker1 != '') {
+			//map.removeLayer(objline.marker1);
+			objline.marker1.setMap(null);
+			objline.marker1 = '';
+		}
+	}
+	//objline.marker1 = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - 1'});
+	objline.marker1 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - 1'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1.png'
+		,draggable: true
+		});
+	//map.addLayer(objline.marker1);	
+	objline.marker1.setMap(map);
+	//objline.marker1.on('dragend', function(ev) {changeMarker1(ev,objline);});
+	objline.marker1.addListener('dragend', function(ev) {changeMarker1(ev,objline);});
+	
+	var B = new Array(objline.coord[2],objline.coord[3]);
+	// On marque l'autre extrémité du segment de droite
+	var markerpoint = {lat: B[0], lng: B[1]};
+		
+	if (typeof(objline.marker2) != 'undefined') {
+		if (objline.marker2 != '') {
+			//map.removeLayer(objline.marker2);
+			objline.marker2.setMap(null);
+			objline.marker2 = '';
+		}
+	}
+	//objline.marker2 = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - 2'});
+	objline.marker2 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - 2'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2.png'
+		,draggable: true
+		});
+	//map.addLayer(objline.marker2);	
+	objline.marker2.setMap(map);
+	//objline.marker2.on('dragend', function(ev) {changeMarker2(ev,objline);});
+	objline.marker2.addListener('dragend', function(ev) {changeMarker2(ev,objline);});
 
 	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
 	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
+		
+	if (typeof(objline.line) != 'undefined') {
+		if (objline.line != '') {
+			//map.removeLayer(objline.line);
+			objline.line.setMap(null);
+			objline.line = '';
+		}
+	}
 	objline.line = new google.maps.Polyline({
 		path: pathCoordinates,
 		geodesic: true,
@@ -856,6 +1133,7 @@ function drawLineWithCoord(objline) {
 		strokeWeight: 5
 	});
 	objline.line.setMap(map);
+	return obj;
 }
 
 function drawLineWithCap(objline) {
@@ -865,12 +1143,88 @@ function drawLineWithCap(objline) {
 	var dist = 50; // 50m
 	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);	
 	var A = new Array(objline.lat,objline.lon);
+	// On marque le point actuel qui représente le milieu du segment de droite
+	var markerpoint = {lat: A[0], lng: A[1]};
+	
+	//objline.marker = new L.Marker(markerpoint,{draggable:true, title: objline.title+' - Milieu'});
+	objline.marker = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Milieu'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/A.png'
+		,draggable: true
+		});
+	//map.addLayer(objline.marker);	
+	objline.marker.setMap(map);
+	//objline.marker.on('dragend', function(ev) {changeMarker(ev,objline);});
+	objline.marker.addListener('dragend', function(ev) {changeMarker(ev,objline);});
+
+	// on marque les 2 points sur la droite du cap
+	var markerpoint = {lat: B[0], lng: B[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markercap = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: 'Cap'});
+	objline.markercap = new google.maps.Marker({
+		position: markerpoint, title: 'Cap'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png'
+		,draggable: true
+		});
+	//map.addLayer(objline.markercap);	
+	objline.markercap.setMap(map);
+	//objline.markercap.on('dragend', function(ev) {changeMarkercap(ev,objline);});
+	objline.markercap.addListener('dragend', function(ev) {changeMarkercap(ev,objline);});
+		
+	// On trace une ligne entre le point milieu du segment de droite et le point cap
+	var pathCoordinates = [{lat: A[0], lng: A[1]},{lat: B[0], lng: B[1]}];
+	//objline.linecap = new L.polyline(pathCoordinates, {color: 'blue'});
+	objline.linecap = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: 'blue',
+		strokeOpacity: 1.0,
+		strokeWeight: 0.5
+	});
+	//map.addLayer(objline.linecap);	
+	objline.linecap.setMap(map);
+	//objline.marker.on('dragend', function(ev) {changeMarker(ev,objline);});
+	objline.marker.addListener('dragend', function(ev) {changeMarker(ev,objline);});
 
 	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
 	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
 	var icoord = getPerpendiculaire(A,B);
 	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),largeur_piste); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	
+	var markerpoint = {lat: coord1[0], lng: coord1[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2.png',
+	//	iconAnchor: [32,64]
+	//});
+	//objline.markerB = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: objline.title+' - Bord', rotationAngle: 45});
+	objline.markerB = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2.png'
+		,draggable: true
+		});
+	//map.addLayer(objline.markerB);	
+	objline.markerB.setMap(map);
+	//objline.markerB.on('dragend', function(ev) {changeMarkerB(ev,objline);});
+	objline.markerB.addListener('dragend', function(ev) {changeMarkerB(ev,objline);});
+
+
+	var markerpoint = {lat: coord2[0], lng: coord2[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: objline.title+' - Bord opposé'});
+	objline.markerB2 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord opposé'
+			,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png'
+			,draggable: false
+		});
+	//map.addLayer(objline.markerB2);	
+	objline.markerB2.setMap(map);
 
 	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de
 	if (Array.isArray(icoord)) {
@@ -885,6 +1239,413 @@ function drawLineWithCap(objline) {
 		objline.line.setMap(map);
 	}
 	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);	
+	return objline;
+}
+
+function changeMarker(ev,objline) {
+	// Le marqueur du milieu de ligne a bougé, on recalcule les coordonnées
+	var lat = objline.lat; // latitude avant déplacement
+	var lon = objline.lon; // longitude avant déplacement
+	var latlon = objline.marker.getPosition();
+	
+	objline.lat = latlon.lat();
+	objline.lon = latlon.lng();
+	
+	// on va déplacer le point opposé de bord de piste
+	objline.coord[1] += (objline.lon - lon);
+	objline.coord[0] += (objline.lat - lat);
+	objline.coord[2] += (objline.lat - lat);
+	objline.coord[3] += (objline.lon - lon);
+	
+	// On marque à nouveau le point par rapport au point de départ
+	if (objline.markerB != '') {
+		//map.removeLayer(objline.markerB);
+		objline.markerB.setMap(null);
+		objline.markerB = '';
+	}
+	
+	var markerpoint = {lat: objline.coord[0], lng: objline.coord[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2.png',
+	//	iconAnchor: [32,64]
+	//});	
+	//objline.markerB = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: objline.title+' - Bord', rotationAngle: 45});
+	//map.addLayer(objline.markerB);	
+	//objline.markerB.on('dragend', function(ev) {changeMarkerB(ev,objline);});
+	objline.markerB = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2.png'
+		,draggable: true
+		});
+	objline.markerB.setMap(map);
+	objline.markerB.addListener('dragend', function(ev) {changeMarkerB(ev,objline);});
+
+	// On marque à nouveau le point opposé par rapport au point de départ
+	if (objline.markerB2 != '') {
+		//map.removeLayer(objline.markerB2)
+		objline.markerB2.setMap(null);
+		objline.markerB2 = '';
+	}
+	var markerpoint = {lat: objline.coord[2], lng: objline.coord[3]};
+	
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: objline.title+' - Bord opposé'});
+	//map.addLayer(objline.markerB2);
+	objline.markerB2 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord opposé'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png'
+    	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/A.png'
+		//,draggable: true
+		});
+	objline.markerB2.setMap(map);
+	
+	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de départ
+	if (objline.line != '') {
+		//map.removeLayer(objline.line);
+		objline.line.setMap(null);
+		objline.line = '';
+	}
+	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
+	//objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+	//map.addLayer(objline.line);	
+	objline.line = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: objline.color,
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	objline.line.setMap(map);
+	
+	// on recalcule le cap
+	objline.cap = wrap360(getCap(objline) + 90); // 90° de + par rapport au cap point bord de ligne de départ, point milieu de ligne de départ
+
+	// On remarque le cap
+	var dist = 50;
+	var A = new Array(objline.lat,objline.lon);
+	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);
+	
+	if (objline.markercap != '') {
+		//map.removeLayer(objline.markercap);
+		objline.markercap.setMap(null);
+		objline.markercap = '';
+	}
+	var markerpoint = {lat: B[0], lng: B[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markercap = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: 'Cap'});
+	//map.addLayer(objline.markercap);	
+	//objline.markercap.on('dragend', function(ev) {changeMarkercap(ev,objline);});	
+
+	// On marque le point cap
+	objline.markercap = new google.maps.Marker({
+		position: markerpoint, title: 'Cap'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png'
+		,draggable: true
+		});
+	objline.markercap.setMap(map);
+	objline.markercap.addListener('dragend', function(ev) {changeMarkercap(ev,objline);});
+
+	// On trace une ligne entre le point de départ (milieu du segment de droite) et le point cap
+	if (objline.linecap != '') {
+		//map.removeLayer(objline.linecap);
+		objline.linecap.setMap(null);
+		objline.linecap = '';
+	}
+	var pathCoordinates = [{lat: A[0], lng: A[1]},{lat: B[0], lng: B[1]}];
+	//objline.linecap = new L.polyline(pathCoordinates, {color: 'blue'});
+	//map.addLayer(objline.linecap);	
+	objline.linecap = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: 'blue',
+		strokeOpacity: 1.0,
+		strokeWeight: 0.5
+	});
+	objline.linecap.setMap(map);
+}
+
+function changeMarkerB(ev,objline) {
+	// Le marqueur du bord de ligne a bougé, on recalcule pcoord
+	var latlon = objline.markerB.getPosition();
+	
+	objline.coord[0] = latlon.lat();
+	objline.coord[1] = latlon.lng();
+	
+	objline.coord[2] = objline.coord[0]+((objline.lat-objline.coord[0])*2);
+	objline.coord[3] = objline.coord[1]+((objline.lon-objline.coord[1])*2);
+
+	// On marque à nouveau le point opposé par rapport au point de départ
+	if (objline.markerB2 != '') {
+		//map.removeLayer(objline.markerB2)
+		objline.markerB2.setMap(null);
+		objline.markerB2 = '';
+	}
+	var markerpoint = {lat: objline.coord[2], lng: objline.coord[3]};
+	
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: objline.title+' - Bord opposé'});
+	//map.addLayer(objline.markerB2);
+	objline.markerB2 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord opposé'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png'
+		,draggable: false
+		});
+	objline.markerB2.setMap(map);
+	
+	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de départ
+	if (objline.line != '') {
+		//map.removeLayer(objline.line);
+		objline.line.setMap(null);
+		objline.line = '';
+	}
+	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
+	//objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+	//map.addLayer(objline.line);	
+	objline.line = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: objline.color,
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	objline.line.setMap(map);
+	
+	// on recalcule le cap
+	objline.cap = wrap360(getCap(objline) + 90); // 90° de + par rapport au cap point bord de ligne de départ, point milieu de ligne de départ
+
+	// On remarque le cap
+	var dist = 50;
+	var A = new Array(objline.lat,objline.lon);
+	var B = getDestination(objline.lat,objline.lon,objline.cap,dist,RT);
+	
+	if (objline.markercap != '') {
+		//map.removeLayer(objline.markercap);
+		objline.markercap.setMap(null);
+		objline.markercap = '';
+	}
+	var markerpoint = {lat: B[0], lng: B[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markercap = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: 'Cap'});
+	//map.addLayer(objline.markercap);	
+	//objline.markercap.on('dragend', function(ev) {changeMarkercap(ev,objline);});
+	objline.markercap = new google.maps.Marker({
+		position: markerpoint, title: 'Cap'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png'
+		,draggable: true
+		});
+	objline.markercap.setMap(map);
+	objline.markercap.addListener('dragend', function(ev) {changeMarkercap(ev,objline);});
+
+	// On trace une ligne entre le point de départ (milieu du segment de droite) et le point cap
+	if (objline.linecap != '') {
+		//map.removeLayer(objline.linecap);
+		objline.linecap.setMap(null);
+		objline.linecap = '';
+	}
+	var pathCoordinates = [{lat: A[0], lng: A[1]},{lat: B[0], lng: B[1]}];
+	//objline.linecap = new L.polyline(pathCoordinates, {color: 'blue'});
+	//map.addLayer(objline.linecap);	
+	objline.linecap = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: 'blue',
+		strokeOpacity: 1.0,
+		strokeWeight: 0.5
+	});
+	objline.linecap.setMap(map);
+}
+
+function changeMarker1(ev,objline) {
+	// Le marqueur 1 du segment de droite a bougé, on recalcule les coordonnées
+	var latlon = objline.marker1.getPosition();
+	
+	objline.coord[0] = latlon.lat();
+	objline.coord[1] = latlon.lng();
+
+	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
+	if (objline.line != '') {
+		//map.removeLayer(objline.line)
+		objline.line.setMap(null);
+		objline.line = '';
+	}
+	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
+	//objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+	//map.addLayer(objline.line);	
+	objline.line = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: objline.color,
+		//strokeColor: "pink",
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	objline.line.setMap(map);
+}
+	
+function changeMarker2(ev,objline) {
+	// Le marqueur 2 du segment de droite a bougé, on recalcule les coordonnées
+	var latlon = objline.marker2.getPosition();
+	
+	objline.coord[2] = latlon.lat();
+	objline.coord[3] = latlon.lng();
+
+	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
+	if (objline.line != '') {
+		//map.removeLayer(objline.line)
+		objline.line.setMap(null);
+		objline.line = '';
+	}
+	var pathCoordinates = [{lat: objline.coord[0], lng: objline.coord[1]},{lat: objline.coord[2], lng: objline.coord[3]}];
+	//objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+	//map.addLayer(objline.line);	
+	objline.line = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: objline.color,
+		//strokeColor: "grey",
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	});
+	objline.line.setMap(map);
+}
+
+function changeMarkercap(ev,objline) {
+	// Le marqueur du point de cap a bougé, on recalcule le cap
+	var latlon = objline.markercap.getPosition();
+	var A = new Array(objline.lat,objline.lon); // point milieu de ligne
+	var B = new Array(latlon.lat(), latlon.lng()); // point cap
+	var cap = initialBearingTo(A,B);
+		
+	// on efface le précédent point cap
+	if (objline.markercap != '') {
+		//map.removeLayer(objline.markercap);
+		objline.markercap.setMap(null);
+		objline.markercap = '';
+	}
+	// on marque le nouveau point cap
+	var markerpoint = {lat: B[0], lng: B[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markercap = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: 'Cap'});
+	//map.addLayer(objline.markercap);	
+	//objline.markercap.on('dragend', function(ev) {changeMarkercap(ev,objline);});
+	objline.markercap = new google.maps.Marker({
+		position: markerpoint, title: 'Cap'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png'
+		,draggable: true
+		});
+	objline.markercap.setMap(map);
+	objline.markercap.addListener('dragend', function(ev) {changeMarkercap(ev,objline);});
+		
+	// on efface la précédente ligne cap
+	if (objline.linecap != '') {
+		//map.removeLayer(objline.linecap);
+		objline.linecap.setMap(null);
+		objline.linecap = '';
+	}
+		
+	// On retrace la ligne entre le point milieu du segment de droite et le point cap
+	var pathCoordinates = [{lat: A[0], lng: A[1]},{lat: B[0], lng: B[1]}];
+	//objline.linecap = new L.polyline(pathCoordinates, {color: 'blue'});
+	//map.addLayer(objline.linecap);	
+	objline.linecap = new google.maps.Polyline({
+		path: pathCoordinates,
+		geodesic: true,
+		strokeColor: 'blue',
+		strokeOpacity: 1.0,
+		strokeWeight: 0.5
+	});
+	objline.linecap.setMap(map);
+	
+	// On trace une ligne passant par le point start, perpendiculaire à la droite point start;point gps et 2 points (P1;P-1)
+	// situés de part et d'autre du point start à une distance égale à la largeur de la piste
+	// on commence par calculer la distance entre milieu le bord
+	var latlon = objline.markerB.getPosition();
+	var C = new Array(latlon.lat(), latlon.lng()); // point bord
+	var dist = distanceGPS(A,C);
+	
+//jfk
+	var icoord = getPerpendiculaire(A,B);
+	//console.log(icoord);
+	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
+
+	if (objline.markerB != '') {
+		//map.removeLayer(objline.markerB);
+		objline.markerB.setMap(null);
+		objline.markerB = '';
+	}
+	
+	var markerpoint = {lat: coord1[0], lng: coord1[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2.png',
+	//	iconAnchor: [32,64]
+	//});	
+	//objline.markerB = new L.Marker(markerpoint,{icon:localIcon, draggable:true, title: objline.title+' - Bord', rotationAngle: 45});
+	//map.addLayer(objline.markerB);	
+	//objline.markerB.on('dragend', function(ev) {changeMarkerB(ev,objline);});
+	objline.markerB = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord'
+		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2.png'
+		,draggable: true
+		});
+	objline.markerB.setMap(map);
+	objline.markerB.addListener('dragend', function(ev) {changeMarkerB(ev,objline);});
+
+	if (objline.markerB2 != '') {
+		//map.removeLayer(objline.markerB2);
+		objline.markerB2.setMap(null);
+		objline.markerB2 = '';
+	}
+
+	var markerpoint = {lat: coord2[0], lng: coord2[1]};
+	//var localIcon = L.icon({
+	//	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png',
+	//	iconAnchor: [8, 16]
+	//});	
+	//objline.markerB2 = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: objline.title+' - Bord opposé'});
+	//map.addLayer(objline.markerB2);	
+	objline.markerB2 = new google.maps.Marker({
+		position: markerpoint, title: objline.title+' - Bord opposé'
+			,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank-lv.png'
+			,draggable: false
+		});
+	objline.markerB2.setMap(map);
+	
+	// On va tracer une ligne entre les 2 points pour matérialiser la ligne de départ
+	if (Array.isArray(icoord)) {
+		if (objline.line != '') {
+			//map.removeLayer(objline.line);
+			objline.line.setMap(null);
+			objline.line = '';
+		}
+		var pathCoordinates = [{lat: coord1[0], lng: coord1[1]},{lat: coord2[0], lng: coord2[1]}];
+		//objline.line = new L.polyline(pathCoordinates, {color: objline.color});
+		//map.addLayer(objline.line);	
+		objline.line = new google.maps.Polyline({
+			path: pathCoordinates,
+			geodesic: true,
+			strokeColor: objline.color,
+			strokeOpacity: 1.0,
+			strokeWeight: 2
+		});
+		objline.line.setMap(map);
+	}
+	objline.coord = new Array(coord1[0],coord1[1],coord2[0],coord2[1]);
 }
 
 function drawCut() {
@@ -1240,6 +2001,7 @@ function showLap(lap) {
 	else {
 		var el = document.getElementById("simu");
 		el.style.display = "block";
+		document.getElementById("switch-graph").style.display = "block";
 	}		
 	
 	// on sauvegarde le n° du tour dans la page
@@ -1745,6 +2507,7 @@ function clearOngletsInfos() {
 }
 
 function switchSimu() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (is_simu) {
 		// On arrête le simulateur
 		simuRelease();
@@ -1817,6 +2580,7 @@ function simuRelease() {
 }
 
 function simuForward() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (!is_simu)
 		return;
 	// on récupère le n° du tour dans la page
@@ -1825,7 +2589,7 @@ function simuForward() {
 		return;
 	var lap = el.value;
 	il = lap - 1;
-	if (il < 0)
+		if (il < 0)
 		return;
 	if (simupoint < 0)
 		simupoint = 0;
@@ -1844,16 +2608,19 @@ function simuForward() {
 }
 
 function simuFaster() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (simu_freq <= 10)
 		simu_freq = simu_freq * 1.3;
 }
 
 function simuSlower() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (simu_freq >= 0.1)
 		simu_freq = simu_freq * 0.8;
 }
 
 function simuBackward() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (!is_simu)
 		return;
 	// on récupère le n° du tour dans la page
@@ -2138,6 +2905,7 @@ function showMobile() {
 	
 }
 function simuStepByStep() {
+	document.getElementById("zone-info").innerHTML = '';
 	playmotion = false;
 	if (simupoint >= Tours[il].points.length-1) {
 		simupoint = 0;
@@ -2146,6 +2914,7 @@ function simuStepByStep() {
 }
 
 function simuStop() {
+	document.getElementById("zone-info").innerHTML = '';
 	clearTimeout(timer);
 }
 
@@ -2174,6 +2943,7 @@ function formatTimestamp(temps) {
 }
 
 function showInputPoint(elem) {
+	document.getElementById("zone-info").innerHTML = '';
 	var zoom = map.getZoom();
 		
 	if (marktemp != '') {
@@ -2677,6 +3447,147 @@ function deg2rad(dg) {
 
 function rad2deg(rd) {
 	return rd*180/π;
+}
+
+// retourne l'angle formés par la droite A,B (A=origine, B=destination)
+function getAngle(A,B) {
+	//console.log('coordonnées='+A+','+B);
+
+	var Ya = A[0];
+	var Xa = A[1];
+	var Yb = B[0];
+	var Xb = B[1];
+	
+	// coordonnées d'un point B sur un cercle de centre A: X, Y
+	var X = Xb-Xa; // X = côté Adjacent de l'angle a
+	//console.log('côté adjacent='+X);
+	var Y = Yb-Ya; // Y = côté Opposé de l'angle a
+	//console.log('côté opposé='+Y);
+	
+	// calcul sinus et cosinus avec les coordonnées lat, lon
+	var H = Math.sqrt((Y*Y)+(X*X));
+	//console.log('hypoténuse='+H);
+	
+	var cosB = X/H;
+	var sinB = Y/H;
+	//console.log('cosB:'+cosB+',sinB:'+sinB);
+	
+	//if (X<0) cosB = cosB * -1;
+	//if (Y<0) sinB = sinB * -1;
+	//console.log('cosB:'+cosB+',sinB:'+sinB);
+	
+	var angleB = Math.acos(Math.abs(cosB)); // angle par rapport à l'horizontale
+	//console.log('angle B='+angleB+'('+rad2deg(angleB)+')');
+	if (Number.isNaN(angleB))
+		angleB = 0;
+	// valeur de l'angle en radian en fonction du signe du sinus et du signe du cosinus
+	if (sinB > 0) {
+		if (cosB < 0)
+			angleB = π - angleB;
+	}
+	else {
+		if (cosB > 0)
+			angleB = (2*π)-angleB;
+		else
+			angleB = π+angleB;
+	}
+	//console.log('angle B (0-360)='+angleB+'('+rad2deg(angleB)+')');
+	
+	//var angle = rad2deg(angleB);
+	//console.log('angle='+angleB);
+
+
+	
+	
+	// calcul sinus et cosinus avec la longueur des côtés
+	//var OM = distanceGPS(A,B);
+	//var OH = distanceGPS(A,new Array(A[0],B[1]));
+	//var OK = distanceGPS(new Array(A[0],B[0]),B);
+	//var cosB = OH/OM;
+	//var sinB = OK/OM;
+	//console.log('cosB:'+cosB+'sinB:'+sinB);
+	//
+	//if (X<0) sinB = sinB * -1;
+	//if (Y<0) cosB = cosB * -1;
+	//console.log('cosB:'+cosB+',sinB:'+sinB);
+	
+	var angle = angleB;
+	return angle;
+	
+	//return angle+',X='+X+',Y='+Y+',cos='+cosB+',sin='+sinB+'<br>A('+A[0]+','+A[1]+'),B('+B[0]+','+B[1]+')';
+}
+
+function getCap(objline) {
+	var Acoord = new Array(objline.coord[0],objline.coord[1]);
+	var Bcoord = new Array(objline.coord[2],objline.coord[3]);
+	
+	var angle = getAngle(Acoord,Bcoord);
+	//console.log('angle='+angle);
+	
+	var cap = initialBearingTo(Acoord,Bcoord);
+	//console.log('bearing='+cap);
+
+	return cap;
+	
+	var cap =  (π) - angle;
+	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
+	if (cap < 0)
+		cap = (π*2)+cap;
+	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
+	objline.cap = rad2deg(cap);
+	
+/*
+	
+	var cap = deg2rad(objline.cap);
+	var angle = ((π*5)/2)-cap;
+	if (!angle-(π*2) < 0)
+		angle = angle+(π*2);
+	//console.log("cap (rad):"+cap+",angle (rad)="+angle);
+*/	
+
+}
+
+/**
+ * Returns the initial bearing from ‘this’ point to destination point.
+ *
+ * @param   {LatLon} point - Latitude/longitude of destination point.
+ * @returns {number} Initial bearing in degrees from north (0°..360°).
+ *
+ * @example
+ *   const p1 = new LatLon(52.205, 0.119);
+ *   const p2 = new LatLon(48.857, 2.351);
+ *   const b1 = p1.initialBearingTo(p2); // 156.2°
+ */
+function initialBearingTo(point1, point2) {
+    // tanθ = sinΔλ⋅cosφ2 / cosφ1⋅sinφ2 − sinφ1⋅cosφ2⋅cosΔλ
+    // see mathforum.org/library/drmath/view/55417.html for derivation
+	var p1lat = point1[0];
+	var p1lon = point1[1];
+	var p2lat = point2[0];
+	var p2lon = point2[1];
+
+    const φ1 = deg2rad(p1lat);
+    const φ2 = deg2rad(p2lat);
+    const Δλ = deg2rad(p2lon - p1lon);
+
+    const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const θ = Math.atan2(y, x);
+
+    const bearing = rad2deg(θ);
+
+    return wrap360(bearing);
+}
+/**
+ * Constrain degrees to range 0..360 (e.g. for bearings); -1 => 359, 361 => 1.
+ *
+ * @private
+ * @param {number} degrees
+ * @returns degrees within range 0..360.
+ */
+function wrap360(degrees) {
+    if (0<=degrees && degrees<360) return degrees; // avoid rounding due to arithmetic ops if within range
+    return (degrees%360+360) % 360; // sawtooth wave p:360, a:360
 }
 	
 function mouseMove(mousePt) {
