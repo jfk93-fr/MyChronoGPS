@@ -951,6 +951,49 @@ function redraw() {
 		document.getElementById("zone-info").innerHTML = 'recalcul impossible, ligne de départ-arrivée manquante.';
 		return;
 	}
+	//
+	// On efface tous les marqueurs des tours affichés
+	for (var i=0; i < Tours.length-1; i++) {
+		if (Tours[i].polyline) {
+			if (Tours[i].polyline != '') {
+				Tours[i].polyline.setMap(null);
+				Tours[i].polyline = '';
+				if (Tours[i].markerPC) {
+					if (Tours[i].markerPC != '') {
+						Tours[i].markerPC.setMap(null);
+						Tours[i].markerPC = '';
+					}
+				}
+				if (Tours[i].markerD1) {
+					if (Tours[i].markerD1 != '') {
+						Tours[i].markerD1.setMap(null);
+						Tours[i].markerD1 = '';
+					}
+				}
+				if (Tours[i].markerD2) {
+					if (Tours[i].markerD2 != '') {
+						Tours[i].markerD2.setMap(null);
+						Tours[i].markerD2 = '';
+					}
+				}
+				if (Tours[i].segment0) {
+					if (Tours[i].segment0 != '') {
+						Tours[i].segment0.setMap(null);
+						Tours[i].segment0 = '';
+					}
+				}
+				if (Tours[i].segment1) {
+					if (Tours[i].segment1 != '') {
+						Tours[i].segment1.setMap(null);
+						Tours[i].segment1 = '';
+					}
+				}
+			}
+		}
+	}
+	
+	
+	
 	FL = new Array(objStart.coord[0],objStart.coord[1],objStart.coord[2],objStart.coord[3]);
 	buildTours(FL);
 	nb_tours = Tours.length;
