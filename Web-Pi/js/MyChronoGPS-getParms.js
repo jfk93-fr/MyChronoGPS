@@ -33,8 +33,6 @@ function loadParmsAjax(proc)
     xmlhttp.onreadystatechange = function(proc) {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Parms = JSON.parse(this.responseText);}
 				catch(e) {Parms = this.responseText;}
 			}
@@ -46,7 +44,6 @@ function loadParmsAjax(proc)
 			}
 		}
     }
-    //xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.open("GET", proc, true);
     xmlhttp.send();
 }
@@ -54,40 +51,15 @@ function loadParmsAjax(proc)
 loadParms();
 
 function dataParmsReady() {
-	//console.log(JSON.stringify(Parms));
 	var myKey = Parms[0].GoogleMapsAPIKey;
-	//console.log(myKey);
 	data_ready = true;
 	var mapl = document.getElementById("maploader");
 	if (myKey) {
 		var newScript = document.createElement("script");
 		var newContent = document.createTextNode("src=\"https://maps.googleapis.com/maps/api/js?key=' + myKey + '&libraries=geometry&callback=initGooglemap\"");
-		//mapl.innerHTML = '<script async defer src="https://maps.googleapis.com/maps/api/js?key=' + myKey + '&libraries=geometry&callback=initGooglemap"></script>';
-		//var scriptTag = '<' + 'script async defer src="https://maps.googleapis.com/maps/api/js?key=' + myKey + '&libraries=geometry&callback=initGooglemap">'+'<'+'/script>';
-		//document.write(scriptTag);
 		newScript.appendChild(newContent);
 		var currentDiv = document.getElementById('maploader');
 		document.body.insertBefore(newScript, currentDiv);
 
 	}
-	//go();
-}	
-
-//function go()
-//{
-//	var listeHTML = '';
-//	if (Parms.length > 0) {
-//		//console.log(Parms[0]);
-//		Parms.params = Parms[0];
-//		for (variable in Parms.params) {
-//			//console.log(variable);
-//			if (variable.substr(0,1) == "#") {
-//				listeHTML += '<li>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
-//			}
-//			else {
-//				listeHTML += '<input id="'+variable+'" name="'+variable+'" value="'+Parms.params[variable]+'"></li>';
-//			}
-//		}
-//	}
-//	document.getElementById("liste_params").innerHTML = listeHTML;
-//}
+}

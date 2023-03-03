@@ -89,12 +89,8 @@ function addTracks(mousePt) {
 function markCircuit() {
 	var listeHTML = '<div class="w3-container"><ul>';
 	for (var i=0; i < Circuit.circuits.length; i++) {
-		//console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
 		var dist = distanceGPS(lat,lng,Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude);
 		icon_image = icon_image_off;
-		//if (dist > rayon)
-		//	icon_image = icon_image_off;
-		//console.log(Circuit.circuits[i].NomCircuit+' est situé à '+dist);
 		createMarker(Circuit.circuits[i]);
 		// remplissage de la liste des circuits
 		IdCircuit  = Circuit.circuits[i].IdCircuit;
@@ -123,7 +119,6 @@ function markCircuit() {
 		LatInt3 = Circuit.circuits[i].LatInt3;
 		LonInt3 = Circuit.circuits[i].LonInt3;
 
-		//listeHTML += '<li><div class="w3-col l6 s6"><a'+
 		listeHTML += '<div class="w3-col l6 s6"><a'+
 						' href="#"'+
 						' id="lien_circuit'+IdCircuit+'"' +
@@ -135,7 +130,6 @@ function markCircuit() {
 						//'</li>';
 						'';
 	}
-	//listeHTML += '</ul></div>';
 	listeHTML += '</div>';
 	document.getElementById("liste_circuits").innerHTML = listeHTML;
 }
@@ -152,7 +146,6 @@ function changeMarker(circuit,onoff)
 	});	
 	var markerpoint = tab_marker[circuit]['point'];
 
-	//L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map);
 	L.marker(markerpoint, {icon: myIcon}).addTo(map);
 }
 function showInfoMarker(circuit)
@@ -171,22 +164,6 @@ function showInfoMarker(circuit)
     .setContent(info)
     .openOn(map);
 	return;
-
-
-	//tab_marker[circuit]['bulle'].open(map, marker);
-	///*
-	//marker.setOptions({
-	//icon:img_icon
-	//});
-	//*/
-
-	var marker = new L.Marker(point,{icon: myIcon, draggable:true}).bindPopup(info);
-	map.addLayer(marker);	
- 	
-	//tab_marker[circuit.IdCircuit]=new Array();
-	//tab_marker[circuit.IdCircuit]['marker']=marker;
-	//tab_marker[circuit.IdCircuit]['point']=point;
-	//tab_marker[circuit.IdCircuit]['info']=info;
 }
 
 function createMarker(circuit,newlat,newlon)
@@ -204,39 +181,7 @@ function createMarker(circuit,newlat,newlon)
 		//console.log(circuit);
 		return;
 	}
-	//var point = new google.maps.LatLng(clat, clon);
-	//
-	//var marker = new google.maps.Marker({
-    //  				position: point,
-	//				title: circuit.NomCircuit,
-    //  				map: map,
-    //  				icon: icon_image,
-	//				dragable: drag,
- 	//				anchorPoint:new google.maps.Point(0, 0),
-	//			  });
-	//
-	//var page='MyChronoGPS-DesignTrack.html';
-	//var url = '';
-	//if (circuit.NomCircuit != "Nouveau Circuit") {
-	//	url = 'id='+circuit.NomCircuit;
-	//}
-	//else {
-	//	//console.log("on va demander l'affichage d'un nouveau circuit");
-	//	url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
-	//}
-	//
-	//var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
-	//			'	<table align="center">' +
-	//			'		<tr>' +
-	//			'			<td colspan="2" align="center">'+
-	//			//'				<a href="#" onclick="showCircuit(\''+circuit.NomCircuit+'\');"><B>'+circuit.NomCircuit+'</B></a></td>' +
-	//			'       		<a href="'+page+'?'+url+'">'+circuit.NomCircuit+'</a></td>' +
-	//			'		</tr>' +
-	//			'		<tr>' +
-	//			'			<td colspan="2" align="center">'+circuit.LongCircuit+' m</td>' +
-	//			'		</tr>' +
-	//			'	</table>' +
-	//			'</div>';
+
 	var myIcon = L.icon({
 		iconUrl: icon_image,
 		iconSize: [38, 38],
@@ -250,7 +195,6 @@ function createMarker(circuit,newlat,newlon)
 		url = 'id='+circuit.NomCircuit;
 	}
 	else {
-		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 	
@@ -274,14 +218,6 @@ function createMarker(circuit,newlat,newlon)
 	tab_marker[circuit.IdCircuit]['marker']=marker;
 	tab_marker[circuit.IdCircuit]['point']=point;
 	tab_marker[circuit.IdCircuit]['info']=info;
-	
-	//tab_marker[circuit.IdCircuit]['bulle'] = new google.maps.InfoWindow({
-	//	content: info
-	//});
-	//
-	//google.maps.event.addListener(marker, 'click', function() {
-  	//    tab_marker[circuit.IdCircuit]['bulle'].open(map, marker);
-	//});
 }
 
 function showCircuit(nomcircuit) {
@@ -291,7 +227,6 @@ function showCircuit(nomcircuit) {
 		url = 'id='+nomcircuit;
 	}
 	else {
-		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 	w = window.open (page+'?'+url,'popup', 'menubar=1, location=0, toolbar=1, directories=0, status=1, scrollbars=1, resizable=1, width=1055, height=700') ; 
@@ -329,7 +264,6 @@ function distanceGPS(lat1, lng1, lat2, lng2) {
 	
 function mouseMove(mousePt) {
 	mouseLatLng = mousePt.latlng;
-	//var mouseCoord = mouseLatLng.toUrlValue();
 	var mouseLat = mouseLatLng.lat;
 	var mouseLon = mouseLatLng.lng;
 	
@@ -360,14 +294,10 @@ function showPoint() {
 	var LatLng = el.value.split(",");
 	lat = LatLng[0];
 	lon = LatLng[1];
-	//var googleLatLng = new google.maps.LatLng(lat,lon); 
-	//map.setCenter(googleLatLng);
-	//map = L.map('map').setView([lat,lon]);
 	map.setView([lat,lon],16);
 	
 	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 		return
-	//console.log("un circuit va être créer à "+lat+","+lon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";

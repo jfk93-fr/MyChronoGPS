@@ -35,8 +35,6 @@ function loadParmsAjax(proc)
     xmlhttp.onreadystatechange = function(proc) {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Parms = JSON.parse(this.responseText);}
 				catch(e) {Parms = this.responseText;}
 			}
@@ -48,7 +46,6 @@ function loadParmsAjax(proc)
 			}
 		}
     }
-    //xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.open("GET", proc, true);
     xmlhttp.send();
 }
@@ -61,21 +58,8 @@ function dataParmsReady() {
 
 function go()
 {
-	/*
-		<div class="w3-responsive">
-			<table id="tabsessions"class="w3-table-all">
-				<tr>
-					<th>Date</th>
-					<th>Heure</th>
-					<th>Circuit</th>
-					<th></th>
-				</tr>
-			</table>
-		</div>
-	*/
 	var listeHTML = '<div class="w3-responsive"><table id="tabsessions"class="w3-table-all">';
 	if (Parms.length > 0) {
-		//console.log(Parms[0]);
 		Parms.params = Parms[0];
 		for (variable in Parms.params) {
 			//console.log(variable);
@@ -88,22 +72,6 @@ function go()
 		}
 		listeHTML += '</table></div>';
 	}
-	/*
-	var listeHTML = '';
-	if (Parms.length > 0) {
-		//console.log(Parms[0]);
-		Parms.params = Parms[0];
-		for (variable in Parms.params) {
-			//console.log(variable);
-			if (variable.substr(0,1) == "#") {
-				listeHTML += '<li>'+variable.substr(1)+' '+Parms.params[variable]+'<br />';
-			}
-			else {
-				listeHTML += '<input id="'+variable+'" name="'+variable+'" value="'+Parms.params[variable]+'"></li>';
-			}
-		}
-	}
-	*/
 	document.getElementById("liste_params").innerHTML = listeHTML;
 }
 
@@ -114,7 +82,6 @@ function copyParms() {
 	createNewParms();
 	
 	var json = JSON.stringify(NewParms, null, '\t');
-	//console.log(json);
 	z_extract.value = json;
 	z_extract.select();
 	if ( !document.execCommand( 'copy' ) ) {
@@ -141,7 +108,6 @@ function createNewParms() {
 	}
 
 	for (property in NewParms) {
-		//console.log(property+':'+NewParms[property]);
 	}
 }
 
@@ -152,8 +118,6 @@ function saveParms() {
 
 	dataPost = new FormData();
 	dataPost.append("parms", json);
-
-	//console.log(JSON.stringify(dataPost));
 	
 	upLoadParmsAjax(fname_save);
 	
@@ -166,10 +130,7 @@ function upLoadParmsAjax(proc)
     xmlhttp.onreadystatechange = function(proc) {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {dataReturn = JSON.parse(this.responseText);
-					//console.log(JSON.stringify(dataReturn));
 					var el = document.getElementById("zone-info");
 					if (el)
 						el.innerHTML = "fichier paramètre sauvegard&eacute;";

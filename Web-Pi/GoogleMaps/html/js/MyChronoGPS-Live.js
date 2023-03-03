@@ -105,10 +105,8 @@ function dataCircuitsReady() {
 		}
 		return false;
 	}
-	//console.log(JSON.stringify(Circuit));
 	
 	loadLiveCoords();
-	//console.log(JSON.stringify(Live))
 }	
 
 function dataLiveReady() {
@@ -180,7 +178,6 @@ function initMap() {
     };
 	
 	map = new google.maps.Map(document.getElementById('map'), optionsMap);
-	//var point = {lat: lat, lng: lon};
 	var markerpoint = {lat: lat, lng: lon};
 	currentmarker = new google.maps.Marker({
 		position: markerpoint, title: thisCircuit.NomCircuit
@@ -352,30 +349,6 @@ function showLines() {
 		drawLine(Tabint[2]);
 	}
 	
-	/*
-    if "PitIn" in self.circuit:
-        self.pitin = self.ChronoData()
-        # PitIn1 est définie en lat,lon des 2 points de part et d'autre de la ligne
-        self.pitin.lat1 = float(self.circuit["PitIn"][0])
-        self.pitin.lon1 = float(self.circuit["PitIn"][1])
-        self.pitin.lat2 = float(self.circuit["PitIn"][2])
-        self.pitin.lon2 = float(self.circuit["PitIn"][3])
-    elif "LatPitIn" in self.circuit:
-        if self.circuit["LatPitIn"] != "":
-            self.pitin = self.ChronoData()
-            
-            self.pitin.lat = float(self.circuit["LatPitIn"])
-            self.pitin.lon = float(self.circuit["LonPitIn"])
-            self.pitin.cap = float(self.circuit["CapPitIn"])
-            self.pitin.draw();
-            self.pitin.lat1 = self.pitin.coord1.lat
-            self.pitin.lon1 = self.pitin.coord1.lon
-            self.pitin.lat2 = self.pitin.coord2.lat
-            self.pitin.lon2 = self.pitin.coord2.lon
-			
-		drawLine(objPitIn);
-			
-	*/
 	var isObjLine = false;
 	if (thisCircuit.LatPitIn && thisCircuit.LonPitIn) {
 		objPitIn = new Object();
@@ -400,7 +373,6 @@ function showLines() {
 	}
 	if (isObjLine) {
 		drawLine(objPitIn);
-		//pitDef = true;
 	}
 	
 	var isObjLine = false;
@@ -427,7 +399,6 @@ function showLines() {
 	}
 	if (isObjLine) {
 		drawLine(objPitOut);
-		//pitDef = true;
 	}
 	// calcul du cap entre pitIn et pitOut
 	if (objPitIn.hasOwnProperty('coord') && objPitOut.hasOwnProperty('coord'))
@@ -471,7 +442,6 @@ function showLines() {
 				pitcap = computeHeading(midIn, midOut);
 			}
 		}
-		//console.log(pitcap);
 	}
 }
 
@@ -569,9 +539,7 @@ function go()
 			el.innerHTML = Live;
 		return false;
 	}
-	//console.log(JSON.stringify(Live));
-		
-	//curr_coord = 0;
+
 	Ev = eval(Live[0]);
 	retour = Ev;
 	if (retour.msgerr) {
@@ -610,7 +578,6 @@ function go()
 		Point1 = Ev[0];
 	}
 	else {
-		//Point1 = Ev[0];
 		Point1 = thisPoint;
 	}
 
@@ -743,7 +710,6 @@ function designCut(parm) {
 	var v1 = parm.v1;
 	
 	var linecut = isLineCut(linecoord,segcoords);
-	//console.log('linecut:'+linecut+' linecoord:',linecoord+' segcoords:',segcoords);
 	
 	if (linecut) {
 		// On va calculer les distances entre le point, le point b et la ligne franchie
@@ -754,11 +720,6 @@ function designCut(parm) {
 		var pointCut = getIntersection(linecoord,segcoords);
 
 		var corrtime = dt1.getTime() - dt0.getTime();
-		//var vs0 = (v0*1000)/3600;
-		//var vs1 = (v1*1000)/3600;
-		//var vmoy = (vs0+vs1)/2;
-		//var dc0 = dist0*(vs1/vmoy);
-		//var dc1 = dist1*(vs0/vmoy);
 		var vmoy = (v0+v1)/2;
 		var dc0 = dist0*(v1/vmoy);
 		var dc1 = dist1*(v0/vmoy);
@@ -810,7 +771,6 @@ function showMobile() {
 	mobpoint = new google.maps.Marker({
 		position: markerpoint, 
 		title: 'v:'+Math.round(Point1.vitesse)+'km/h\r\n'+
-		       'alt:'+Math.round(Point1.altitude)+'m\r\n'+
                'cap:'+Math.round(Point1.cap*10)/10+'° '
 		,icon: {
 			path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
@@ -850,88 +810,7 @@ function showMobile() {
 		// affichage du tableau de bord lorsque le mobile est en piste
 		displayDashboard();
 	}
-	//
-	//// affichage de l'accélération
-	//var el = document.getElementById('accel');
-	//if (el) {
-	//	el.innerHTML = Math.round(accel*100)/100+"g";
-	//}
-	//
-	//// affichage de la distance parcourue
-	//var el = document.getElementById('dist');
-	//if (el) {
-	//	var geodist = new Array();
-	//	for (var m=0; m < i1; m++) {
-	//		geodist.push(Tours[il].geocoords[m]);
-	//	}
-	//	var dist =	google.maps.geometry.spherical.computeLength(geodist);
-	//	el.innerHTML = Math.round(dist)+"m";
-	//}
-	//
-	//// affichage de l'altitude
-	//var el = document.getElementById('altitude');
-	//if (el) {
-	//	el.innerHTML = 'alt:'+Math.round(altitude)+"m";
-	//}
-	//
-	//// affichage du cap
-	//var el = document.getElementById('cap');
-	//if (el) {
-	//	var cap0 = Math.round(Tours[il].points[i0].cap*100)/100;
-	//	el.innerHTML = 'cap:'+Math.round(cap*100)/100+"° cap0:"+cap0;
-	//}
-	//
-	//// affichage du virage (changement de cap entre 2 points)
-	//var a0 = deg2rad(Tours[il].points[i0].cap);
-	//var a1 = deg2rad(Tours[il].points[i1].cap);
-	//var turn = 0;
-	//if (Math.abs(a1-a0) <= π) {
-	//	if (a1 < a0) {
-	//		turn = (a0 - a1) * -1;
-	//	}
-	//	else {
-	//		turn = a1 - a0;
-	//	}
-	//}
-	//else if (a1 < π) {
-	//	turn = a1+(2*π-a0);
-	//}
-	//else {
-	//	turn = 2*π-(a1+a0);
-	//}
-	//	
-	//var el = document.getElementById('turn');
-	//if (el) {
-	//	//el.innerHTML = 'turn:'+deg2rad(cap)+'/'+deg2rad(cap0)+"rad";
-	//	turn = rad2deg(turn);
-	//	el.innerHTML = '';
-	//	if (turn <= -2) {
-	//		el.innerHTML += 'turn left ';
-	//	}
-	//	else if (turn >= 2) {
-	//		el.innerHTML += 'turn right ';
-	//	}
-	//	el.innerHTML += Math.round(turn)+"°";
-	//}
-	//
-	//// Si on est en mode pas à pas, on marque le point d'intersection du segment avec la ligne
-	//if (!playmotion) {
-	//	if (marktemp != '') {
-	//		marktemp.setMap(null);
-	//		marktemp = '';
-	//	}
-	//	var lat = Tours[il].points[i1].CP.latitude;
-	//	var lng = Tours[il].points[i1].CP.longitude;
-	//	if (lat > 0 && lng > 0) {
-	//		var markerpoint = {lat: lat, lng: lng};
-	//		var l = tabMarktemp.length-1;
-	//		marktemp = new google.maps.Marker({
-	//			position: markerpoint, title: 'Intersection'
-	//			,draggable: true
-	//			});
-	//		marktemp.setMap(map);
-	//	}
-	//}
+
 	// affichage des chronos précédents
 	for (var i=0; i < 4; i++) {
 		var el = document.getElementById("C"+i);
@@ -955,13 +834,6 @@ function showMobile() {
 	
 	// on va réserver le point pour les prochains calculs
 	Point0 = new Object();
-	/*[{"timestamp":"145430.600",
-	    "pointgps":[46.1976613667,0.634537433333],
-		"vitesse":16.475392,
-		"altitude":162.298,
-		"cap":79.536514
-	  }]
-	*/
 	Point0.timestamp = Point1.timestamp;
 	Point0.pointgps = Point1.pointgps;
 	Point0.vitesse = Point1.vitesse;
@@ -1225,8 +1097,7 @@ function computeTimes() {
 	}
 
 	// ensuite on regarde la ligne de départ/arrivée
-	//var linecoord = objStart.coord;
-			var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
+	var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
 	if (objStart.hasOwnProperty('coord')) {
 		var parmCut = new Object();
 		parmCut.linecoord = objStart.coord;
@@ -1775,7 +1646,7 @@ function writeMessage(text_mess,time_mess=1) {
 function resizeMap() {
 	if (!map)
 		return;
-	//
+
 	var el = document.getElementById("map");
 	var largeur = window.innerWidth;
 	var hauteur = window.innerHeight;

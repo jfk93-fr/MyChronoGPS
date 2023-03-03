@@ -1,4 +1,3 @@
-//var fname = 'ajax/get_circuits.php';
 var fname = 'ajax/get_circuits.py';
 var data_ready = false;
 var Circuit = false;
@@ -25,9 +24,6 @@ function isCircuitsReady()
 		return;
 	}
 	clearTimeout(circuits_timer);
-	//var el = document.getElementById("zone-info");
-	//if (el)
-	//	el.innerHTML = '';
 
 	dataCircuitsReady();
 }
@@ -38,8 +34,6 @@ function loadCircuitsAjax(proc)
     xmlhttp.onreadystatechange = function(proc) {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Circuit = JSON.parse(this.responseText);}
 				catch(e) {Circuit = this.responseText;}
 			}
@@ -51,7 +45,6 @@ function loadCircuitsAjax(proc)
 			}
 		}
     }
-    //xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.open("GET", proc, true);
     xmlhttp.send();
 }

@@ -28,12 +28,6 @@ function switchGraph() {
 		graphRelease();
 		resizeMap();
 		is_graph = false;
-		//if (window.innerWidth <= 500) {
-		//	document.getElementById("menu-graph-35").style.display = "none";
-		//}		
-		//else {
-			//document.getElementById("menu-graph").style.display = "none";
-		//}		
 		return;
 	}
 	//document.getElementById("menu-graph").style.display = "none";
@@ -55,15 +49,12 @@ function switchGraph() {
 	var maxcols = tabShow.length;
 	// Boucle de construction des graphiques des tours sélectionnés
 	for (var i=0; i < maxcols; i++) {
-		//console.log(tabShow);
 		var il = tabShow[i]-1;
-		//drawChartLap(il);
 		datag.addColumn('number', 'T'+(il+1)); 
 		if (Tours[il].geocoords.length > maxrows) {
 			maxrows = Tours[il].geocoords.length;
 		}
 	}
-	//console.log(maxrows);
 	// préparation du tableau graphe
 	tabGraph = new Array();
 	for (var i=0; i < maxrows; i++) {
@@ -84,7 +75,6 @@ function switchGraph() {
 			tabGraph[i][j] = lapGraph[i];
 		}
 	}
-	//console.log(JSON.stringify(tabGraph));
 
 	for (var i=0; i < maxrows; i++) {
 		datag.setCell(i,0,i);
@@ -117,39 +107,8 @@ function switchGraph() {
 		if (lieu.length > 0) {
 			var x = lieu[0].row;
 			var y = lieu[0].column-1;
-			//var lap = tabShow[y];
-			//var point2mark = tabGraph[x][y];
-			//console.log(JSON.stringify(point2mark));
-			
-			//setMarkerpoint(lap,point2mark);
+
 			setMarkerpoint(x,y);
-			//if (graphmarker != '') {
-			//	graphmarker.setMap(null);
-			//	graphmarker = '';
-			//}
-			//var markerpoint = {lat: point2mark.lat(), lng: point2mark.lon()};
-			//console.log(markerpoint);
-			//graphmarker = new google.maps.Marker({
-			//	position: markerpoint, 
-			//	title: 'T:\t'+lap+'\r\n'+
-			//		'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
-			//		'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
-			//		'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
-			//		'cap:\t'+Math.round(point2mark.cap*10)/10+'° '
-			//	,icon: {
-			//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-			//		rotation: cap,
-			//		fillColor: "cyan",
-			//		fillOpacity: 0.8,
-			//		scale: 5,
-			//		strokeColor: "gold",
-			//		strokeWeight: 2,
-			//		}
-			//	,draggable: true
-			//	});
-			//graphmarker.setMap(map);
-			//setCenter(markerpoint);
-			//graphmarker.addListener('dragend', function(ev) {changeMobilePoint(ev);});
 		}
 		return;
 	});
@@ -171,14 +130,12 @@ function setMarkerpoint(x,y) {
 	}
 	var cap = point2mark.cap;
 	var markerpoint = {lat: point2mark.lat(), lng: point2mark.lon()};
-	//console.log(markerpoint);
 	graphmarker = new google.maps.Marker({
 		position: markerpoint, 
 		title: 'T:\t'+lap+'\r\n'+
 			'P:\t'+x+'\r\n'+
 			'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
 			'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
-			'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
 			'cap:\t'+Math.round(point2mark.cap*10)/10+'° '
 		,icon: {
 			path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
@@ -197,12 +154,10 @@ function setMarkerpoint(x,y) {
 }
 
 function changeMobilePoint(ev) {
-	//console.log(JSON.stringify(ev));
 	var x = lieu[0].row;
 	var y = lieu[0].column-1;
 	var lap = tabShow[y];
 	var il = lap-1;
-	//console.log(JSON.stringify(Tours[il].geocoords));
 	// recherche du point le plus proche du marker mobile
 	var mindist = 999999;
 	var dist;
@@ -213,21 +168,13 @@ function changeMobilePoint(ev) {
 		var latb = Tours[il].geocoords[ip].lat();
 		var lngb = Tours[il].geocoords[ip].lng();
 		dist = distanceGPS(new Array(lata,lnga),new Array(latb,lngb));
-		//console.log('dist:'+dist);
 		if (dist < mindist) {
 			mindist = dist;
 			im = ip;
 		}
 	}
-	//console.log('mindist:'+mindist);
-	//console.log('indice point:'+im);
 	// on place le mobile sur le point le plus près qu'on a trouvé
 	var point2mark = tabGraph[im][0];
-
-	//var point2mark = new Array();
-	//point2mark.lat = Tours[il].geocoords[im].lat;
-	//point2mark.lon = Tours[il].geocoords[im].lng;
-	//point2mark.cap = Tours[il].points[im].cap;
 	var x=im;
 	var y=0;
 	setMarkerpoint(x,y);
@@ -242,7 +189,6 @@ function changeMobilePoint(ev) {
 	chart.draw(datag, options);
 	chart.setSelection([{'row' : im}]);
 	
-	//for (var
 }
 	
 function drawChartLap(il) {
@@ -262,7 +208,6 @@ function drawChartLap(il) {
 		var geodist = new Array();
 		geodist.push(Tours[il].geocoords[ip-1]);
 		geodist.push(Tours[il].geocoords[ip]);
-		//var dist =	google.maps.geometry.spherical.computeLength(geodist);
 		var dist = distance2segments(geodist);
 		distlap += dist;
 		ograph = new Object();
@@ -278,19 +223,11 @@ function drawChartLap(il) {
 		
 		lapGraph.push(ograph);
 	}
-	//console.log('longueur Graph'+lapGraph.length);
 }
 
 function graphRelease() {
 	is_graph = false;
 
-	//if (graphmarker != '') {
-	//	graphmarker.setMap(null);
-	//	graphmarker = '';
-	//}
-	//var el = document.getElementById("sousmenu-simu");
-	//if (el)
-	//	el.style.display = "none";
 	var el = document.getElementById("sousmenu-map");
 	if (el)
 		el.style.display = "block";

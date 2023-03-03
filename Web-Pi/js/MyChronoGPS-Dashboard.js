@@ -1,7 +1,3 @@
-//if (typeof(data_ready) == 'undefined') {
-//	//console.log('data_ready undefined');
-//}
-
 function isDocInFullscreen() {
   if (document.fullscreenElement) {
     return true;
@@ -9,12 +5,6 @@ function isDocInFullscreen() {
   return false;
 }
 var fullscreen = isDocInFullscreen();
-//console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
-
-//var el = document.getElementById('changescreen');
-//el.innerHTML = screen.width+' '+screen.height;
-//el.innerHTML = 'sat 12 58°';
-
 
 var timer = '';
 var dashboard_timer = '';
@@ -53,19 +43,14 @@ function go()
 		clearTimeout(timer);
 	}
 	document.getElementById('dashboard').style.display = 'block';
-	//resizescreen('dashboard');
 
 	if (!Array.isArray(Dashboard)) {
 		// on n'a pas réussi à charger les données
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		//console.log('go() erreur');
-		//console.log(Dashboard);
-			//el.innerHTML = Live;
 		return false;
 	}
-	//console.log(Dashboard[0]);
 
 	Ev = eval(Dashboard[0]);
 	retour = Ev;
@@ -77,12 +62,10 @@ function go()
 		if (el)
 			el.innerHTML = retour.msgerr;
 		// tout recommencer dans quelques secondes
-		//console.log(retour.msgerr)
 		timer = setTimeout(getNextDisplay, 3000);	
 		return false;
 	}
 
-	//console.log(Ev);
 	thisDashboard = Ev;
 	
 	displayDashboard();
@@ -97,9 +80,7 @@ function displayDashboard() {
 	clearDashboard()
 	var message = thisDashboard.dashboard;
 	var command = message.substr(0,1);
-	//console.log(command);
 	var texte = message.substr(1);
-	//console.log(texte);
 	var tabLines = texte.split('//');
 	switch(command) {
 		case "D":
@@ -146,10 +127,7 @@ function displayBig(lines) {
 	var el = document.getElementById('LH');
 	el.style.display="block";
 	var el = document.getElementById('LH0');
-	//el.innerHTML = lines[0];
-	//var texte = ""
 	if (lines.length > 1) {
-		//texte = lines[0];
 		textLayout('LH0',lines[0]);
 	}
 
@@ -160,21 +138,14 @@ function displayBig(lines) {
 	}
 	el.innerHTML = texte;
 
-	//var texte = ""
 	if (lines.length > 2) {
-		//var el = document.getElementById('LH2');
-		//texte = lines[2];
 		textLayout('LH2',lines[2]);
-	}
-	//el.innerHTML = texte;
-	
+	}	
 }
 function displaySmall(lines) {
 	var el = document.getElementById('LS');
 	el.style.display="block";
 	
-	//var el = document.getElementById('LS0');
-	//el.innerHTML = lines[0];
 	textLayout('LS0',lines[0]);
 	
 	var el = document.getElementById('LS1');
@@ -183,24 +154,20 @@ function displaySmall(lines) {
 		texte = lines[1];
 		textLayout('LS1',lines[1]);
 	}
-	//el.innerHTML = texte;
-	
-	//var el = document.getElementById('LS2');
+
 	var texte = ""
 	if (lines.length > 2) {
 		texte = lines[2];
 		textLayout('LS2',lines[2]);
 	}
-	//el.innerHTML = texte;
 	
 	var texte = ""
 	if (lines.length > 3) {
 		texte = lines[3];
 		textLayout('LS3',lines[3]);
 	}
-	//var el = document.getElementById('LS3');
-	//el.innerHTML = texte;
 }
+
 function textLayout(div,texte) {
 	var el = document.getElementById(div);
 	texteleft = texte;
@@ -212,7 +179,6 @@ function textLayout(div,texte) {
 	}
 	var layout = "<div class=\"txtleft\">"+texteleft+"</div>"; 
 	layout += "<div class=\"txtright\">"+texteright+"</div>"; 
-		
 	
 	el.innerHTML = layout;	
 }
@@ -221,7 +187,6 @@ function displayLeds() {
 	var led1 = thisDashboard.led1;
 	var led2 = thisDashboard.led2;
 	var led3 = thisDashboard.led3;
-	//console.log('leds='+led1+'/'+led2+'/'+led3);
 	if (Array.isArray(led1)) {
 		displayLed(led1,'yellow');
 	}		
@@ -237,8 +202,6 @@ function displayLed(led,color) {
 	var flashing = led[1]*1;
 	var flashtime = led[2]*1;
 	var flashmode = led[3]*1;
-	//if (flashtime == 0)
-	//	flashtime = 2; // on va faire un flash pendant au moins 2 secondes
 	var led = document.getElementById('led-'+color);
 	if (led_timer[color]) {
 		clearTimeout(led_timer[color]);
@@ -264,10 +227,9 @@ function displayLed(led,color) {
 }
 
 function stopBlinkLed() {
-	//console.log('timeout');
-	for (property in led_timer) {
-		//console.log(led_timer[property]);
-	}
+	//for (property in led_timer) {
+	//	//console.log(led_timer[property]);
+	//}
 	return;
 	var led = document.getElementById('led-'+color);
 	led.className = 'led-'+color+'-off';
@@ -315,8 +277,6 @@ function isDisplayReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		//console.log('isDisplayReady() erreur');
-		//console.log(Dashboard);
 		return false;
 	}
 
@@ -332,12 +292,10 @@ function isDisplayReady()
 		if (el)
 			el.innerHTML += ' '+retour.msgerr;
 		// aller vers le prochain point
-		//console.log(retour.msgerr)
 		timer = setTimeout(getNextDisplay, 3000);
 		return false;
 	}
 
-	//console.log(Ev)
 	thisDashboard = Ev;
 	
 	displayDashboard();
@@ -431,14 +389,9 @@ function ajax_cmd(cmd) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-		    //alert("responseText:"+this.responseText);
-			//console.log(this.responseText);
-        
+
             myObj = JSON.parse(this.responseText);
-			
-			//alert("objet:"+JSON.stringify(myObj));
-            
-            //document.getElementById("zone-info").innerHTML = myObj.return;
+
             document.getElementById("info-cmd").innerHTML = myObj.msg;
         }
     }
@@ -447,7 +400,6 @@ function ajax_cmd(cmd) {
 }
 
 function setInactiv(delai=delai_inactiv) {
-	//var delai = delai_inactiv;
 	if (inactiv_timeout) {
 		window.clearTimeout(inactiv_timeout);
 	}
@@ -485,8 +437,6 @@ function isInfosReady()
 		var el = document.getElementById("zone-info");
 		if (el)
 			el.innerHTML = 'problème détecté';
-		//console.log('isInfosReady() erreur');
-		//console.log(Infos);
 		timerInfos = setTimeout(getInfos, 3000);
 		return false;
 	}
@@ -512,10 +462,8 @@ function isInfosReady()
 	distcircuit = retour.distcircuit;
 
 	var el = document.getElementById("nb-sats");
-	//el.innerHTML = 'sat '+nbsats;
 	el.innerHTML = nbsats;
 	
-	//el.style.display="none";
 	var el = document.getElementById("signal-container");
 	el.style.display="block";
 	var ebar1 = document.getElementById("sbar1");
@@ -543,12 +491,8 @@ function isInfosReady()
 	if (nbsats > 9) {
 		 ebar5.style.height="100%";
 	}
-	//signal.className = 'signal-container';
 
-	
-	
 	document.getElementById("tempcpu").innerHTML = tempcpu+'°';
-	//document.getElementById("NomCircuit").innerHTML = circuit+"("+distcircuit+"m)";
 	document.getElementById("NomCircuit").innerHTML = circuit;
 	
 	// recherche des compléments d'infos sur LIVE
@@ -558,16 +502,12 @@ function isInfosReady()
 		if (Infos.length > 2) {
 			Ev = eval(Infos[1]);
 			retourCircuit = Ev[0];
-			//console.log(JSON.stringify(retourCircuit));
 			FL = retourCircuit.FL;
 			Ev = eval(Infos[2]);
 			retourPoint = Ev[0];
 			pointgps = retourPoint.pointgps;
 			nearest = retourPoint.neartrk;
-			//document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
 			document.getElementById("NomCircuit").innerHTML = nearest[0];
-			//console.log(document.getElementById("NomCircuit").innerHTML);
-			//console.log(JSON.stringify(retourPoint));
 		}
 		else {
 			if (Infos.length > 1) {
@@ -575,54 +515,13 @@ function isInfosReady()
 				retourPoint = Ev[0];
 				pointgps = retourPoint.pointgps;
 				nearest = retourPoint.neartrk;
-				//document.getElementById("NomCircuit").innerHTML = nearest[0]+"("+nearest[1]+"m)";
 				document.getElementById("NomCircuit").innerHTML = nearest[0];
-				//console.log(document.getElementById("NomCircuit").innerHTML);
-				//console.log(JSON.stringify(retourPoint));
 			}
 		}
 	}
-	catch(e) {//console.log(JSON.stringify(Infos));}
-/*
+	catch(e) {console.log(JSON.stringify(Infos));}
 
-    def createPoint(self):
-        self.Line = '[{"timestamp":"'+str(self.gps.gpstime)+'"'
-        self.Line += ',"pointgps":['+str(self.gps.latitude)+","+str(self.gps.longitude)
-        # to minimise the size of the lines we round to 2 decimal places
-        self.Line += '],"vitesse":'+str(round(self.gps.gpsvitesse,2))
-        self.Line += ',"altitude":'+str(round(self.gps.gpsaltitude,2))
-        self.Line += ',"cap":'+str(round(self.gps.gpscap,2))
-        self.Line += ',"lap":'+str(self.chrono.nblap)
-        self.Line += '}]'
-        #logger.debug("***"+str(self.Line)+"***")
-
-        with open(self.trace, 'a') as trace: # we write the trace file
-            trace.write(self.Line+"\r\n")
-            trace.close()
-
-    def createLine1(self):
-        #logger.info(str(self.chrono.circuit))
-        line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
-        NomCircuit = "inconnu"
-        #logger.debug("circuit:"+str(type(self.chrono.circuit)))
-        if "NomCircuit" in self.chrono.circuit:
-            NomCircuit = self.chrono.circuit["NomCircuit"]
-        line += ',"NomCircuit":"'+NomCircuit+'"'
-        line += ',"FL":['+str(self.chrono.startlat1)+","+str(self.chrono.startlon1)+","+str(self.chrono.startlat2)+","+str(self.chrono.startlon2)+"]"
-        if self.chrono.pitin != False and self.chrono.pitout != False:
-            line += ',"PitIn":['+str(self.chrono.pitin.lat1)+","+str(self.chrono.pitin.lon1)+","+str(self.chrono.pitin.lat2)+","+str(self.chrono.pitin.lon2)+"]"
-            line += ',"PitOut":['+str(self.chrono.pitout.lat1)+","+str(self.chrono.pitout.lon1)+","+str(self.chrono.pitout.lat2)+","+str(self.chrono.pitout.lon2)+"]"
-        i = 0
-        while i < len(self.chrono.intline):
-            line += ',"Int'+str(i+1)+'":['+str(self.chrono.intline[i].lat1)+","+str(self.chrono.intline[i].lon1)+","+str(self.chrono.intline[i].lat2)+","+str(self.chrono.intline[i].lon2)+"]"
-            i = i+1            
-
-        line += '}]'
-        self.Line1 = line
-*/	
-
-	timerInfos = setTimeout(getInfos, 2000);
-	
+	timerInfos = setTimeout(getInfos, 2000);	
 }
 
 function loadInfosAjax(proc) 
@@ -631,8 +530,6 @@ function loadInfosAjax(proc)
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Infos = JSON.parse(this.responseText);}
 				catch(e) {Infos = this.responseText;}
 			}
@@ -647,8 +544,6 @@ function loadInfosAjax(proc)
     xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.send();
 }
-
-
 
 // Fonction de redimensionnement de l'écran (normal ou fullscreen)
 function resizescreen(div2rsz) {
@@ -665,7 +560,6 @@ function resizescreen(div2rsz) {
 		set_windowscreen();
 		fullscreen = false;
 	}
-	//console.log('est-ce que le navigateur supporte le plein écran:'+fullscreen)
 }
 function set_fullscreen(el) {
    return (el.requestFullscreen ||

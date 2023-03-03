@@ -57,53 +57,6 @@ function is_map_ready()
 	}
 }
 
-//function load_data()
-//{
-//	loadJSON(fname);
-//	is_ready();
-//}
-
-//function is_ready()
-//{
-//	//if (!retour_geolocation) {
-//	//	timer = setTimeout(is_ready, 100);
-//	//	return;
-//	//}
-//	if (!Circuit) {
-//		timer = setTimeout(is_ready, 100);
-//		return;
-//	}
-//	if (!map) {
-//		timer = setTimeout(is_ready, 100);
-//		return;
-//	}
-//	clearTimeout(timer);
-//	document.getElementById("zone-info").innerHTML = '';
-//	if (!lat) {
-//		// l'utilisateur n'a sans doute pas autorisé la geolocation, on place le curseur sur le circuit Carole !
-//		for (var i=0; i < Circuit.circuits.length; i++) {
-//			if (Circuit.circuits[i].NomCircuit == 'Carole') {
-//				lat = 48.9801;
-//				lng = 2.5222;
-//			}
-//		}
-//	}
-//	// le centre de la France !
-//	lat = 46.71488676953859;
-//	lng = 2.6913890507936644;
-//
-//    //var zoom = 6;
-//	//optionsMap = {
-//    //     zoom: zoom,
-//    //     center: new google.maps.LatLng(lat,lon),
-//    //     draggableCursor:"crosshair",
-//    //     mapTypeId: google.maps.MapTypeId.SATELLITE
-//    //};
-//	map = new google.maps.Map(document.getElementById('map'), {zoom: 6});
-//
-//	initMap(lat,lng);
-//}
-
 // Initialize and add the map
 function initMap(lat,lon) {
 	optionsMap = {
@@ -142,39 +95,11 @@ function go()
 	initMap(latfr,lngfr);
 }
 
-//function loadJSON(fname) 
-//{
-//	var xhr=createXHR();
-//
-//  xhr.open("GET", fname+"?nocache=" + Math.random(),true);
-//	xhr.onreadystatechange=function() { ajax_xhr(xhr); };
-//	xhr.send(null);
-//}
-//
-//function ajax_xhr(xhr)
-//{
-//	if (xhr.readyState == 4) 
-//	{
-//		if (xhr.status == 200) 
-//		{
-//			if (xhr.responseText.substr(0,1) != '{') {
-//			  alert(xhr.responseText);
-//			}
-//			Circuit=eval("(" + xhr.responseText + ")");
-//		} 
-//		else 
-//		{
-//			document.getElementById("zone").innerHTML = "fichier JSON " + fname + " non trouv&eacute;";
-//		}
-//	}
-//}
-
 function addTracks(mousePt) {
 	mouseLatLng = mousePt.latLng;
 	var mouseCoord = mouseLatLng.toUrlValue();
 	var mouseLat = mouseLatLng.lat();
 	var mouseLon = mouseLatLng.lng();
-	//console.log("un circuit va être créer à "+mouseLat+","+mouseLon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";
@@ -188,12 +113,8 @@ function addTracks(mousePt) {
 function markCircuit() {
 	var listeHTML = '<div class="w3-container"><ul>';
 	for (var i=0; i < Circuit.circuits.length; i++) {
-		//console.log('latitude:'+Circuit.circuits[i].Latitude+',longitude:'+Circuit.circuits[i].Longitude);
 		var dist = distanceGPS(lat,lng,Circuit.circuits[i].Latitude,Circuit.circuits[i].Longitude);
 		icon_image = icon_image_off;
-		//if (dist > rayon)
-		//	icon_image = icon_image_off;
-		//console.log(Circuit.circuits[i].NomCircuit+' est situé à '+dist);
 		createMarker(Circuit.circuits[i]);
 		// remplissage de la liste des circuits
 		IdCircuit  = Circuit.circuits[i].IdCircuit;
@@ -222,7 +143,6 @@ function markCircuit() {
 		LatInt3 = Circuit.circuits[i].LatInt3;
 		LonInt3 = Circuit.circuits[i].LonInt3;
 
-		//listeHTML += '<li><div class="w3-col l6 s6"><a'+
 		listeHTML += '<div class="w3-col l6 s6"><a'+
 						' href="#"'+
 						' id="lien_circuit'+IdCircuit+'"' +
@@ -234,7 +154,6 @@ function markCircuit() {
 						//'</li>';
 						'';
 	}
-	//listeHTML += '</ul></div>';
 	listeHTML += '</div>';
 	document.getElementById("liste_circuits").innerHTML = listeHTML;
 }
@@ -243,7 +162,7 @@ function changeMarker(circuit,onoff)
 	var img_icon;
 	if (onoff == 0) {img_icon = icon_image_off;}
 	else {img_icon = icon_image_on;}
-  var marker = tab_marker[circuit]['marker'];
+	var marker = tab_marker[circuit]['marker'];
 	marker.setOptions({
 		icon:img_icon
 	});
@@ -252,11 +171,6 @@ function showInfoMarker(circuit)
 {
   var marker = tab_marker[circuit]['marker'];
   tab_marker[circuit]['bulle'].open(map, marker);
-  /*
-	marker.setOptions({
-		icon:img_icon
-	});
-  */
 }
 
 function createMarker(circuit,newlat,newlon)
@@ -287,7 +201,6 @@ function createMarker(circuit,newlat,newlon)
 		url = 'id='+circuit.NomCircuit;
 	}
 	else {
-		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 
@@ -325,50 +238,11 @@ function showCircuit(nomcircuit) {
 		url = 'id='+nomcircuit;
 	}
 	else {
-		//console.log("on va demander l'affichage d'un nouveau circuit");
 		url = 'latlng='+NewCircuit.Latitude+','+NewCircuit.Longitude;
 	}
 	w = window.open (page+'?'+url,'popup', 'menubar=1, location=0, toolbar=1, directories=0, status=1, scrollbars=1, resizable=1, width=1055, height=700') ; 
 	w.focus () ;    
 }
-
-//function go()
-//{
-//	// On vérifie que la méthode est implémentée dans le navigateur
-//	if ( navigator.geolocation ) {
-//		// On demande d'envoyer la position courante à la fonction callback
-//		navigator.geolocation.getCurrentPosition( callback, erreur );
-//	} else {
-//		// Function alternative sinon
-//		alternative();
-//	}
-//}
-
-//function erreur( error ) {
-//	retour_geolocation = true;
-//	switch( error.code ) {
-//		case error.PERMISSION_DENIED:
-//			//console.log( 'L\'utilisateur a refusé la demande' );
-//			break;     
-//		case error.POSITION_UNAVAILABLE:
-//			//console.log( 'Position indéterminée' );
-//			break;
-//		case error.TIMEOUT:
-//			//console.log( 'Réponse trop lente' );
-//			break;
-//	}
-//	// Function alternative
-//	//alternative();
-//	alert('pas d\'alternative !');
-//};
-//
-//function callback( position ) {
-//	retour_geolocation = true;
-//    lat = position.coords.latitude;
-//    lng = position.coords.longitude;
-//    //console.log( lat, lng );
-//    // Do stuff
-//}
 
 function deg2rad(dg) {
 	return dg/180*Math.PI;
@@ -428,7 +302,6 @@ function copyClipboard(mousePt) {
 function showPoint() {
 	// On recentre la map sur le point contenu dans l'input
 	var el = document.getElementById("mouseTrack");
-	//var coords = el.value;
 	var LatLng = el.value.split(",");
 	lat = LatLng[0];
 	lon = LatLng[1];
@@ -438,7 +311,6 @@ function showPoint() {
 	
 	if (!confirm("voulez-vous créer une piste à cet endroit ?"))
 		return
-	//console.log("un circuit va être créer à "+lat+","+lon);
 	NewCircuit = new Object();
 	NewCircuit.IdCircuit = 0;
 	NewCircuit.NomCircuit = "Nouveau Circuit";

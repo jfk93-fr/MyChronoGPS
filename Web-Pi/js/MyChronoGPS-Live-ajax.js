@@ -1,4 +1,3 @@
-//var fonction_get = 'ajax/get_live.php';
 var fonction_get = 'ajax/get_live.py';
 
 var Live = false;
@@ -41,12 +40,7 @@ function loadLiveAjax(proc)
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Live = JSON.parse(this.responseText);
-				//try {resp = JSON.parse(this.responseText);
-					//Live = resp[0];
-					//Live = JSON.parse(Live);
 					nb_coords = Live.length;
 				}
 				catch(e) {Live = this.responseText;
@@ -60,7 +54,6 @@ function loadLiveAjax(proc)
 			}
 		}
     }
-    //xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.open("GET", proc, true);
     xmlhttp.send();
 }

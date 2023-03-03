@@ -57,7 +57,6 @@ var RT = 6378137;
 
 var largeur_piste = 15; // largeur de la piste en mètre; utilisée pour déterminer le franchissement du point de départ
 
-//var Circuit = false;
 var map = false;
 var tab_marker=new Array();
 
@@ -92,14 +91,11 @@ var originBounds = false;
 document.getElementById('map').style.display = 'block';
 map = true;
 
-//document.getElementById("zone-info").innerHTML = 'les données sont en cours de chargement, veuillez patienter';
-
 loadCircuits();
 
 function dataCircuitsReady() {
 	document.getElementById("zone-info").innerHTML = 'les données sont chargées, calcul en cours, veuillez patienter';
 	loadCoords();
-	//console.log(JSON.stringify(Coords))
 }	
 
 function dataCoordsReady() {
@@ -123,11 +119,6 @@ function is_map_ready()
 	}
 }
 
-//// Initialize API Googlemap
-//function initGooglemap() {
-//  document.getElementById('map').style.display = 'block';
-//  map = true;
-//}
 // Initialize and add the map
 function initMap() {
 	if (!thisCircuit.Latcenter) {
@@ -153,14 +144,6 @@ function initMap() {
 		thisCircuit.Zoom = 16;
 	var zoom = thisCircuit.Zoom*1;
 
-    //optionsMap = {
-    //     zoom: zoom,
-    //     center: new google.maps.LatLng(lat,lon),
-    //     draggableCursor:"crosshair",
-    //     mapTypeId: google.maps.MapTypeId.SATELLITE
-    //};
-	//
-	//map = new google.maps.Map(document.getElementById('map'), optionsMap);
 	map = L.map('map').setView([lat,lon],zoom);
 	
 	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -173,14 +156,7 @@ function initMap() {
 
 	lat = thisCircuit.Latitude*1;
 	lon = thisCircuit.Longitude*1;
-	//var point = {lat: lat, lng: lon};
 	var markerpoint = L.latLng(lat,lon);
-	//var markerpoint = {lat: lat, lng: lon};
-	//currentmarker = new google.maps.Marker({
-	//	position: markerpoint, title: thisCircuit.NomCircuit
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-blank.png'
-	//	,draggable: true
-	//});
 	var info = 	'<div style="font: 1em \'trebuchet ms\',verdana, helvetica, sans-serif;">' +
 				'	<table align="center">' +
 				'		<tr>' +
@@ -207,26 +183,6 @@ function initMap() {
 	}
 	info +=		'	</table>' +
 				'</div>';
-	
-	//infoBulle = new google.maps.InfoWindow({
-	//	content: info
-	//});
-	//
-	//google.maps.event.addListener(currentmarker, 'mouseover', function() {
-	//	document.getElementById("zone-info").innerHTML = '<B>'+thisCircuit.NomCircuit+'</B>';
-	//});
-	//
-	//google.maps.event.addListener(currentmarker, 'click', function() {
-  	//    infoBulle.open(map, currentmarker);
-	//});
-	//
-	//google.maps.event.addListener(map, 'mousemove', function(event) {
-	//	mouseMove(event);
-	//});
-	//
-	//google.maps.event.addListener(map, 'rightclick', function(event) {
-	//	copyClipboard(event);
-	//});
 
 	currentmarker = new L.Marker(markerpoint,{draggable:true}).bindPopup(info);
 	map.addLayer(currentmarker);	
@@ -243,25 +199,6 @@ function initMap() {
 		copyClipboard(event);
 	});
 
-	//google.maps.event.addListener(map, 'center_changed', function(event) {
-	//	var center = map.getCenter();
-	//	el = document.getElementById("Latcenter");
-	//	if (el)
-	//		el.value = center.lat();
-	//	el = document.getElementById("Loncenter");
-	//	if (el)
-	//		el.value = center.lng();
-	//});
-	//
-	//google.maps.event.addListener(map, 'zoom_changed', function(event) {
-	//	var zoom = map.getZoom();
-	//	el = document.getElementById("Zoom");
-	//	if (el)
-	//		el.value = zoom;
-	//});
-	//
-	//currentmarker.setMap(map);
-	
 	showLines();
 	
 }
@@ -274,30 +211,6 @@ function showData() {
 	}
 	else el.style.display = 'none';
 
-	//el = document.getElementById("Adresse");
-	//if (thisCircuit.Adresse) {
-	//	el.value = thisCircuit.Adresse;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CodePostal");
-	//if (thisCircuit.CodePostal) {
-	//	el.value = thisCircuit.CodePostal;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Ville");
-	//if (thisCircuit.Ville) {
-	//	el.value = thisCircuit.Ville;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("URL");
-	//if (thisCircuit.URL) {
-	//	el.value = thisCircuit.URL;
-	//}
-	//else el.style.display = 'none';
-
 	el = document.getElementById("Latitude");
 	if (thisCircuit.Latitude) {
 		el.value = thisCircuit.Latitude;
@@ -309,18 +222,6 @@ function showData() {
 		el.value = thisCircuit.Longitude;
 	}
 	else el.style.display = 'none';
-
-	//el = document.getElementById("Latcenter");
-	//if (thisCircuit.Latcenter) {
-	//	el.value = thisCircuit.Latcenter;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("Loncenter");
-	//if (thisCircuit.Loncenter) {
-	//	el.value = thisCircuit.Loncenter;
-	//}
-	//else el.style.display = 'none';
 
 	el = document.getElementById("LongCircuit");
 	if (thisCircuit.LongCircuit) {
@@ -336,7 +237,6 @@ function showData() {
 
 	/* FL en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("FLLat1");
-	//console.log("FL:"+thisCircuit.FL)
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[0];
 	}
@@ -357,78 +257,6 @@ function showData() {
 	}
 	else el.style.display = 'none';
 
-	/* FL en lat,lon,cap */
-	//el = document.getElementById("LatFL");
-	//if (thisCircuit.LatFL) {
-	//	el.value = thisCircuit.LatFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonFL");
-	//if (thisCircuit.LonFL) {
-	//	el.value = thisCircuit.LonFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapFL");
-	//if (thisCircuit.CapFL) {
-	//	el.value = thisCircuit.CapFL;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt1");
-	//if (thisCircuit.LatInt1) {
-	//	el.value = thisCircuit.LatInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt1");
-	//if (thisCircuit.LonInt1) {
-	//	el.value = thisCircuit.LonInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt1");
-	//if (thisCircuit.CapInt1) {
-	//	el.value = thisCircuit.CapInt1;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt2");
-	//if (thisCircuit.LatInt2) {
-	//	el.value = thisCircuit.LatInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt2");
-	//if (thisCircuit.LonInt2) {
-	//	el.value = thisCircuit.LonInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt2");
-	//if (thisCircuit.CapInt2) {
-	//	el.value = thisCircuit.CapInt2;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LatInt3");
-	//if (thisCircuit.LatInt3) {
-	//	el.value = thisCircuit.LatInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("LonInt3");
-	//if (thisCircuit.LonInt3) {
-	//	el.value = thisCircuit.LonInt3;
-	//}
-	//else el.style.display = 'none';
-	//
-	//el = document.getElementById("CapInt3");
-	//if (thisCircuit.CapInt3) {
-	//	el.value = thisCircuit.CapInt3;
-	//}
-	//else el.style.display = 'none';
 }
 
 function showLines() {
@@ -442,7 +270,6 @@ function showLines() {
 		objStart.title = "Ligne de départ/arrivée";
 		objStart.color = "black";
 		objStart.idelem = "FL";
-		//drawLine(objStart);
 		isObjLine = true;
 	}
 	if (thisCircuit.FL) {
@@ -453,7 +280,6 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		//console.log("drawLine(objStart)")
 		drawLine(objStart);
 	}
 	
@@ -479,7 +305,6 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		//console.log("drawLine(objStart)")
 		drawLine(Tabint[0]);
 	}
 	
@@ -505,7 +330,6 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		//console.log("drawLine(objStart)")
 		drawLine(Tabint[1]);
 	}
 	
@@ -581,7 +405,6 @@ function showLines() {
 		isObjLine = true;
 	}
 	if (isObjLine) {
-		//console.log("drawLine(objStart)")
 		drawLine(objPitOut);
 	}
 }
@@ -642,37 +465,20 @@ function designLine(line) {
 
 	if (obj.coord) {
 		var newobj = drawLine(obj);
-		/*
-		if (line > 0) {
-			if (Tabint[line-1])
-				Tabint[line-1] = obj;
-		}
-		if (line == 0)
-			objStart = obj;
-		if (line == -1)
-			objPitIn = obj;
-		if (line == -2)
-			objPitOut = obj;
-		*/
-		//setMaxZoom(obj.lat,obj.lon,2);
 		return;
 	}
 
 	if (obj.marker) {
-		//if (!confirm("la ligne est déjà active, voulez-vous la changer ?"))
-		//	return;
 		setMaxZoom(obj.lat,obj.lon);
 		return;
 	}
 	if (obj.marker1) {
-		//if (!confirm("la ligne est déjà active, voulez-vous la changer ?"))
-		//	return;
 		setMaxZoom(obj.coord[0],obj.coord[1]);
 		return;
 	}
 
 	obj = new Object();
-	// SI la ligne n'existe pas on va la placer là où on était centré
+	// Si la ligne n'existe pas on va la placer là où on était centré
 	obj.lat = center.lat;
 	obj.lon = center.lng;
 	obj.cap = 0;
@@ -725,27 +531,7 @@ function getObjLine(line) {
 		obj = objPitOut;
 	return obj;
 }
-/*
-function point2Line(line) {
-	var obj = false;
-	if (line > 0) {
-		if (Tabint[line-1])
-			obj = Tabint[line-1];
-	}
-	if (line == 0)
-		obj = objStart;
-	if (line == -1)
-		obj = objPitIn;
-	if (line == -2)
-		obj = objPitOut;
-	
-	if (obj.line) {
-		//setMaxZoom(obj.coord[0],obj.coord[1]); // recentrage sur les coordonnées at zoom max
-		setCenter(obj.coord[0],obj.coord[1]); // maintenant, on fait juste un recentrage sans changer le zoom
-		return;
-	}	
-}
-*/
+
 function nextCut() {
 	if (nb_coords > curr_coord+1) {
 		curr_coord++;
@@ -780,34 +566,16 @@ function getCoord() {
 function resetScreen() {
 	// On recentre la map avec le zoom d'origine
 	var zoom = thisCircuit.Zoom*1;
-	//map.setZoom(zoom);
 	lat = thisCircuit.Latcenter*1;
 	lon = thisCircuit.Loncenter*1;
-	//var googleLatLng = new google.maps.LatLng(lat,lon); 
-	//map.setCenter(googleLatLng);
-	//map = L.map('map').setView([lat,lon],zoom);
 	map.flyTo([lat,lon],zoom);
 }
 
 function setCenter(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1) {
-	//var googleLatLng = new google.maps.LatLng(zlat,zlon); 
-	var LatLng = L.latLng(zlat,zlon); 
-	//map.setCenter(googleLatLng);
-	map.panTo(LatLng);
-}
-/*
-function setMaxZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
-	//setCenter(zlat,zlon);
 	var LatLng = L.latLng(zlat,zlon); 
 	map.panTo(LatLng);
-	var oldz = map.getZoom();
-	var newz = oldz + max;
-	if (newz !='NaN') {
-		//map.setZoom(newz);
-		L.setZoom(newz);
-	}
 }
-*/
+
 function setMaxZoom(zlat,zlon,max=20) {
 	var el = document.getElementById("map");
 	var largeur = window.innerWidth;
@@ -822,18 +590,7 @@ function setMaxZoom(zlat,zlon,max=20) {
 	var ndifflat = (lat2 - lat1) * (hauteur/largeur);
 	map.fitBounds(bounds);
 }
-/*
-function setOriginZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1,max=20) {
-	var newz = thisCircuit.Zoom*1;
-	//setCenter(zlat,zlon);
-	var LatLng = L.latLng(zlat,zlon); 
-	map.panTo(LatLng);
-	if (newz !='NaN') {
-		//map.setZoom(newz);
-		L.setZoom(newz);
-	}
-}
-*/
+
 function accueil() {
 	document.getElementById('analyzer').style.display = 'none';
 	objStart = new Object(); // Tableau des coordonnées de la ligne de départ
@@ -858,11 +615,10 @@ function go()
 			el.innerHTML = 'problème détecté';
 		return false;
 	}
-	//console.log(JSON.stringify(Coords));
 		
 	curr_coord = 0;
 	Ev = eval(Coords[curr_coord]);
-	retour = Ev; //jfk
+	retour = Ev;
 	if (retour.msgerr) {
 		// on n'a pas réussi à charger les coordonnées
 		var el = document.getElementById("zone-info");
@@ -876,8 +632,6 @@ function go()
 	if (thisCircuit.date)
 		dateSession = thisCircuit.date;
 	
-	//var is_FL = thisCircuit.hasOwnProperty('FL');
-	//
 	// on va construire le tableau des Tours à partir de FL
 	FL = new Array(thisCircuit.FL[0]*1,thisCircuit.FL[1]*1,thisCircuit.FL[2]*1,thisCircuit.FL[3]*1);
 	buildTours(FL);
@@ -888,19 +642,15 @@ function go()
 	var i = 0;
 	Tour = Tours[i];
 	Points = Tour.points;
-	//var nbpoints = Points.length;
-	//console.log("nbpoints:"+nbpoints);
 	
 	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
 	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
 	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
 	var dT = T1.getTime() - T0.getTime();
-	//console.log('fréquence d\'envoi des trames:'+JSON.stringify(dT));
 	Frequence = 1000/dT;
 
 	latitude = Points[0].lat1;
 	longitude = Points[0].lon1;
-	//console.log("lat:"+latitude+",lon:"+longitude)
 	
 	var trackfound = scanCircuit();
 	
@@ -908,11 +658,6 @@ function go()
 	// si le circuit existe dans la première ligne du fichier et qu'on a trouvé la définition de la ligne de départ/arrivée,
 	// on prend les coordonnées inscrites pour afficher la map.
 	// sinon, on utilise le point gps indiqué dans la première ligne du fichier pour rechercher le circuit.
-	//if (!is_FL) {
-	//	if (!trackfound)
-	//		return;
-	//}
-	
 	if (trackfound)
 		initCircuit(trackfound); // on complète les informations du circuit avec les données lues dans la base
 
@@ -925,7 +670,6 @@ function go()
 		return;
 	el.innerHTML = "";
 	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
-		//console.log("Tour:"+Tours[i].id);
 		var tour = Tours[i].id;
 		
 		if (Tours[i].valid) {
@@ -952,21 +696,16 @@ function buildTours(FL) {
 	var prevTimestamp = false;
 	var Point0 = false;
 	var Point1 = false;
-	//var is_FL = thisCircuit.hasOwnProperty('FL');
-	
-	//console.log('FL:+'+FL);
-	
+
 	// traitement de tous les points gps
 	while (curr_coord < nb_coords-1) {
 		Point0 = Point1;
 		Ev = eval(Coords[curr_coord]);
 		Point1 = Ev[0];
 		if (!Point0) {
-			//console.log('Point0 absent');
 			curr_coord++
 			continue;
 		}
-		//console.log(JSON.stringify(Point0));
 		var segcoords = new Array(Point0.pointgps[0]*1,Point0.pointgps[1]*1,Point1.pointgps[0]*1,Point1.pointgps[1]*1)
 		var pointCut = getIntersection(FL,segcoords);
 		
@@ -1011,47 +750,18 @@ function buildTours(FL) {
 		}
 
 		if (tour == 0) {
-			//console.log('tour non commencé, n coord:'+curr_coord);
 			curr_coord++
 			continue;
 		}
 
 
 		Point1.tour = tour;
-			
-
-			
-		/*
-		if (Point1.tour != tour) {
-			tour = Point1.tour;
-			// On stocke le tour dans le tableau
-			if (Tour) {
-				Tours.push(Tour);
-			}
-			// On prépare le nouveau tour
-		    Tour = new Object();
-			Tour.id = Point1.tour;
-			Tour.points = new Array()
-			Tour.line = '';
-			Tour.show = false;
-			Tour.valid = true; // le tour est valide s'il contient des points gps à fréquence régulière, un écart de +20" environ invalide le tour
-			nt = Tours.length-1;
-			np = 0;
-		}
-		*/
 
 		if (!prevTimestamp)
 			prevTimestamp = Point1.timestamp;
-		//console.log('num coord:'+curr_coord);
-		//console.log('prevTimestamp:'+prevTimestamp);
-		//console.log('Point1.timestamp:'+Point1.timestamp);
 		var T0 = getObjTime(prevTimestamp);
 		var T1 = getObjTime(Point1.timestamp);
 		var dT = T1.getTime() - T0.getTime();
-		//if (dT > 20000) {
-		//	//console.log('Tour invalide Point1.timestamp:'+Point1.timestamp);
-		//	Tour.valid = false;
-		//}
 		prevTimestamp = Point1.timestamp;
 
 		Point = new Object();
@@ -1068,7 +778,6 @@ function buildTours(FL) {
 		
 		if (nt > 0 && np <= 1) {
 			// on va ajouter les points 0 & 1 à la fin du tour précédent
-			//console.log('on va ajouter les points 0 & 1 à la fin du tour précédent');
 			Point = new Object();
 			Point.timestamp = Tours[nt].points[np].timestamp;
 			Point.lat1 = Tours[nt].points[np].lat1;
@@ -1081,16 +790,12 @@ function buildTours(FL) {
 
 		np++;
 	}
-	//console.log(Tours);
 	// ne ratons pas le dernier tour
 	if (Tour) {
 		Tours.push(Tour);
-		//console.log('ne ratons pas le dernier tour');
 		// on va ajouter le points 0 & 1 à la fin du tour précédent
 		nt = Tours.length-1;
 		if (nt > 0) {
-			//console.log(JSON.stringify(Tours[nt-1]))
-			//console.log(JSON.stringify(Tours[nt]))
 			for (var np=0; np < 2; np++) {
 				Point = new Object();
 				Point.timestamp = Tours[nt].points[np].timestamp;
@@ -1101,8 +806,6 @@ function buildTours(FL) {
 				Point.cap = Tours[nt].points[np].cap;
 				Tours[nt-1].points.push(Point);
 			}
-			//console.log(JSON.stringify(Tours[nt-1]))
-			//console.log(JSON.stringify(Tours[nt]))
 		}
 	}
 }
@@ -1131,7 +834,6 @@ function redraw() {
 		return;
 	el.innerHTML = "";
 	for (var i=0; i < Tours.length-1; i++) { // le dernier tour est incomplet, on ne le propose pas
-		//console.log("Tour:"+Tours[i].id);
 		var tour = Tours[i].id;
 		
 		if (Tours[i].valid) {
@@ -1147,17 +849,12 @@ function redraw() {
 }
 
 function initCircuit(track) {
-	//console.log(JSON.stringify(thisCircuit));
-	//if (!thisCircuit.NomCircuit) // si le nom du circuit est absent alors on réinitialise complètement l'objet circuit
 	if (!thisCircuit) // si le nom du circuit est absent alors on réinitialise complètement l'objet circuit
 		thisCircuit = new Object();
-	//console.log(JSON.stringify(track));
 	for (property in track) {
-		//console.log(`${property}: ${track[property]}`);
 		if (!thisCircuit[property])
 			thisCircuit[property] = track[property];
 	}
-	//console.log(JSON.stringify(thisCircuit));
 }
 
 function scanCircuit() {
@@ -1168,8 +865,6 @@ function scanCircuit() {
 		if (Circuit.msgerr != '')
 			return trackfound
 	}
-	//console.log(JSON.stringify(thisCircuit))
-	//console.log(JSON.stringify(Circuit))
 	// on scrute les circuits
 	for (var i=0; i < Circuit.circuits.length; i++) {
 		if (Circuit.circuits[i].NomCircuit == thisCircuit.NomCircuit) {
@@ -1562,9 +1257,7 @@ function changeMarkercap(ev,objline) {
 	var C = new Array(latlon.lat, latlon.lng); // point bord
 	var dist = distanceGPS(A,C);
 	
-//jfk
 	var icoord = getPerpendiculaire(A,B);
-	//console.log(icoord);
 	var coord1 = pointDroite(A,new Array(icoord[0],icoord[1]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 	var coord2 = pointDroite(A,new Array(icoord[2],icoord[3]),dist); // le point situé à 50m du point de départ sur le segment de droite de latitude = latitude de A 
 
@@ -1620,11 +1313,6 @@ function drawCut() {
 		map.removeLayer(objline.markerA1)
 		markerA1 = '';
 	}
-	//markerA1 = new google.maps.Marker({
-	//	position: markerpoint, title: 'A1-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
-	//	});
-	//markerA1.setMap(map);
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png',
 		iconAnchor: [8, 16]
@@ -1637,15 +1325,9 @@ function drawCut() {
 	var markerpoint = {lat: A[0], lng: A[1]};
 		
 	if (markerA2 != '') {
-		//markerA2.setMap(null);
 		map.removeLayer(objline.markerA2)
 		markerA2 = '';
 	}
-	//markerA2 = new google.maps.Marker({
-	//	position: markerpoint, title: 'A2-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
-	//	});
-	//markerA2.setMap(map);
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png',
 		iconAnchor: [8, 16]
@@ -1655,19 +1337,10 @@ function drawCut() {
 	
 	// On trace une ligne pour matérialiser le segment de droite
 	if (segment1 != '') {
-		//segment1.setMap(null);
 		map.removeLayer(segment1);
 		segment1 = '';
 	}
 	var pathCoordinates = [{lat: coord[0], lng: coord[1]},{lat: coord[2], lng: coord[3]}];
-	//segment1 = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "white",
-	//	strokeOpacity: 0.2,
-	//	strokeWeight: 6
-	//});
-	//segment1.setMap(map);
 	segment1 = new L.polyline(pathCoordinates, {color: "white"});
 	map.addLayer(segment1);
 	
@@ -1676,15 +1349,9 @@ function drawCut() {
 	var markerpoint = {lat: A[0], lng: A[1]};
 	
 	if (markerB1 != '') {
-		//markerB1.setMap(null);
 		map.removeLayer(markerB1);
 		markerB1 = '';
 	}
-	//markerB1 = new google.maps.Marker({
-	//	position: markerpoint, title: 'B1-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-	//	});
-	//markerB1.setMap(map);
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png',
 		iconAnchor: [8, 16]
@@ -1698,15 +1365,9 @@ function drawCut() {
 	var markerpoint = {lat: A[0], lng: A[1]};
 		
 	if (markerB2 != '') {
-		//markerB2.setMap(null);
 		map.removeLayer(markerB2);
 		markerB2 = '';
 	}
-	//markerB2 = new google.maps.Marker({
-	//	position: markerpoint, title: 'B2-'+A[0]+','+A[1]
-	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-	//	});
-	//markerB2.setMap(map);
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png',
 		iconAnchor: [8, 16]
@@ -1716,19 +1377,10 @@ function drawCut() {
 	
 	// On trace une ligne pour matérialiser le segment de droite
 	if (segment2 != '') {
-		//segment2.setMap(null);
 		map.removeLayer(segment2);
 		segment2 = '';
 	}
 	var pathCoordinates = [{lat: coord[4], lng: coord[5]},{lat: coord[6], lng: coord[7]}];
-	//segment2 = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "pink",
-	//	strokeOpacity: 1.0,
-	//	strokeWeight: 2
-	//});
-	//segment2.setMap(map);
 	segment2 = new L.polyline(pathCoordinates, {color: "pink"});
 	map.addLayer(segment2);
 }
@@ -1738,7 +1390,6 @@ function designLap(lap) {
 	//
 	// On construit le polygone représentant le tour
 	Points = Tours[il].points;
-	//var pathcoords = new Array();
 	var segcoords = new Array(); // lat point a,lng point a,lat point b,lng point b
 	var laptime = new Array(); // temps de passage du point a et du point b
 	var speed = new Array(); // vitesse de passage au point a et au point b
@@ -1752,14 +1403,11 @@ function designLap(lap) {
 	
 	var geocoords = new Array();
 
-	//
 	// Pour construire le polygone on traite les points, point par point
 	for (var i=0; i < Points.length; i++) {
-		//console.log(JSON.stringify(Points[i]));
 		var pcoord = new Object();
 		pcoord.lat = Points[i].lat1;
 		pcoord.lng = Points[i].lon1;
-		//pathcoords.push(pcoord);
 
 		segcoords.push(pcoord.lat);
 		segcoords.push(pcoord.lng);
@@ -1793,7 +1441,6 @@ function designLap(lap) {
 		if (segcoords[3]) {
 			// toutes les coordonnées du segment sont définies, on regarde s'il coupe une ligne
 			// on commence par la ligne de départ/arrivée
-			//var linecoord = objStart.coord;
 			var parmCut = new Object();
 			parmCut.linecoord = objStart.coord;
 			parmCut.segcoords = segcoords;
@@ -1805,25 +1452,17 @@ function designLap(lap) {
 			parmCut.v1 = v1;
 			var Tcut = designCut(parmCut);
 			if (Tcut.linecut) {
-				//console.log(JSON.stringify(Points[i]));
 				pointCut = Tcut.pointCut;
 				time_start = Tcut.tdeb;
 				time_arrival = Tcut.tfin;
 				time_prev[0] = time_start;
-				//console.log('temps départ:'+time_start);
-				//console.log('temps fin:'+time_arrival);
-				//console.log('temps de coupure:'+JSON.stringify(Tcut));
                 Points[i].timecut = time_arrival - time_start;		
 				// s'il s'agit d'un point de coupure, on l'indique dans le chemin
-				//var latlng = new google.maps.LatLng(pointCut[0], pointCut[1]);
 				var latlng = L.latLng(pointCut[0], pointCut[1]);
 				var CP = getIntersectionSphere(parmCut.linecoord,parmCut.segcoords);
 				Points[i].CP = CP;
-				//console.log('geocoords CP:'+geocoords.length);
-				//console.log('pointCut:'+JSON.stringify(Tcut.pointCut)+';CP:'+JSON.stringify(CP));
 			}
 			else {
-				//var latlng = new google.maps.LatLng(pcoord.lat, pcoord.lng);
 				var latlng = L.latLng(pcoord.lat, pcoord.lng);
 			}
 			geocoords.push(latlng);
@@ -1841,11 +1480,7 @@ function designLap(lap) {
 					parmCut.v0 = v0;
 					parmCut.v1 = v1;
 					var Tcut = designCut(parmCut);
-					//linecut = Tcut.linecut;
 					if (Tcut.linecut) {
-						//console.log(j);
-						//console.log('parm:'+JSON.stringify(parmCut));
-						//console.log('ret :'+JSON.stringify(Tcut));
 						pointCut = Tcut.pointCut;
 						time_sect[j] = Tcut.tfin;
 						k = j+1;
@@ -1853,9 +1488,6 @@ function designLap(lap) {
 							time_prev[k] = Tcut.tfin;
                         Points[i].timecut = time_sect[j] - time_prev[j];		
                         Points[i].icut = j+1;		
-						//console.log('temps prev:'+time_prev[j]);
-						//console.log('temps sect:'+time_sect[j]);
-						//console.log('temps de coupure:'+JSON.stringify(Tcut));
 					}
 				}
 			}
@@ -1875,10 +1507,6 @@ function designLap(lap) {
 		}
 	}
 	// on continue avec les lignes intermédiaires
-	//console.log('temps départ:'+time_start);
-	//console.log('temps fin:'+time_arrival);
-	//console.log('temps départ intermédiaire:'+JSON.stringify(time_prev));
-	//console.log('temps fin intermédiaire:'+JSON.stringify(time_sect));
 	if (Tabint.length > 0) {
 		Tours[il].timeSect = new Array();
 	}
@@ -1887,7 +1515,6 @@ function designLap(lap) {
 			if (time_sect[j]) {
 				var time_sector = time_sect[j] - time_prev[j];
 				var time2display = formatMMSS(time_sector);
-				//Tours[il].timeSect[j] = time2display;
 				Tours[il].timeSect.push(time2display);
 				var time_lastsect = time_arrival - time_sect[j];
 			}
@@ -1897,16 +1524,11 @@ function designLap(lap) {
 		var time2display = formatMMSS(time_lastsect);
 		Tours[il].timeSect.push(time2display);
 	}
-	//console.log(JSON.stringify(Tours[il].timeSect));
 		
 	// Le polygone est construit et prêt à être affiché dans la map
-	//Tours[il].pathRun = pathcoords;
 	Tours[il].pathRun = geocoords;
 
-	//console.log(JSON.stringify(geocoords));
-	//var lenLap = google.maps.geometry.spherical.computeLength(geocoords);
 	var lenLap = 0; // on va calculer une autre fois
-	//console.log(JSON.stringify(lenLap));
 	Tours[il].lenLap = lenLap;
 	Tours[il].geocoords = geocoords;
 	
@@ -1936,46 +1558,22 @@ function designCut(parm) {
 	var v0 = parm.v0;
 	var v1 = parm.v1;
 	
-	//var linecut = isLineCut(linecoord,segcoords);
 	var linecut = false;
 	var pointCut = getIntersection(linecoord,segcoords);
-	//console.log('linecut:'+linecut+' coord:',segcoords);
 	
-	//if (linecut) {
 	if (pointCut != false) {
 		linecut = true;
-		//console.log('ligne franchie');
 		// On va calculer les distances entre le point, le point b et la ligne franchie
-		//console.log('coordonnées line:'+linecoord[0]+','+linecoord[1]+'-'+linecoord[2]+','+linecoord[3]);
-		//console.log('coordonnées segment:'+segcoords[0]+','+segcoords[1]+'-'+segcoords[2]+','+segcoords[3]);
 		var dist0 = getDistanceLine(linecoord,new Array(segcoords[0],segcoords[1]));
-		//console.log('dist0:'+dist0);
-		//var distseg = distanceGPS(new Array(segcoords[0],segcoords[1]),new Array(segcoords[2],segcoords[3]))
-		//console.log('distseg:'+distseg);
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
-		//console.log('dist1:'+dist1);
-		//console.log('somme d0 d1:'+(dist0+dist1));
-		
-		//var pointCut = getIntersection(linecoord,segcoords);
-
 		var corrtime = dt1.getTime() - dt0.getTime();
-		//console.log('deb secteur:'+dt0.getTime()+' fin secteur:'+dt1.getTime());
-		
-		//var vs0 = (v0*1000)/3600;
-		//var vs1 = (v1*1000)/3600;
-		//var vmoy = (vs0+vs1)/2;
 		var vmoy = (v0+v1)/2;
-		
-		//var dc0 = dist0*(vs1/vmoy);
-		//var dc1 = dist1*(vs0/vmoy);
 		var dc0 = dist0*(v1/vmoy);
 		var dc1 = dist1*(v0/vmoy);
 	
 		corrtime = corrtime * (dc0/(dc0+dc1));
 		corrtime = Math.round(corrtime);
 		var temps = dt0.getTime() + corrtime;
-		
-		//console.log('correction temps:'+corrtime)
 		
 		if (!tdeb) {
 			tdeb = temps;
@@ -2018,40 +1616,34 @@ function showLap(lap) {
 		
 	if (Tours[il].polyline) {
 		if (Tours[il].polyline != '') {
-			//Tours[il].polyline.setMap(null);
 			map.removeLayer(Tours[il].polyline);
 			Tours[il].polyline = '';
 			if (Tours[il].markerPC) {
 				if (Tours[il].markerPC != '') {
-					//Tours[il].markerPC.setMap(null);
 					map.removeLayer(Tours[il].markerPC);
 					Tours[il].markerPC = '';
 				}
 			}
 			if (Tours[il].markerD1) {
 				if (Tours[il].markerD1 != '') {
-					//Tours[il].markerD1.setMap(null);
 					map.removeLayer(Tours[il].markerD1);
 					Tours[il].markerD1 = '';
 				}
 			}
 			if (Tours[il].markerD2) {
 				if (Tours[il].markerD2 != '') {
-					//Tours[il].markerD2.setMap(null);
 					map.removeLayer(Tours[il].markerD2);
 					Tours[il].markerD2 = '';
 				}
 			}
 			if (Tours[il].segment0) {
 				if (Tours[il].segment0 != '') {
-					//Tours[il].segment0.setMap(null);
 					map.removeLayer(Tours[il].segment0);
 					Tours[il].segment0 = '';
 				}
 			}
 			if (Tours[il].segment1) {
 				if (Tours[il].segment1 != '') {
-					//Tours[il].segment1.setMap(null);
 					map.removeLayer(Tours[il].segment1);
 					Tours[il].segment1 = '';
 				}
@@ -2115,15 +1707,6 @@ function showLap(lap) {
 			el.className += " "+colorLap;
 	}
 
-	//Tours[il].polyline = new google.maps.Polyline({
-	//	path: Tours[il].pathRun,
-	//	geodesic: true,
-	//	//strokeColor: 'blue',
-	//	strokeColor: Tours[il].linecolor,
-	//	strokeOpacity: 1.0,
-	//	strokeWeight: 2
-	//});
-	//Tours[il].polyline.setMap(map);
 	Tours[il].polyline = new L.polyline(Tours[il].pathRun, {color: Tours[il].linecolor});
 	map.addLayer(Tours[il].polyline);	
 		
@@ -2139,98 +1722,14 @@ function showLap(lap) {
 	var markerpoint = new Object();
 	markerpoint.lat = Tours[il].pointCut[0];
 	markerpoint.lng = Tours[il].pointCut[1];
-	//console.log(markerpoint);
-	//Tours[il].markerPC = new google.maps.Marker({
-	//	position: markerpoint, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'
-	//	//,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-	//	,visible: true
-	//	});
-	//Tours[il].markerPC.setMap(map);
 	var localIcon = L.icon({
 		iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png',
 		iconAnchor: [8, 16]
 	});	
 	Tours[il].markerPC = new L.Marker(markerpoint,{icon:localIcon, draggable:false, title: 'tour '+Tours[il].id+': '+Tours[il].timeLap+' ('+Math.round(Tours[il].vmax*1)+')'});
 	map.addLayer(Tours[il].markerPC);
-//		
-//	// affichage du point de début du tour (avant passage de la ligne)
-//	if (Tours[il].markerD1) {
-//		if (Tours[il].markerD1 != '') {
-//			Tours[il].markerD1.setMap(null);
-//			Tours[il].markerD1 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[0];
-//	//console.log(markerpoint);
-//	Tours[il].markerD1 = new google.maps.Marker({
-//		position: markerpoint, title: 'D1 '+Tours[il].points[0].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/1-lv.png'
-//		});
-//	Tours[il].markerD1.setMap(map);
-//		
-//	if (Tours[il].segment0) {
-//		if (Tours[il].segment0 != '') {
-//			Tours[il].segment0.setMap(null);
-//			Tours[il].segment0 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[0],Tours[il].pathRun[1]);
-//	Tours[il].segment0 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'white',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment0.setMap(map);
 	
 	var l = Tours[il].pathRun.length-1;
-	//console.log(l);
-				
-//	// affichage du point de fin du tour (après passage de la ligne)
-//	if (Tours[il].markerD2) {
-//		if (Tours[il].markerD2 != '') {
-//			Tours[il].markerD2.setMap(null);
-//			Tours[il].markerD2 = '';
-//		}
-//	}
-//	var markerpoint = Tours[il].pathRun[l];
-//	//console.log(markerpoint);
-//	Tours[il].markerD2 = new google.maps.Marker({
-//		position: markerpoint, title: 'D2 '+Tours[il].points[l].timestamp
-//		,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//		});
-//	Tours[il].markerD2.setMap(map);
-//		
-//	//if (markerDB != '') {
-//	//	markerDB.setMap(null);
-//	//	markerDB = '';
-//	//}
-//	//var markerpoint = Tours[il].pathRun[0];
-//	//console.log(markerpoint);
-//	//markerDB = new google.maps.Marker({
-//	//	position: markerpoint, title: 'DB'
-//	//	,icon: 'http://maps.google.com/mapfiles/kml/paddle/2-lv.png'
-//	//	});
-//	//markerDB.setMap(map);
-//		
-//	if (Tours[il].segment1) {
-//		if (Tours[il].segment1 != '') {
-//			Tours[il].segment1.setMap(null);
-//			Tours[il].segment1 = '';
-//		}
-//	}
-//	var pathsegment = new Array(Tours[il].pathRun[l],Tours[il].pathRun[l-1]);
-//	Tours[il].segment1 = new google.maps.Polyline({
-//		path: pathsegment,
-//		geodesic: true,
-//		//strokeColor: 'blue',
-//		strokeColor: 'black',
-//		strokeOpacity: 1.0,
-//		strokeWeight: 2
-//	});
-//	Tours[il].segment1.setMap(map);
 	
 	displayMap();
 	
@@ -2650,12 +2149,10 @@ function simuRelease() {
 	}
 	// on efface la représentation du mobile
 	if (simup0 != '') {
-		//simup0.setMap(null);
 		map.removeLayer(simup0);
 		simup0 = '';
 	}
 	if (simup1 != '') {
-		//simup1.setMap(null);
 		map.removeLayer(simup1);
 		simup1 = '';
 	}
@@ -2750,12 +2247,10 @@ function showMobile() {
 	
 	// On va matérialiser les 2 points du segment de droite
 	if (simup0 != '') {
-		//simup0.setMap(null);
 		map.removeLayer(simup0)
 		simup0 = '';
 	}
 	if (simup1 != '') {
-		//simup1.setMap(null);
 		map.removeLayer(simup1)
 		simup1 = '';
 	}
@@ -2763,58 +2258,10 @@ function showMobile() {
 	var cap = Tours[il].points[i0].cap;
 
 	var markerpoint = {lat: Tours[il].points[i0].lat1, lng: Tours[il].points[i0].lon1};
-	//console.log(markerpoint);
-	//simup0 = new google.maps.Marker({
-	//	position: markerpoint,
-	//	title: 'T:'+Tours[il].points[i0].timestamp+'\r\n'+
-	//	       'v:'+Math.round(Tours[il].points[i0].vitesse)+'km/h\r\n'+
-	//	       'alt:'+Math.round(Tours[il].points[i0].altitude)+'m\r\n'+
-	//		   'cap:'+Math.round(Tours[il].points[i0].cap*10)/10+'° '
-	//	,icon: {
-	//		path: google.maps.SymbolPath.CIRCLE,
-	//		rotation: cap,
-	//		fillColor: "yellow",
-	//		fillOpacity: 0.6,
-	//		scale: 5,
-	//		strokeColor: "gold",
-	//		strokeWeight: 2,
-	//
-	//		}
-	//	});
-	//simup0.setMap(map);
-	//$$$$var	title = 'T:'+Tours[il].points[i0].timestamp+'\r\n'+
-	//$$$$	       'v:'+Math.round(Tours[il].points[i0].vitesse)+'km/h\r\n'+
-	//$$$$	       'alt:'+Math.round(Tours[il].points[i0].altitude)+'m\r\n'+
-	//$$$$		   'cap:'+Math.round(Tours[il].points[i0].cap*10)/10+'° ';
-	//$$$$var localIcon = L.icon({
-	//$$$$	iconUrl: 'http://maps.google.com/mapfiles/kml/paddle/red-stars-lv.png',
-	//$$$$	iconAnchor: [8, 16]
-	//$$$$});	
-	//$$$$simup0 = new L.Marker(markerpoint,{draggable:true, title: title, rotationAngle:cap});
-	//$$$$map.addLayer(simup0);
 
 	var cap = Tours[il].points[i1].cap;
 
 	var markerpoint = {lat: Tours[il].points[i1].lat1, lng: Tours[il].points[i1].lon1};
-	//console.log(markerpoint);
-	//simup1 = new google.maps.Marker({
-	//	position: markerpoint, 
-	//	title: 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
-	//	       'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
-	//	       'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
-    //           'cap:'+Math.round(Tours[il].points[i1].cap*10)/10+'° '
-	//	,icon: {
-	//		path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-	//		rotation: cap,
-	//		fillColor: "cyan",
-	//		fillOpacity: 0.8,
-	//		scale: 5,
-	//		strokeColor: "gold",
-	//		strokeWeight: 2,
-	//
-	//		}
-	//	});
-	//simup1.setMap(map);
 	var	title = 'T:'+Tours[il].points[i1].timestamp+'\r\n'+
 		        'v:'+Math.round(Tours[il].points[i1].vitesse)+'km/h\r\n'+
 		        //'alt:'+Math.round(Tours[il].points[i1].altitude)+'m\r\n'+
@@ -2829,20 +2276,10 @@ function showMobile() {
 	// On va tracer une ligne entre les 2 points pour matérialiser le segment de droite
 	// on commence par effacer l'ancienne ligne
 	if (simuline != '') {
-		//simuline.setMap(null);
 		map.removeLayer(simuline)
 		simuline = '';
 	}
 	var pathCoordinates = [{lat: Tours[il].points[i0].lat1, lng: Tours[il].points[i0].lon1},{lat: Tours[il].points[i1].lat1, lng: Tours[il].points[i1].lon1}];
-	//simuline = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "cyan",
-	//	strokeOpacity: 0.6,
-	//	strokeWeight: 12
-	//});
-	//simuline.setMap(map);
-	//setCenter(Tours[il].points[i0].lat1, Tours[il].points[i0].lon1);
 	simuline = new L.polyline(pathCoordinates, {color: "cyan"});
 	map.addLayer(simuline);
 	var LatLng = L.latLng(Tours[il].points[i0].lat1, Tours[il].points[i0].lon1);
@@ -2922,16 +2359,9 @@ function showMobile() {
 		for (var m=0; m < i1; m++) {
 			geodist.push(Tours[il].geocoords[m]);
 		}
-		//var dist =	google.maps.geometry.spherical.computeLength(geodist);
 		var dist =	0;
 		el.innerHTML = Math.round(dist)+"m";
 	}
-
-	//// affichage de l'altitude
-	//var el = document.getElementById('altitude');
-	//if (el) {
-	//	el.innerHTML = 'alt:'+Math.round(altitude)+"m";
-	//}
 
 	// affichage du cap
 	var el = document.getElementById('cap');
@@ -2961,7 +2391,6 @@ function showMobile() {
 		
 	var el = document.getElementById('turn');
 	if (el) {
-		//el.innerHTML = 'turn:'+deg2rad(cap)+'/'+deg2rad(cap0)+"rad";
 		turn = rad2deg(turn);
 		el.innerHTML = '';
 		if (turn <= -2) {
@@ -2976,7 +2405,6 @@ function showMobile() {
 	// Si on est en mode pas à pas, on marque le point d'intersection du segment avec la ligne
 	if (!playmotion) {
 		if (marktemp != '') {
-			//marktemp.setMap(null);
 			map.removeLayer(marktemp);
 			marktemp = '';
 		}
@@ -2985,11 +2413,6 @@ function showMobile() {
 		if (lat > 0 && lng > 0) {
 			var markerpoint = {lat: lat, lng: lng};
 			var l = tabMarktemp.length-1;
-			//marktemp = new google.maps.Marker({
-			//	position: markerpoint, title: 'Intersection'
-			//	,draggable: true
-			//	});
-			//marktemp.setMap(map);
 			marktemp = new L.Marker(markerpoint,{draggable:true, title: 'Intersection'});
 			map.addLayer(marktemp);
 		}
@@ -3061,7 +2484,6 @@ function showInputPoint(elem) {
 	var zoom = map.getZoom();
 		
 	if (marktemp != '') {
-		//marktemp.setMap(null);
 		map.removeLayer(marktemp);
 		marktemp = '';
 	}
@@ -3086,14 +2508,9 @@ function showInputPoint(elem) {
 	var lng = A[1]*1;
 
 	var markerpoint = {lat: lat, lng: lng};
-	//marktemp = new google.maps.Marker({
-	//	position: markerpoint, title: 'D2'
-	//	});
-	//marktemp.setMap(map);
 	marktemp = new L.Marker(markerpoint,{draggable:false, title: 'D2'});
 	map.addLayer(marktemp);
 	
-	//setCenter(lat,lng);	
 	var LatLng = L.latLng(lat,lng);
 	map.panTo(LatLng);
 
@@ -3109,9 +2526,6 @@ function markMultiPoints(tabPoints) {
 		var lat = tabPoints[i]*1;
 		var lng = tabPoints[i+1]*1;
 		var markerpoint = {lat: lat, lng: lng};
-		//var marker = new google.maps.Marker({
-		//	position: markerpoint, title: 'Point'
-		//	});
 		markter = new L.Marker(markerpoint,{draggable:false, title: 'Point'});
 		map.addLayer(marker);
 		tabMarktemp.push(marker);
@@ -3135,11 +2549,6 @@ function markMultiPoints(tabPoints) {
 					var markerpoint = {lat: lat, lng: lng};
 					tabMarktemp.push();
 					var l = tabMarktemp.length-1;
-					//tabMarktemp[l] = new google.maps.Marker({
-					//	position: markerpoint, title: 'X'
-					//	,draggable: true
-					//	});
-					//tabMarktemp[l].setMap(map);
 					tabMarktemp[l] = new L.Marker(markerpoint,{draggable:false, title: 'X'});
 					map.addLayer(tabMarktemp[l]);
 				}
@@ -3150,11 +2559,6 @@ function markMultiPoints(tabPoints) {
 					var markerpoint = {lat: lat, lng: lng};
 					tabMarktemp.push();
 					var l = tabMarktemp.length-1;
-					//tabMarktemp[l] = new google.maps.Marker({
-					//	position: markerpoint, title: 'Y'
-					//	,draggable: true
-					//	});
-					//tabMarktemp[l].setMap(map);
 					tabMarktemp[l] = new L.Marker(markerpoint,{draggable:false, title: 'Y'});
 					map.addLayer(tabMarktemp[l]);
 				}
@@ -3170,13 +2574,6 @@ function markMultiPoints(tabPoints) {
 function designSegment(seg) {
 	document.getElementById("zone-info").innerHTML = '';
 	var pathCoordinates = [{lat: seg[0], lng: seg[1]},{lat: seg[2], lng: seg[3]}];
-	//segment = new google.maps.Polyline({
-	//	path: pathCoordinates,
-	//	geodesic: true,
-	//	strokeColor: "cyan",
-	//	strokeOpacity: 1,
-	//	strokeWeight: 1
-	//});
 	segment = new L.polyline(pathCoordinates, {color: "cyan"});
 	map.addLayer(segment);	
 	tabLinetemp.push(segment);
@@ -3188,7 +2585,6 @@ function clearMultiPoints() {
 	// on efface les anciens points
 	for (var i=0; i < tabMarktemp.length; i++) {
 		if (tabMarktemp[i] != "") {
-			//tabMarktemp[i].setMap(null);
 			map.removeLayer(tabMarktemp[i]);
 			tabMarktemp[i] = '';
 		}
@@ -3197,7 +2593,6 @@ function clearMultiPoints() {
 	// on efface les anciens segments
 	for (var i=0; i < tabLinetemp.length; i++) {
 		if (tabLinetemp[i] != "") {
-			//tabLinetemp[i].setMap(null);
 			map.removeLayer(tabLinetemp[i]);
 			tabLinetemp[i] = '';
 		}
@@ -3207,8 +2602,6 @@ function clearMultiPoints() {
 
 
 function degrees_to_decimal(coord, hemisphere) {
-	//$GPRMC,083000.00,A,4814.49972,N,00400.01847,E,69.161,124.02,240620,,,A*5D
-
 	degmin = coord.split('.');
 	degrees = degmin[0].substr(0,degmin[0].length-2);
 	minutes = degmin[0].substr(degmin[0].length-2);
@@ -3225,7 +2618,6 @@ function degrees_to_decimal(coord, hemisphere) {
 
 function getObjTime(t) {
 	if (!dateSession) {
-		//var dtnow = Date.now();
 		var dtnow = new Date();
 		var i = dtnow.getMonth();
 		var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
@@ -3233,7 +2625,6 @@ function getObjTime(t) {
 		if (d < 10)
 			d = '0'+d;
 		dateSession = d+'/'+months[i]+'/'+dtnow.getFullYear();
-		//console.log('Date session générée:'+dateSession);
 	}
 	var dt = dateSession;
 	syy = dt.substr(6,4);
@@ -3381,7 +2772,7 @@ function getPerpendiculaire(A,B) { // coordonnées du point A, point B
 	// coordonnées d'un point B sur un cercle de centre A: X, Y
 	var X = Xb-Xa; // X = côté Adjacent de l'angle a
 	var Y = Yb-Ya; // Y = côté Opposé de l'angle a
-//	
+
 	var latA = deg2rad(A[0]);
 	var lonA = deg2rad(A[1]);
 	var latB = deg2rad(B[0]);
@@ -3411,16 +2802,6 @@ function pointDroite(A,B,d) { // coordonnées du point A, point B et distance à
 }
 
 function getIntersection(SegAB,SegCD) {
-	//var pinter = getIntersectionSphere(SegAB,SegCD)
-	////var new_pinter = new Array(pinter.latitude,pinter.longitude)
-	//var new_pinter = new Array(pinter.latitude,pinter.longitude)
-	//  
-	////var ret = new Array(Number.parseFloat(Sx),Number.parseFloat(Sy))
-	////return new Array(Sx,Sy)
-	//return new_pinter
-	
-	/////////////////////////////////////////////////
-	
 	var Ax = SegAB[0]*1;
 	var Ay = SegAB[1]*1;
 	var Bx = SegAB[2]*1;
@@ -3430,14 +2811,6 @@ function getIntersection(SegAB,SegCD) {
 	var Cy = SegCD[1]*1;
 	var Dx = SegCD[2]*1;
 	var Dy = SegCD[3]*1;
-	
-//function getIntersectionSphere(line1 ,line2) {
-//   //console.log("segment1:"+JSON.stringify(line1));
-//   //console.log("segment2:"+JSON.stringify(line2));
-//   // find the plane of the line in cartesian coordinates
-//   var p1 = findPlane(line1[0],line1[1],line1[2],line1[3]);
-//   var p2 = findPlane(line2[0],line2[1],line2[2],line2[3])
-	
 
 	var Sx;
 	var Sy;
@@ -3481,56 +2854,6 @@ function getIntersection(SegAB,SegCD) {
 	By = precis14(By);
 	Cy = precis14(Cy);
 	Dy = precis14(Dy);
-	
-	//console.log('Sx:'+Sx);
-	//console.log('Ax:'+Ax);
-	//console.log('Bx:'+Bx);
-	//console.log('Cx:'+Cx);
-	//console.log('Dx:'+Dx);
-	//console.log('Sy:'+Sy);
-	//console.log('Ay:'+Ay);
-	//console.log('By:'+By);
-	//console.log('Cy:'+Cy);
-	//console.log('Dy:'+Dy);
-	//var v = false;
-	//if (Sx<Ax && Sx<Bx)
-	//	v = true;
-	//console.log('v1:'+v);
-	//
-	//var v = false;
-	//if (Sx>Ax && Sx>Bx)
-	//	v = true;
-	//console.log('v2:'+v);
-	//
-	//var v = false;
-	//if (Sx<Cx && Sx<Dx)
-	//	v = true;
-	//console.log('v3:'+v);
-	//
-	//var v = false;
-	//if (Sx>Cx && Sx>Dx)
-	//	v = true;
-	//console.log('v4:'+v);
-	//
-	//var v = false;
-	//if (Sy<Ay && Sy<By)
-	//	v = true;
-	//console.log('v5:'+v);
-	//
-	//var v = false;
-	//if (Sy>Ay && Sy>By)
-	//	v = true;
-	//console.log('v6:'+v);
-	//
-	//var v = false;
-	//if (Sy<Cy && Sy<Dy)
-	//	v = true;
-	//console.log('v7:'+v);
-	//
-	//var v = false;
-	//if (Sy>Cy && Sy>Dy)
-	//	v = true;
-	//console.log('v8:'+v);
 
 	if((Sx<Ax && Sx<Bx)|(Sx>Ax && Sx>Bx) | (Sx<Cx && Sx<Dx)|(Sx>Cx && Sx>Dx)
 			| (Sy<Ay && Sy<By)|(Sy>Ay && Sy>By) | (Sy<Cy && Sy<Dy)|(Sy>Cy && Sy>Dy)) return false;
@@ -3554,13 +2877,9 @@ function getIntersectionSphere(line1 ,line2) {
       }
    in decimal
    */
-   //console.log("segment1:"+JSON.stringify(line1));
-   //console.log("segment2:"+JSON.stringify(line2));
    // find the plane of the line in cartesian coordinates
    var p1 = findPlane(line1[0],line1[1],line1[2],line1[3]);
    var p2 = findPlane(line2[0],line2[1],line2[2],line2[3])
-   //console.log("plan p1:"+JSON.stringify(p1));
-   //console.log("plan p2:"+JSON.stringify(p2));
    // The intersection of two planes contains of course the
    // point of origin, but also the point P : (x,y,z)
    // x = b1 * c2 - c1 * b2
@@ -3571,9 +2890,7 @@ function getIntersectionSphere(line1 ,line2) {
    var z = p1['a'] * p2['b'] - p1['b'] * p2['a'];
    
    var norme = Math.sqrt(x**2+y**2+z**2);
-   //var lat1 = degrees(Math.asin(z/norme));
    var lat1 = rad2deg(Math.asin(z/norme));
-   //var long1 = degrees(Math.atan2(y,x));
    var long1 = rad2deg(Math.atan2(y,x));
    lat2 = - (lat1)
    if (long1 <= 0)
@@ -3584,14 +2901,11 @@ function getIntersectionSphere(line1 ,line2) {
    var intersection2 = {'latitude' : lat2, 'longitude' : long2};
    var ver1 = lat1 * line1[0];
    var ver2 = lat1 * line2[0];
-   //console.log("vérification:"+ver1+"/"+ver2);
    var spinter = false;
    if (ver1 > 0 && ver2 > 0) {
-       //console.log("intersection des 2 arcs (intersection1):"+JSON.stringify(intersection1));
 	   var spinter = intersection1;
    }
    else {
-       //console.log ("intersection des 2 arcs (intersection2):"+JSON.stringify(intersection2));
 	   var spinter = intersection2;
    }
    return spinter;
@@ -3602,8 +2916,6 @@ function findPlane (lat1,long1,lat2,long2) {
    //using their spherical coordinates
    var c1 = sphericalToCartesian(lat1,long1)
    var c2 = sphericalToCartesian(lat2,long2)
-   //console.log (c1)
-   //console.log (c2)
    // the point 0 is the center of the earth
    // the plane through 0, c1 and c2 then the equation ax + by + cz = 0
    // a = y1 * z2 - z1 * y2
@@ -3637,10 +2949,6 @@ function sphericalToCartesian (lat,lng) {
 function radians(el) {
 	return deg2rad(el);
 }
-//function degrees(el) {
-//	return rad2deg(el);
-//}
-/**/
 
 function deg2rad(dg) {
 	return dg/180*π;
@@ -3652,8 +2960,6 @@ function rad2deg(rd) {
 
 // retourne l'angle formés par la droite A,B (A=origine, B=destination)
 function getAngle(A,B) {
-	//console.log('coordonnées='+A+','+B);
-
 	var Ya = A[0];
 	var Xa = A[1];
 	var Yb = B[0];
@@ -3661,24 +2967,15 @@ function getAngle(A,B) {
 	
 	// coordonnées d'un point B sur un cercle de centre A: X, Y
 	var X = Xb-Xa; // X = côté Adjacent de l'angle a
-	//console.log('côté adjacent='+X);
 	var Y = Yb-Ya; // Y = côté Opposé de l'angle a
-	//console.log('côté opposé='+Y);
 	
 	// calcul sinus et cosinus avec les coordonnées lat, lon
 	var H = Math.sqrt((Y*Y)+(X*X));
-	//console.log('hypoténuse='+H);
 	
 	var cosB = X/H;
 	var sinB = Y/H;
-	//console.log('cosB:'+cosB+',sinB:'+sinB);
-	
-	//if (X<0) cosB = cosB * -1;
-	//if (Y<0) sinB = sinB * -1;
-	//console.log('cosB:'+cosB+',sinB:'+sinB);
 	
 	var angleB = Math.acos(Math.abs(cosB)); // angle par rapport à l'horizontale
-	//console.log('angle B='+angleB+'('+rad2deg(angleB)+')');
 	if (Number.isNaN(angleB))
 		angleB = 0;
 	// valeur de l'angle en radian en fonction du signe du sinus et du signe du cosinus
@@ -3692,30 +2989,9 @@ function getAngle(A,B) {
 		else
 			angleB = π+angleB;
 	}
-	//console.log('angle B (0-360)='+angleB+'('+rad2deg(angleB)+')');
-	
-	//var angle = rad2deg(angleB);
-	//console.log('angle='+angleB);
 
-
-	
-	
-	// calcul sinus et cosinus avec la longueur des côtés
-	//var OM = distanceGPS(A,B);
-	//var OH = distanceGPS(A,new Array(A[0],B[1]));
-	//var OK = distanceGPS(new Array(A[0],B[0]),B);
-	//var cosB = OH/OM;
-	//var sinB = OK/OM;
-	//console.log('cosB:'+cosB+'sinB:'+sinB);
-	//
-	//if (X<0) sinB = sinB * -1;
-	//if (Y<0) cosB = cosB * -1;
-	//console.log('cosB:'+cosB+',sinB:'+sinB);
-	
 	var angle = angleB;
 	return angle;
-	
-	//return angle+',X='+X+',Y='+Y+',cos='+cosB+',sin='+sinB+'<br>A('+A[0]+','+A[1]+'),B('+B[0]+','+B[1]+')';
 }
 
 function getCap(objline) {
@@ -3723,29 +2999,10 @@ function getCap(objline) {
 	var Bcoord = new Array(objline.coord[2],objline.coord[3]);
 	
 	var angle = getAngle(Acoord,Bcoord);
-	//console.log('angle='+angle);
 	
 	var cap = initialBearingTo(Acoord,Bcoord);
-	//console.log('bearing='+cap);
 
 	return cap;
-	
-	var cap =  (π) - angle;
-	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
-	if (cap < 0)
-		cap = (π*2)+cap;
-	//console.log('angle='+rad2deg(angle)+'cap='+rad2deg(cap));
-	objline.cap = rad2deg(cap);
-	
-/*
-	
-	var cap = deg2rad(objline.cap);
-	var angle = ((π*5)/2)-cap;
-	if (!angle-(π*2) < 0)
-		angle = angle+(π*2);
-	//console.log("cap (rad):"+cap+",angle (rad)="+angle);
-*/	
-
 }
 
 //var B = getDestination(objline.lat,objline.lon,objline.cap,dist)
@@ -3818,21 +3075,17 @@ function wrap360(degrees) {
 	
 function mouseMove(mousePt) {
 	mouseLatLng = mousePt.latlng;
-	//var mouseCoord = mouseLatLng.toUrlValue();
 	var mouseLat = mouseLatLng.lat;
 	var mouseLon = mouseLatLng.lng;
 	
-	//var oStatusDiv = document.getElementById("mouseTrack")	
 	var oStatusDiv = document.getElementById("LatLng")	
 	if (oStatusDiv) {
 		oStatusDiv.value  = mouseLat + ',' + mouseLon;
 	}
-	//document.getElementById("zone-info").innerHTML = '';
 }
 	
 function copyClipboard(mousePt) {
 	mouseMove(mousePt);
-	//var z_extract = document.getElementById("mouseTrack")
 	var z_extract = document.getElementById("LatLng")
 	z_extract.select();
 	if ( !document.execCommand( 'copy' ) ) {
@@ -3842,7 +3095,6 @@ function copyClipboard(mousePt) {
 	var el = document.getElementById("HiddenLatLng")
 	if (el)
 	    el.value = z_extract.value;
-	//document.getElementById("zone-info").innerHTML = 'Les coordonnées du point sont copiés dans le presse papier';
 	writeMessage("Les coordonnées du point sont copiés dans le presse papier",3);
 	showInputPoint(el.id);
 	return true;
@@ -3867,9 +3119,7 @@ function resizeMap() {
 	if (!map)
 		return;
 	var bounds = map.getBounds();
-	//console.log('bounds avant:'+JSON.stringify(bounds));	
 
-	//
 	var el = document.getElementById("map");
 	var html = "oT:";
 	html += el.offsetTop+" oL:"+el.offsetLeft;
@@ -3879,22 +3129,17 @@ function resizeMap() {
 	var hauteur = window.innerHeight;
 	html += " l:"+largeur+" h:"+hauteur;
 	document.getElementById("ecran").innerHTML = html;
-	//document.getElementById("ecran").style.display = 'block';
 	
 	var hopt = Math.floor((hauteur - el.offsetTop)/4)*4;
 	var ohopt = hopt; 
-	//console.log(hopt);
 	// si le container graph est ouvert, on retire 200
 	var elg = document.getElementById("container-graph");
 	if (elg) {
-		/**/
 		if (elg.style.display == "block") {
 			hopt = hopt - 208;
 			originBounds = map.getBounds();
 			// on recadre sur le centre précédent
 			var difflat = bounds._southWest.lat - bounds._northEast.lat
-			//var ndifflat = difflat * (hopt / ohopt) * (hauteur/largeur);
-			//var ndifflat = difflat * (hopt / ohopt) * (el.offsetHeight/el.offsetWidth);
 			var ndifflat = difflat * ((el.offsetHeight-208)/el.offsetHeight);
 			var newsouthlat = bounds._southWest.lat + ndifflat;
 			var corner1 = L.latLng(newsouthlat, bounds._southWest.lng);
@@ -3907,7 +3152,6 @@ function resizeMap() {
 			if (originBounds)
 				map.fitBounds(originBounds);
 		}
-		/**/
 	}
 	
 	if (hopt != el.offsetHeight) {

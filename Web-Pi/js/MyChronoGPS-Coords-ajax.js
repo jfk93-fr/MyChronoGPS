@@ -69,8 +69,6 @@ function loadCoordsAjax(proc)
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4) {
 			if (this.status == 200) {
-				//alert("responseText:"+this.responseText);
-				//console.log(this.responseText);
 				try {Coords = JSON.parse(this.responseText);
 					nb_coords = Coords.length;
 				}
@@ -85,73 +83,9 @@ function loadCoordsAjax(proc)
 			}
 		}
     }
-    //xmlhttp.open("GET", proc+"?nocache=" + Math.random(), true);
     xmlhttp.open("GET", proc, true);
     xmlhttp.send();
 }
-
-/*
-				Coords = FileContent;
-				nb_coords = Coords.length;
-*/
-//function is_file_ready()
-//{
-//	if (nb_coords == 0) {
-//		coords_timer = setTimeout(is_file_ready, 1000);
-//	}
-//	else {
-//		clearTimeout(coords_timer);
-//		var fileInput = document.getElementById('fileInput');
-//		var fileDisplayArea = document.getElementById('fileDisplayArea');
-//		fileDisplayArea.innerText = "File is loaded!";
-//
-//		fileInput.removeEventListener('change', read_file);
-//		copyCoords();
-//		dataCoordsReady();
-//	}
-//}
-//
-//function load_file() {
-//		nb_coords = 0;	
-//	
-//		var fileInput = document.getElementById('fileInput');
-//		var fileDisplayArea = document.getElementById('fileDisplayArea');
-//		fileInput.addEventListener('change', read_file);
-//}
-//
-//function read_file(e) {
-//	fileDisplayArea.innerText = 'please wait';
-//		var file = fileInput.files[0];
-//		var reader = new FileReader();
-//		reader.onload = function(e) {
-//			chaine = reader.result;
-//			var reg = new RegExp("\r", "g" );
-//			var newstr = chaine.replace(reg,'');
-//			FileContent=newstr.split('\n');
-//			var i = FileContent.length-1;
-//			if (FileContent[i] == "")
-//				FileContent.pop();
-//
-//			//console.log(JSON.stringify(file));
-//			//alert('name:'+file.name);
-//			var ext = file.name.split('.');
-//			var ie = ext.length-1;
-//			if (ie < 0) {
-//				alert ('extension du fichier non traitée');
-//				return;
-//			}
-//			if (ext[ie] == 'nmea') {
-//				fileDisplayArea.innerText = "NMEA File is being converted !";
-//				Trames = FileContent;
-//				convertNMEA();
-//			}
-//			else {
-//				Coords = FileContent;
-//				nb_coords = Coords.length;
-//			}
-//		}
-//		reader.readAsText(file);	
-//}
 
 function convertNMEA() {
 	Coords = new Array();
@@ -161,25 +95,20 @@ function convertNMEA() {
 		parse_nmea(gpsline);
 	}
 	nb_coords = Coords.length;
-	//console.log("Coords:"+Coords.length);
 }
 
 function parse_nmea(sentence) {
     NMEA = sentence.split(",");
 	// le premier élément commence par $, suivi de 2 caractères identifiant l'émetteur de la trame, suivi de 3 caractères identifiant la trame
 	if (NMEA[0].substr(0,1) != '$') {
-		//console.log("no talker indicator ("+NMEA[0].substr(0,1)+")");
 		return;
 	}
 	idsender = NMEA[0].substr(1,2);
-	//console.log("sender:"+idsender);
 	idtrame = NMEA[0].substr(3,3);
-	//console.log("idtrame:"+idtrame);
 	
 	getTimeNmea(); // on va rechercher un temps dans la trame
         
 	// on regarde si le temps à changer par rapport au temps du paquet
-	//console.log("times nmea/packet:"+nmeatime+"/"+packettime);
 	if (nmeatime > 0) { //est-ce que la trame en cours possède 1 temps
 		if (packettime > 0) { // est-ce qu'il y a un temps associé au paquet
 			if (nmeatime != packettime) {
@@ -195,7 +124,6 @@ function parse_nmea(sentence) {
 	}
 	if (idtrame == "GGA") {
 		if (NMEA.length < 12) {
-			//console.log("invalid GGA:"+sentence)
 			gpsfix = INVALID
 		}
 		else {
@@ -221,7 +149,6 @@ function parse_nmea(sentence) {
 	
 	if (idtrame == "RMC") {
 		if (NMEA.length < 9) {
-			//console.log("invalid RMC:"+sentence)
 			gpsfix = INVALID;
 		}
 		else {
@@ -282,7 +209,6 @@ function getTimeNmea() {
 }
             
 function createPacket() {
-	//console.log("gpsrmcgga:"+gpsrmcgga);
 	if (gpsrmcgga < 2) { // les données ne sont pas complètes, on ne crée pas le paquet
 		gpsrmcgga = 0;
 		packettime = nmeatime;
@@ -290,7 +216,6 @@ function createPacket() {
 	}
 	gpstime = packettime;
 	// on va calculer l'heure et la date locale
-	//console.log("["+nmeatime+"/"+packettime+"]")
 	JJ = gpsdate.substr(0,2);
 	MM = gpsdate.substr(2,2);
 	AA = "20"+gpsdate.substr(4,2);
@@ -311,14 +236,10 @@ function createPacket() {
 }
 
 function degrees_to_decimal(coord, hemisphere) {
-	//$GPRMC,083000.00,A,4814.49972,N,00400.01847,E,69.161,124.02,240620,,,A*5D
-	//			Trames=newstr.split('\n');
-
 	var degmin = coord.split('.');
 	var degrees = degmin[0].substr(0,degmin[0].length-2);
 	var minutes = degmin[0].substr(degmin[0].length-2);
 	minutes += "."+degmin[1];
-	//console.log("degrees minutes:"+degrees+" "+minutes);
 	degrees = degrees*1
 	minutes = minutes/60
 
@@ -353,7 +274,6 @@ function nmea_send() {
 		if (thisCircuit.Int3)
 			Coord.Int3 = thisCircuit.Int3;
 		Coord.date = gpsdate;
-		//console.log(JSON.stringify(Coord));
 		Coords.push(new Array(Coord));
 		
 		Coord = new Object()
@@ -375,7 +295,6 @@ function nmea_send() {
 		Coord.vitesse = gpsvitesse;
 		Coord.altitude = gpsalt;
 		Coord.cap = gpscap;
-		//Coords.push(Coord);
 		Coords.push(new Array(Coord));
 	}
 	lat0 = latitude*1;
