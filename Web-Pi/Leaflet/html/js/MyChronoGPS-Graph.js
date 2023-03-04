@@ -56,7 +56,6 @@ function switchGraph() {
 			maxrows = Tours[il].geocoords.length;
 		}
 	}
-
 	// préparation du tableau graphe
 	tabGraph = new Array();
 	for (var i=0; i < maxrows; i++) {
@@ -88,7 +87,7 @@ function switchGraph() {
 		}
 	}
 
-	var options = {
+	options = {
 		hAxis: {
 			title: 'Echantillon'
 		},
@@ -117,6 +116,9 @@ function switchGraph() {
 	if (el) {
 		el.innerHTML = "";
 	}
+	var el = document.getElementById("sousmenu-graph");
+	if (el)
+		el.style.display = "block";
 
 	return;
 }
@@ -124,6 +126,7 @@ function switchGraph() {
 function setMarkerpoint(x,y) {
 	var lap = tabShow[y];
 	var point2mark = tabGraph[x][y];
+	
 	if (graphmarker != '') {
 		map.removeLayer(graphmarker)
 		graphmarker = '';
@@ -183,7 +186,6 @@ function changeMobilePoint(ev) {
 	}
 	// on place le mobile sur le point le plus près qu'on a trouvé
 	var point2mark = tabGraph[im][0];
-
 	var x=im;
 	var y=0;
 	setMarkerpoint(x,y);
@@ -199,7 +201,28 @@ function changeMobilePoint(ev) {
 	chart.setSelection([{'row' : im}]);
 }
 
-
+function graphPoint(pm) {
+	if (lieu.length > 0) {
+		var x = lieu[0].row;
+		var y = lieu[0].column-1;
+		var x2 = x + pm;
+		if (pm > 0) {
+			if (x2 > tabGraph.length - 1)
+				x2 = tabGraph.length - 1;
+		}
+		else {
+			if (x2 < 0)
+				x2 = 0;
+		}
+	
+		setMarkerpoint(x2,y);
+		lieu[0].row = x2;
+	
+		chart.draw(datag, options);
+		chart.setSelection([{'row' : x2}]);
+	}
+	
+}
 	
 function drawChartLap(il) {
 	// Ici, on va construire le tableau du tour en cours 
@@ -208,7 +231,7 @@ function drawChartLap(il) {
 	ograph = new Object();
 	ograph.dist = distlap; // X axis
 	ograph.speed = Tours[il].points[0].vitesse; // Y axis
-	ograph.altitude = Tours[il].points[0].altitude;
+	//ograph.altitude = Tours[il].points[0].altitude;
 	ograph.cap = Tours[il].points[0].cap;
 	ograph.lat = Tours[il].geocoords[0].lat;
 	ograph.lon = Tours[il].geocoords[0].lng;
@@ -244,6 +267,9 @@ function graphRelease() {
 	if (el)
 		el.style.display = "none";
 	var el = document.getElementById("info-graph");
+	if (el)
+		el.style.display = "none";
+	var el = document.getElementById("sousmenu-graph");
 	if (el)
 		el.style.display = "none";
 }

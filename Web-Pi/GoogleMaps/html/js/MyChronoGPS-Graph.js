@@ -23,6 +23,7 @@ function drawChart () {
 }
 
 function switchGraph() {
+	document.getElementById("zone-info").innerHTML = '';
 	if (is_graph) {
 		// On arrête l'affichage du graphique
 		graphRelease();
@@ -30,7 +31,7 @@ function switchGraph() {
 		is_graph = false;
 		return;
 	}
-	//document.getElementById("menu-graph").style.display = "none";
+
 	var el = document.getElementById("info-graph");
 	if (el) {
 		el.style.display = "block";
@@ -86,7 +87,7 @@ function switchGraph() {
 		}
 	}
 
-		options = {
+	options = {
 		hAxis: {
 			title: 'Echantillon'
 		},
@@ -107,7 +108,6 @@ function switchGraph() {
 		if (lieu.length > 0) {
 			var x = lieu[0].row;
 			var y = lieu[0].column-1;
-
 			setMarkerpoint(x,y);
 		}
 		return;
@@ -116,6 +116,9 @@ function switchGraph() {
 	if (el) {
 		el.innerHTML = "";
 	}
+	var el = document.getElementById("sousmenu-graph");
+	if (el)
+		el.style.display = "block";
 
 	return;
 }
@@ -129,7 +132,7 @@ function setMarkerpoint(x,y) {
 		graphmarker = '';
 	}
 	var cap = point2mark.cap;
-	var markerpoint = {lat: point2mark.lat(), lng: point2mark.lon()};
+	var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
 	graphmarker = new google.maps.Marker({
 		position: markerpoint, 
 		title: 'T:\t'+lap+'\r\n'+
@@ -188,18 +191,39 @@ function changeMobilePoint(ev) {
 	
 	chart.draw(datag, options);
 	chart.setSelection([{'row' : im}]);
+}
+
+function graphPoint(pm) {
+	if (lieu.length > 0) {
+		var x = lieu[0].row;
+		var y = lieu[0].column-1;
+		var x2 = x + pm;
+		if (pm > 0) {
+			if (x2 > tabGraph.length - 1)
+				x2 = tabGraph.length - 1;
+		}
+		else {
+			if (x2 < 0)
+				x2 = 0;
+		}
+	
+		setMarkerpoint(x2,y);
+		lieu[0].row = x2;
+	
+		chart.draw(datag, options);
+		chart.setSelection([{'row' : x2}]);
+	}
 	
 }
 	
 function drawChartLap(il) {
 	// Ici, on va construire le tableau du tour en cours 
-	//
 	lapGraph = new Array();
 	var distlap = 0;
 	ograph = new Object();
 	ograph.dist = distlap; // X axis
 	ograph.speed = Tours[il].points[0].vitesse; // Y axis
-	ograph.altitude = Tours[il].points[0].altitude;
+	//ograph.altitude = Tours[il].points[0].altitude;
 	ograph.cap = Tours[il].points[0].cap;
 	ograph.lat = Tours[il].geocoords[0].lat();
 	ograph.lon = Tours[il].geocoords[0].lng();
@@ -213,10 +237,10 @@ function drawChartLap(il) {
 		ograph = new Object();
 		ograph.dist = distlap; // X axis
 		ograph.speed = Tours[il].points[ip].vitesse; // Y axis
-		ograph.altitude = Tours[il].points[ip].altitude;
+		//ograph.altitude = Tours[il].points[ip].altitude;
 		ograph.cap = Tours[il].points[ip].cap;
-		ograph.lat = Tours[il].geocoords[ip].lat;
-		ograph.lon = Tours[il].geocoords[ip].lng;
+		ograph.lat = Tours[il].geocoords[ip].lat();
+		ograph.lon = Tours[il].geocoords[ip].lng();
 		// calcul de l'accélération
 		var accel = (((Tours[il].points[ip].vitesse - Tours[il].points[ip-1].vitesse)) * Frequence) / gkmh;
 		ograph.accel = accel;
@@ -237,6 +261,9 @@ function graphRelease() {
 	var el = document.getElementById("info-graph");
 	if (el)
 		el.style.display = "none";
+	var el = document.getElementById("sousmenu-graph");
+	if (el)
+		el.style.display = "none";
 }
 
 function distance2segments(coords) {
@@ -255,21 +282,21 @@ function distance2segments(coords) {
         // δ = 2·atan2(√(a), √(1−a))
         // see mathforum.org/library/drmath/view/51879.html for derivation
 		
-Presuming a spherical Earth with radius R (see below), and that the
-locations of the two points in spherical coordinates (longitude and
-latitude) are lon1,lat1 and lon2,lat2, then the Haversine Formula 
-(from R. W. Sinnott, "Virtues of the Haversine," Sky and Telescope, 
-vol. 68, no. 2, 1984, p. 159): 
-
-  dlon = lon2 - lon1
-  dlat = lat2 - lat1
-  a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
-  c = 2 * atan2(sqrt(a), sqrt(1-a)) 
-  d = R * c		
-
-Number.prototype.toRadians = function() { return this * π / 180; };
-Number.prototype.toDegrees = function() { return this * 180 / π; };
-*/
+	Presuming a spherical Earth with radius R (see below), and that the
+	locations of the two points in spherical coordinates (longitude and
+	latitude) are lon1,lat1 and lon2,lat2, then the Haversine Formula 
+	(from R. W. Sinnott, "Virtues of the Haversine," Sky and Telescope, 
+	vol. 68, no. 2, 1984, p. 159): 
+	
+	dlon = lon2 - lon1
+	dlat = lat2 - lat1
+	a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
+	c = 2 * atan2(sqrt(a), sqrt(1-a)) 
+	d = R * c		
+	
+	Number.prototype.toRadians = function() { return this * π / 180; };
+	Number.prototype.toDegrees = function() { return this * 180 / π; };
+	*/
 	var radius = RT;
 	const R = radius;
 	const φ1 = latA,  λ1 = lonA;
@@ -294,11 +321,9 @@ Number.prototype.toDegrees = function() { return this * 180 / π; };
 	var Acos = Msin + Mcos;
 	if (Acos > 1) Acos = 1;
 	var D = Math.acos(Acos);
-    //var S = Math.acos(Math.sin(latA)*Math.sin(latB) + Math.cos(latA)*Math.cos(latB)*Math.cos(Math.abs(longB-longA)))
 	var S = D;
     // distance entre les 2 points, comptée sur un arc de grand cercle
 	var distance = S*RT;
-	//console.log('distance='+distance);
     return distance;
 }
 

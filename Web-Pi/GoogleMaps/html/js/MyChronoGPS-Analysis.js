@@ -1,3 +1,8 @@
+var fname_save = 'ajax/save_coords.php';
+var dataPost = false; // Objet recueillant le formulaire à passer à la procédure ajax d'écriture
+var dataReturn;
+var coords_save_timer = '';
+
 var curr_coord = 0;
 var latitude     = '';
 var longitude    = '';
@@ -451,21 +456,21 @@ function deleteLine(line) {
 	// on efface tous les marqueurs
 	if (typeof(obj.marker1) != 'undefined') {
 		if (obj.marker1 != '') {
-			objline.marker1.setMap(null);
+			obj.marker1.setMap(null);
 			obj.marker1 = '';
 		}
 	}
 		
 	if (typeof(obj.marker2) != 'undefined') {
 		if (obj.marker2 != '') {
-			objline.marker2.setMap(null);
+			obj.marker2.setMap(null);
 			obj.marker2 = '';
 		}
 	}
 
 	if (typeof(obj.line) != 'undefined') {
 		if (obj.line != '') {
-			objline.line.setMap(null);
+			obj.line.setMap(null);
 			obj.line = '';
 		}
 	}
@@ -480,6 +485,121 @@ function deleteLine(line) {
 		objPitIn = new Object();
 	if (line == -2)
 		objPitOut = new Object();
+}
+
+// sauvegarde des lignes tracées dans le fichier analysis
+function saveLines() {
+	var CoordLines = new Object();
+	if (typeof(objStart.coord) != 'undefined') {
+		CoordLines.FL = objStart.coord;
+	}
+	if (typeof(objPitIn.coord) != 'undefined') {
+		CoordLines.PitIn = objPitIn.coord;
+	}
+	if (typeof(objPitOut.coord) != 'undefined') {
+		CoordLines.PitOut = objPitOut.coord;
+	}
+	if (Tabint[0]) {
+		if (typeof(Tabint[0].coord) != 'undefined') {
+			CoordLines.Int1 = Tabint[0].coord;
+		}
+	}
+	if (Tabint[1]) {
+		if (typeof(Tabint[1].coord) != 'undefined') {
+			CoordLines.Int2 = Tabint[1].coord;
+		}
+	}
+	if (Tabint[2]) {
+		if (typeof(Tabint[2].coord) != 'undefined') {
+			CoordLines.Int3 = Tabint[2].coord;
+		}
+	}
+	if (Tabint[3]) {
+		if (typeof(Tabint[3].coord) != 'undefined') {
+			CoordLines.Int4 = Tabint[3].coord;
+		}
+	}
+	// on crée le JSON de la piste à passer en POST
+
+	dataPost = new FormData();	
+
+	for (property in CoordLines) {
+		var valuePost = CoordLines[property];
+		if (Array.isArray(CoordLines[property])) {
+			valuePost = '['+CoordLines[property]+']';
+		}
+		dataPost.append(property, valuePost);
+	}
+
+	var proc = fname_save+"?nocache=" + Math.random()+"&analysis="+parmAnalysis
+	upLoadLinesAjax(proc);
+	
+	document.getElementById("zone-info").innerHTML = 'Les données analyse sont en cours de sauvegarde, veuillez patienter';
+	isCoordsSaved();
+}
+
+function isCoordsSaved()
+{
+	if (!dataReturn) {
+		coords_save_timer = setTimeout(isCoordsSaved, 300);
+		return;
+	}
+	clearTimeout(coords_save_timer);
+	var el = document.getElementById("zone-info");
+	if (el)
+		el.innerHTML = '';
+
+	dataCoordsSaved();
+}
+
+function dataCoordsSaved() {
+	console.log(JSON.stringify(dataReturn));
+	Ev = eval(dataReturn);
+	console.log(JSON.stringify(Ev));
+	retour = Ev;
+	if (retour.msgerr) {
+		// on n'a pas réussi à sauvegarder les coordonnées
+		var el = document.getElementById("zone-info");
+		if (el)
+			el.innerHTML = retour.msgerr;
+		return false;
+	}
+
+	thisCircuit = Ev[0]; // Mise à jour des données du circuit
+	
+	document.getElementById("zone-info").innerHTML = 'Les données analyse ont été sauvegardée';
+}	
+
+function upLoadLinesAjax(proc) 
+{
+	dataReturn = false;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function(proc) {
+        if (this.readyState == 4) {
+			if (this.status == 200) {
+				try {
+					dataReturn = JSON.parse(this.responseText);
+					var el = document.getElementById("zone-info");
+					if (el)
+						el.innerHTML = "fichier analysis sauvegard&eacute;";
+				}
+				catch(e) {
+							dataReturn = this.responseText;
+							var el = document.getElementById("zone-info");
+							if (el)
+								el.innerHTML = dataReturn;
+						}
+			}
+			else 
+			{	
+				var el = document.getElementById("zone-info");
+				if (el)
+					el.innerHTML = "fichier " + proc + " non trouv&eacute;";
+			}
+		}
+    }
+    xmlhttp.open("POST", proc, true);
+    xmlhttp.send(dataPost);
 }
 	
 
@@ -2192,7 +2312,7 @@ function getLapTime(t) {
 	sdd = dt.substr(0,2);
 	sh = 0;
 	var tt = t.split(':');
-	sm = tt[0].substr(2,2);
+	sm = tt[0].substr(0,2);
 	var tt = tt[1].split('.');
 	ss = tt[0];
 	sms = tt[1]+'0';

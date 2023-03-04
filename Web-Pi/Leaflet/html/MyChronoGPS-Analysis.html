@@ -145,6 +145,20 @@
 					<span id="simu" style="display:none"> 
 						<a id="switch-simu" class="w3-bar-item w3-button LCD35-hide" href="#" onClick="switchSimu();" >Simulateur</a>
 						<a  id="switch-graph" class="w3-bar-item w3-button LCD35-hide" href="#" onClick="switchGraph();" >Graphe</a>
+						<span class="LCD35-hide" id="sousmenu-graph" style="display:none">
+							<span class="w3-bar-item" style="padding:0px 16px; 0px; 16px;">
+								<a class="w3-button w3-black w3-round w3-col" href="#"  onClick="graphPoint(-10);" title="10 previous points" > &lt;&lt; </a>
+							</span>
+							<span class="w3-bar-item" style="padding:0px 16px; 0px; 16px;">
+								<a class="w3-bar-item w3-button w3-black w3-round w3-col" href="#"  onClick="graphPoint(-1);" title="previous point" > &nbsp;&lt;&nbsp; </a>
+							</span>
+							<span class="w3-bar-item" style="padding:0px 16px; 0px; 16px;">
+								<a class="w3-bar-item w3-button w3-black w3-round w3-col" href="#"  onClick="graphPoint(+1);" title="next point" > &nbsp;&gt;&nbsp; </a>
+							</span>
+							<span class="w3-bar-item" style="padding:0px 16px; 0px; 16px;">
+								<a class="w3-bar-item w3-button w3-black w3-round w3-col" href="#"  onClick="graphPoint(+10);" title="next 10 points" > &gt;&gt; </a>
+							</span>
+						</span>
 						<div class="LCD35-show">
 							<a href="#" class="w3-bar-item  w3-button btnchart" id="switch-graph" onClick="switchGraph();" style="display:none">
 							</a>
