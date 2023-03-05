@@ -2,8 +2,8 @@ MyChronoGPS
 ==
 Installation du Logiciel
 -
-MyChronoGPS fonctionne sur des Raspberry 2,3,4 et zero
-Les rpi 3 et au delà ou zeroW v2 sont recommandés 
+MyChronoGPS fonctionne sur des Raspberry 2,3,4 et zero.
+Les RPi 3 et au delà ou zeroW v2 sont recommandés. 
 
 ### Préparation de la carte SD #
 La préparation de la carte SD s'effectue avec l'outil Pi Imager.

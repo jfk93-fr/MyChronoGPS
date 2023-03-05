@@ -174,8 +174,9 @@ $ sudo ./LCD-hdmi
 Lancer MyChronoGPS au démarrage
 Editer le fichier /etc/rc.local
 $ sudo nano /etc/rc.local
-avant la ligne exit 0 insérer la commande pour démarrer MyChronoGPS au démarrage du Rpi :
+avant la ligne exit 0 insérer la commande pour démarrer MyChronoGPS au démarrage du Rpi :
 sh /home/pi/MyChronoGPS/start_gps.sh
+(si nom utilisateur # pi => remplacer /pi par /nom utilisateur)
 =============================================================================================================
 
 Pour lancer le tableau de bord au démarrage du pi, à partir du répertoire MyChronoGPS, lancez la commande suivante :
