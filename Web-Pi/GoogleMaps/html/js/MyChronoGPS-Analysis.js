@@ -1,4 +1,4 @@
-var fname_save = 'ajax/save_coords.php';
+var fname_save = 'ajax/save_coords.py';
 var dataPost = false; // Objet recueillant le formulaire à passer à la procédure ajax d'écriture
 var dataReturn;
 var coords_save_timer = '';
@@ -490,6 +490,8 @@ function deleteLine(line) {
 // sauvegarde des lignes tracées dans le fichier analysis
 function saveLines() {
 	var CoordLines = new Object();
+	CoordLines.date = thisCircuit.date;
+	CoordLines.NomCircuit = thisCircuit.NomCircuit;
 	if (typeof(objStart.coord) != 'undefined') {
 		CoordLines.FL = objStart.coord;
 	}
@@ -520,16 +522,8 @@ function saveLines() {
 		}
 	}
 	// on crée le JSON de la piste à passer en POST
-
 	dataPost = new FormData();	
-
-	for (property in CoordLines) {
-		var valuePost = CoordLines[property];
-		if (Array.isArray(CoordLines[property])) {
-			valuePost = '['+CoordLines[property]+']';
-		}
-		dataPost.append(property, valuePost);
-	}
+	dataPost.append('coords',JSON.stringify(CoordLines));
 
 	var proc = fname_save+"?nocache=" + Math.random()+"&analysis="+parmAnalysis
 	upLoadLinesAjax(proc);
@@ -565,7 +559,21 @@ function dataCoordsSaved() {
 		return false;
 	}
 
+	var oldCircuit = thisCircuit;
 	thisCircuit = Ev[0]; // Mise à jour des données du circuit
+
+	if (!thisCircuit.Latitude) {
+		thisCircuit.Latitude = oldCircuit.Latitude;
+	}
+	if (!thisCircuit.Longitude) {
+		thisCircuit.Longitude = oldCircuit.Longitude;
+	}
+	if (!thisCircuit.Latcenter) {
+		thisCircuit.Latcenter = oldCircuit.Latcenter;
+	}
+	if (!thisCircuit.Loncenter) {
+		thisCircuit.Loncenter = oldCircuit.Loncenter;
+	}
 	
 	document.getElementById("zone-info").innerHTML = 'Les données analyse ont été sauvegardée';
 }	
@@ -602,7 +610,6 @@ function upLoadLinesAjax(proc)
     xmlhttp.send(dataPost);
 }
 	
-
 function designLine(line) {
 	var center = map.getCenter(); // on met de côté le centrage actuel
 	// On recentre la map avec le zoom d'origine
