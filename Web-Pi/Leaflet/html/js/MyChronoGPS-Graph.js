@@ -134,6 +134,7 @@ function setMarkerpoint(x,y) {
 	var cap = point2mark.cap;
 	var markerpoint = {lat: point2mark.lat, lng: point2mark.lon};
 	var title = 'T:\t'+lap+'\r\n'+
+			'P:\t'+x+'\r\n'+
 			'v:\t'+Math.round(point2mark.speed)+'km/h\r\n'+
 			'accel:\t'+Math.round(point2mark.accel*100)/100+'g\r\n'+
 			//'alt:\t'+Math.round(point2mark.altitude)+'m\r\n'+
