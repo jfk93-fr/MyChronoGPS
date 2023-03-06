@@ -1,4 +1,4 @@
-# MyChronoGPS "1.1"
+# MyChronoGPS
 GPS LapTimer with RaspberryPI and Python
 
-https://github.com/jfk93-fr/MyChronoGPS
+https://jfk93-fr.github.io/MyChronoGPS-website/
