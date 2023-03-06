@@ -12,9 +12,9 @@ Lancez les commandes suivantes :
 	$ sh correctif
 
 Normalement, çà doit fonctionner tel quel
-En cas de problème, lancer la procédure d'installation de MyChronoGPS
+En cas de problème, lancez la procédure d'installation de MyChronoGPS
 	$ cd $HOME/MyChronoGPS
 	$ sh MyChronoGPS.sh
 
-A la fin redémarrer le système
+A la fin redémarrez le système
 $ sudo reboot
