@@ -12,7 +12,7 @@
 #       communicates via the GPS and GPSDATA pipes
 #       receives GPS data sent through the GPSDATA pipe by MyChronoGPS_GPS
 #       controls MyChronoGPS_GPS via commands sent through the GPS pipe
-#   Thread ButtonControl
+#   Thread MenuControl
 #       communicates via the BUTTON pipe and receives the actions of the buttons sent in the pipe by MyChronoGPS_BUTTON (Button_Id + press (PRESS or LONGPRESS))
 #   Thread LedControl
 #       manages the actions on the LEDs (ON, OFF, NORMAL_FLASH, SLOW_FLASH, FAST_FLASH)
@@ -20,6 +20,9 @@
 #       communicates via the DISPLAY pipe, sends messages to be displayed in the pipe, messages are retrieved and processed by the MyChronoGPS_LCD module
 #   Thread TrackingControl (not operational)
 #       receives the NMEA frames contained in the GPSNMEA pipe and writes the trace file
+#   Thread PredictiveControl
+#       predictive time control thread
+#       this thread calculates in real time the difference between the previous lap time and the current lap time prediction
 #   Class SessionControl
 #       manages the storage of session data
 #   Class AnalysisControl
@@ -864,6 +867,8 @@ class DisplayControl(threading.Thread):
                                 self.buff1 = self.buff1+formatTimeDelta(t)+"//"
                                 self.buff1 = self.buff1+self.localTime+" "+formatVitesse(gps.gpsvitesse)
                                 self.buff2 = " "
+                                if self.chrono.predict_time != False:
+                                    self.buff1 = self.buff1+" "+self.chrono.predict_time
                                 self.displayBig = True
                             else:
                                 # line 1: the elapsed time is displayed
@@ -1606,6 +1611,7 @@ class ChronoControl():
     best_lap = timedelta(seconds=0)
     circuit = False
     in_pitlane = False # indicates if we are in the pitlane
+    predict_time = False
 
     class ChronoData():
         lat = 0
@@ -1707,6 +1713,9 @@ class ChronoControl():
         self.startLineCut = False
         self.ils = ils
         self.nblap = 0
+        self.lap = 0
+        self.npoint = 0
+        self.distseg = 0
 
         self.main_led = main_led # the main LED is common to several processes
         self.led = False
@@ -1750,6 +1759,10 @@ class ChronoControl():
         #logger.info('begin chrono_begin:'+str(self.chrono_begin))
         self.chrono_begin = True
         self.nblap = 0
+        self.nblap = 0
+        self.lap = 0
+        self.npoint = 0
+        self.distseg = 0
         
         self.chronoStartTime = self.getTime(gps.gpstime)
         #self.chronoStartTime = self.getTime(gps.prevtime)
@@ -1933,6 +1946,10 @@ class ChronoControl():
                     if self.in_pitlane == False:
                         # if we are in the process of timing, we trigger the writing of the analysis file
                         if self.nblap > 0:
+                            if self.lap != self.nblap:
+                                self.npoint = 0
+                                self.lap = self.nblap
+                            self.npoint += 1
                             fanalys.writePoint()
                             self.lat0 = self.gps_prevlat
                             self.lon0 = self.gps_prevlon
@@ -1942,7 +1959,7 @@ class ChronoControl():
                             self.cap0 = self.gps_gpscap
                         
                         # the distance travelled between 2 gps points is calculated
-                        distseg = distanceGPS(self.gps_prevlat, self.gps_prevlon, self.gps_latitude, self.gps_longitude)
+                        self.distseg = distanceGPS(self.gps_prevlat, self.gps_prevlon, self.gps_latitude, self.gps_longitude)
                             
                         # is the start-finish line crossed ?
                         if self.startLineCut == True:
@@ -1958,7 +1975,7 @@ class ChronoControl():
                                 
                             corrtime = self.chronoGpsTime - self.chronoPrevTime
 
-                            if distseg > 0: # distseg = 0 is possible, if the gps remains static
+                            if self.distseg > 0: # distseg = 0 is possible, if the gps remains static
                                 cormic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
                                 if self.ils != False:
                                     self.ils.set_ilstime(cormic)
@@ -2040,7 +2057,7 @@ class ChronoControl():
 
                                 corrtime = self.chronoGpsTime - self.chronoPrevTime
 
-                                if distseg > 0: # distAB = 0 is possible, if the gps remains static
+                                if self.distseg > 0: # distAB = 0 is possible, if the gps remains static
                                     cormic = getMicroseconds(corrtime) * (dc0/(dc0+dc1));
                                     corrtime = timedelta(microseconds=cormic)
 
@@ -2533,6 +2550,119 @@ class AcqControl(threading.Thread):
             return False
         #logger.debug("dist between 2 segments:"+str(dist))
         return True
+#
+# predictive time control thread
+#       this thread calculates in real time the difference between the previous lap time and the current lap time prediction
+class PredictiveControl(threading.Thread):
+
+    def __init__(self,chrono):
+        threading.Thread.__init__(self)
+        self.active = False
+        self.chrono = chrono
+        self.gps = chrono.gps
+        self.prevtime = False
+        # tableau des distances parcourues (timeline)
+        self.BT = [] # tableau du meilleur tour
+        self.T0 = [] # tableau du tour précédent
+        self.T1 = [] # tableau du tour en cours
+        self.point = dict()
+        self.lap = 0
+        self.nblap = 0
+        self.npoint = 0
+        self.dist = 0
+        self.sleep = 0.05
+        logger.info("PredictiveControl init complete")
+        self.__running = False
+
+    def run(self):
+        self.__running = True
+        self.active = True;
+        logger.info("PredictiveControl is running")
+        while self.__running:
+            if self.chrono.npoint > 0 and self.chrono.npoint != self.npoint: # on est en cours d'acquisition de points pour le tour en cours
+                self.npoint = self.chrono.npoint # pour éviter de traiter plusieurs fois le même point
+                if self.lap == 0:
+                    self.lap = self.chrono.nblap
+                if self.prevtime == False:
+                    self.prevtime = self.chrono.time0
+                    self.prevtime = self.chrono.chronoStartTime
+                #logger.info('point:'+str(self.chrono.npoint)+'lap:'+str(self.lap)+'nblap:'+str(self.nblap)+'chrono.nblap:'+str(self.chrono.nblap))
+                self.dist += self.chrono.distseg
+                if self.nblap == 0: # il n'y a pas de tour précédent, on peuple T0
+                    self.point = dict()
+                    self.point["point"] = self.npoint
+                    self.point["time"] = self.chrono.getTime(self.chrono.time0) - self.chrono.getTime(self.prevtime)
+                    self.point["dist"] = self.dist # distance à calculer
+                    self.T0.append(self.point) # stockage du point
+                    #logger.info(str(len(self.T0)))
+                    if self.lap != self.chrono.nblap: # c'est la fin du tour
+                        self.nblap = self.lap
+                        self.lap = self.chrono.nblap
+                        self.prevtime = self.chrono.time0
+                        self.dist = 0
+                else: # le tour précédent est chargé, on peuple le tour courant
+                    self.point = dict()
+                    self.point["point"] = self.npoint
+                    self.point["time"] = self.chrono.getTime(self.chrono.time0) - self.chrono.getTime(self.prevtime)
+                    self.point["dist"] = self.dist # distance à calculer
+                    self.T1.append(self.point) # stockage du point
+                    #logger.info(str(len(self.T1)))
+                    if self.lap != self.chrono.nblap: # c'est la fin du tour
+                        logger.info(str(len(self.T0)))
+                        logger.info(str(len(self.T1)))
+                        #logger.info(str(self.T0))
+                        #logger.info(str(self.T1))
+                        self.lap = self.chrono.nblap
+                        self.nblap = self.lap
+                        # maintenant on recommence, T0 vaut T1
+                        self.T0 = self.T1
+                        self.T1 = []
+                        self.prevtime = self.chrono.time0
+                        self.dist = 0
+                    else: # on essaie de prédire le temps T1 par rapport à T0
+                        #logger.info(str(len(self.T0)))
+                        #logger.info(str(len(self.T1)))
+                        np  = len(self.T1) # nombre de points acquis sur le tour en cours
+                        npt = len(self.T0) # nombre de points acquis sur le tour en précédent
+                        j = len(self.T1) - 1
+                        i = j
+                        if i > len(self.T0) - 1:
+                            i = len(self.T0) - 1
+                        d0 = self.T0[i]["dist"]
+                        d1 = self.T1[j]["dist"]
+                        #nwt = self.chrono.temps_tour * d0 / d1
+                        #nwt = self.chrono.temps_tour * (d0 * np / npt) / (d1 * np / npt)
+                        nwt = self.chrono.temps_tour * (d0 * npt / np) / (d1 * npt / np)
+
+                        if nwt < self.chrono.temps_tour:
+                            diff = self.chrono.temps_tour - nwt
+                            difft = "-"+formatTimeDelta(diff,"sscc")
+                        else:
+                            diff = nwt - self.chrono.temps_tour
+                            difft = "+"+formatTimeDelta(diff,"sscc")
+                        
+                        self.chrono.predict_time = difft
+
+
+
+                        #difft = nwt - self.chrono.temps_tour
+                        logger.info(str(self.T0[i]))
+                        logger.info(str(self.T1[j]))
+                        logger.info('tt:'+str(formatTimeDelta(self.chrono.temps_tour))+'nwt:'+str(formatTimeDelta(nwt))+'d0:'+str(d0)+' d1:'+str(d1)+' t:'+str(difft))
+                        #logger.info(str(formatTimeDelta(difft)))
+            time.sleep(self.sleep)
+        logger.info(str(self.T0))
+        logger.info(str(self.T1))
+        self.active = False;
+        logger.info("PredictiveControl ended")
+    
+    def stop(self):
+        if self.__running != True:
+            logger.info("PredictiveControl already stopped")
+            return
+        self.__running = False
+        self.active = False;
+            
         
     
 def deg2rad(dg):
@@ -2850,6 +2980,9 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
+        predict = PredictiveControl(chrono)
+        predict.start()        
+        
         #jfk: si on déporte la gestion du Tracker dans le programme principal, çà commencera ici
         # tracker = TrackingControl(chrono)
         # tracker.start()
@@ -3011,6 +3144,10 @@ if __name__ == "__main__":
             if gps.gpsactiv != True:
                 running = False
         #
+        if predict != False:
+            predict.stop()
+            predict.join()
+        #
         chrono.terminate() # arrête proprement la classe ChronoControl
         #
         #logger.debug("menu:"+str(menu))
@@ -3085,6 +3222,8 @@ if __name__ == "__main__":
             acq.stop()
         if ils != False:
             ils.stop()
+        if predict != False:
+            predict.stop()
             
     except:
         print(traceback.print_exc())
@@ -3111,6 +3250,8 @@ if __name__ == "__main__":
             acq.stop()
         if ils != False:
             ils.stop()
+        if predict != False:
+            predict.stop()
         raise
         
     finally:
