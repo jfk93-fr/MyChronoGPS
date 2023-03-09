@@ -177,26 +177,26 @@ function changeMobilePoint(ev) {
 		}
 	}
 	// on place le mobile sur le point le plus près qu'on a trouvé
-	var point2mark = tabGraph[im][0];
-	var x=im;
-	var y=0;
-	setMarkerpoint(x,y);
-	
-	//on repère le mobile sur le graphe
-	var lieu2 = new Array();
-	var newlocation = new Array();
-	lieu2.row = im;
-	lieu2.column = 0;
-	newlocation.push(lieu2);
-	
 	chart.draw(datag, options);
 	chart.setSelection([{'row' : im}]);
+	lieu = chart.getSelection();
+	if (lieu.length > 0) {
+		var x = lieu[0].row;
+		var y = 0;
+		if (lieu[0].column != null)
+			var y = lieu[0].column-1;
+		setMarkerpoint(x,y);
+	}
 }
 
 function graphPoint(pm) {
+	if (typeof(lieu) == 'undefined')
+		return;
 	if (lieu.length > 0) {
 		var x = lieu[0].row;
-		var y = lieu[0].column-1;
+		var y = 0;
+		if (lieu[0].column != null)
+			var y = lieu[0].column-1;
 		var x2 = x + pm;
 		if (pm > 0) {
 			if (x2 > tabGraph.length - 1)

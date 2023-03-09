@@ -180,7 +180,7 @@ def send_delayed():
     global delayed_msg
     global dTimer
     global log
-    chrono.lcd.set_display_sysmsg(delayed_msg,lcd.DISPLAY_BIG,3)
+    chrono.lcd.set_display_sysmsg(delayed_msg,lcd.DISPLAY_BIG,20)
     delayed_msg = ""
     dTimer = False
     
@@ -1146,9 +1146,8 @@ class DisplayControl(threading.Thread):
         else:
             self.displaySysBig = False
         self.sys_message = msg
-        self.sysloop = timer * 10 # 10 cycles = about 1 second
+        #self.sysloop = timer * 10 # 10 cycles = about 1 second
         self.sysloop = timer * 1 # 10 cycles = about 1 second
-        #self.sysloop = timer * 4 # 10 cycles = about 1 second
         
     def set_contrast(self,contrast):
         try:
@@ -2572,10 +2571,12 @@ class PredictiveControl(threading.Thread):
         self.dist = 0
         self.sleep = 0.05
         logger.info("PredictiveControl init complete")
+        self.started = False
         self.__running = False
 
     def run(self):
         self.__running = True
+        self.started = True
         self.active = True;
         logger.info("PredictiveControl is running")
         while self.__running:
@@ -2981,7 +2982,7 @@ if __name__ == "__main__":
         fanalys = AnalysisControl(chrono)
         
         predict = PredictiveControl(chrono)
-        predict.start()        
+        #predict.start() # n'a pas l'air de fonctionner correctement alors, on ne le démarre pas pour l'instant.
         
         #jfk: si on déporte la gestion du Tracker dans le programme principal, çà commencera ici
         # tracker = TrackingControl(chrono)
@@ -3137,7 +3138,7 @@ if __name__ == "__main__":
                 
             if delayed_msg != "":
                 if dTimer == False:
-                    dTimer = Timer(2.0, send_delayed)
+                    dTimer = Timer(3.0, send_delayed)
                     dTimer.start()  # after 3 seconds, the message is sent
                 
             time.sleep(0.01)
@@ -3146,7 +3147,8 @@ if __name__ == "__main__":
         #
         if predict != False:
             predict.stop()
-            predict.join()
+            if predict.started == True:
+                predict.join()
         #
         chrono.terminate() # arrête proprement la classe ChronoControl
         #
