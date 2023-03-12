@@ -1,3 +1,4 @@
+urlvar = new Array();
 if (window.location.search != "") {
 	longueur = window.location.search.length - 1;
 	data = window.location.search.substr(1,longueur);
