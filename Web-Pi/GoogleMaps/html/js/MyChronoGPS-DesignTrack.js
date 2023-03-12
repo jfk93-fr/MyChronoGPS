@@ -2167,6 +2167,7 @@ function getAngle(A,B) {
 			angleB = π+angleB;
 	}
 
+	var angle = angleB;
 	return angle;
 }
 

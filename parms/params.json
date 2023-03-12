@@ -71,5 +71,7 @@
 	"UseStopwatchDisplayByILS": 0,
 	"#LiveSessionMode": "traitement des infos 'LIVE' . 0=NO, 1=YES",
 	"LiveSessionMode": 1,
+	"#HillRaceMode": "Affichage des temps intermédiaires cumulés 0=NO, 1=YES (défaut=0)",
+	"HillRaceMode": 1,
 	"#": "End of Parms"
 }

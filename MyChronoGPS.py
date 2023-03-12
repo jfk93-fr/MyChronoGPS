@@ -157,6 +157,8 @@ UseStopwatchDisplayByILS = 0
 LiveSessionMode = 0
 parms = ""
 
+HillRaceMode = 0
+
 delayed_msg = "" # message to be sent after a certain time
 dTimer = False # timer for delayed messages
 tTimer = False # timer for delayed ils tick
@@ -2064,7 +2066,9 @@ class ChronoControl():
                             
                                 temps = temps_estime - self.chronoStartTime # temps = time passed since the start
                                 self.temps_inter = temps - self.temps_i
-                                self.temps_i = temps #
+                                # si HillRaceMode = 1 on ne réinitialise pas le temps intermédiaire
+                                if HillRaceMode != 1:
+                                    self.temps_i = temps #
                                 
                                 self.temps_secteurs.append(self.temps_inter)
                                 if self.nblap > 0:
@@ -2921,6 +2925,8 @@ if __name__ == "__main__":
             LiveSessionMode = parms.params["LiveSessionMode"]
         #logger.info("LiveSessionMode:"+str(LiveSessionMode))
             
+        if "HillRaceMode" in parms.params:
+            HillRaceMode = parms.params["HillRaceMode"]
 
         if GpsChronoMode > 0:
             # we will read the tracks
