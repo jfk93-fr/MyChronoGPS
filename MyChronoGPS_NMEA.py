@@ -338,8 +338,12 @@ class NmeaControl():
 
     def get_baudrate(self,device):
         command = 'stty -F {0}'.format(device)
-        proc_retval = subprocess.check_output(shlex.split(command))
-        baudrate = int(proc_retval.split()[1])
+        baudrate = -1
+        try:
+            proc_retval = subprocess.check_output(shlex.split(command))
+            baudrate = int(proc_retval.split()[1])
+        except:
+            pass
         return baudrate
         
     class TrackerControl():

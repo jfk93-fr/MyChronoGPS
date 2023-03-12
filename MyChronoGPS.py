@@ -809,106 +809,117 @@ class DisplayControl(threading.Thread):
                         while i < len(self.buffer) :
                             i = i+1
             else:
-                if (gps.gpsline == "" or gps.gpsfix == gps.INVALID):
-                    self.buff1 = "Waiting for GPS"
-                    self.buff1 += "//"+get_ipadr()
-                    self.buff1 += "// // "
-                    self.displaySmall = True
-                    gps.gpsfix = gps.INVALID
-                    self.waiting_time = 1; # delay 1 second
-                #else:
-                    #logger.debug("gpsline:["+gps.gpsline+"]")
-                if gps.gpsfix == gps.VALID:
-                    self.localTime = formatLocalTime(gps)
-                    if (self.display_mode == self.DATE_TIME):
+                if gps != False:
+                    if (gps.gpsline == "" or gps.gpsfix == gps.INVALID):
+                        self.buff1 = "Waiting for GPS"
+                        self.buff1 += "//on "+gps.gpsport
+                        self.buff1 += "//"+get_ipadr()
+                        self.buff1 += "// "
+                        self.displaySmall = True
+                        gps.gpsfix = gps.INVALID
                         self.waiting_time = 1; # delay 1 second
-                        # if the speed is <= SpeedOmeter (about 15 km/h) the self.carousel is not taken care of and only the speed is displayed
-                        if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                            self.set_contrast(255)
-                            if CharacterSize == BIG_CHARACTER:
-                                # speed is written in large letters
-                                self.buff1 = self.localTime+" sat: "+str(gps.gpsnbsat)+"//"
-                                self.buff1 = self.buff1+formatVitesse(gps.gpsvitesse)+"// //"
-                                self.buff2 = " "
-                                self.displayBig = True
-                            else:
-                                self.buff1 = self.localTime
-                                w = "                    "
-                                self.buff2 = w[0:6]
-                                self.buff2 = self.buff2+formatVitesse(gps.gpsvitesse)
-                        else:
-                            # here we can display raspberry and gps status information
-                            # or display the time list of the last session
-                            if self.chrono != False:
-                                if len(self.chrono.tbsessions) > 0:
-                                    # we will display the list of times from the last session
-                                    self.display_temps_session()
-                                else:
-                                    self.display_carousel()
-                            else:
-                                self.display_carousel()
-                    
-                    if (self.display_mode == self.MSG_READY): #
-                        self.waiting_time = 1; # delay 1 second
-                        self.set_contrast(255)
-                        self.buff1 = self.localTime
-                        # line 2: "ready" and the speed are displayed
-                        self.buff2 = "Ready "
-                        self.buff2 = self.buff2+formatVitesse(gps.gpsvitesse)
-
-                    if (self.display_mode == self.DISPLAY_CHRONO):
-                        self.waiting_time = 0.1; # delay 0.1 second
-                        t = chrono.temps_en_cours - timedelta(microseconds=chrono.temps_en_cours.microseconds)
-                        self.set_contrast(255)
-                        if chrono.in_pitlane == False:
-                            # we look in the parameters if we have to display in big size (1 line = 2 LCD lines)
-                            self.displayBig = False
-                            if CharacterSize == BIG_CHARACTER:
-                                # the current time is written in large letters
-                                self.buff1 = formatTimeDelta(chrono.temps_tour)+" Lap "+str(self.chrono.nblap)+"//"
-                                self.buff1 = self.buff1+formatTimeDelta(t)+"//"
-                                self.buff1 = self.buff1+self.localTime+" "+formatVitesse(gps.gpsvitesse)
-                                self.buff2 = " "
-                                if self.chrono.predict_time != False:
-                                    self.buff1 = self.buff1+" "+self.chrono.predict_time
-                                self.displayBig = True
-                            else:
-                                # line 1: the elapsed time is displayed
-                                # display a timedelta object as mm:ss.00 (cc = hundredth of a second to 00 for the current time)
-                                self.buff1 = formatTimeDelta(chrono.temps_tour)+" Lap "+str(self.chrono.nblap)
-                                # line 2: the lap time is displayed
-                                self.buff2 = formatTimeDelta(t)+" Lap "+str(self.chrono.nblap)
-                                self.buff2 = self.buff2+" "+formatVitesse(gps.gpsvitesse)
-                        else: # we are in the pitlane, we watch the speed
-                            self.displayBig = False
-                            if gps.gpsvitesse > self.PitMaxSpeed:
+                    #else:
+                        #logger.debug("gpsline:["+gps.gpsline+"]")
+                    if gps.gpsfix == gps.VALID:
+                        self.localTime = formatLocalTime(gps)
+                        if (self.display_mode == self.DATE_TIME):
+                            self.waiting_time = 1; # delay 1 second
+                            # if the speed is <= SpeedOmeter (about 15 km/h) the self.carousel is not taken care of and only the speed is displayed
+                            if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
+                                self.set_contrast(255)
                                 if CharacterSize == BIG_CHARACTER:
-                                    self.buff1 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)+"//Warning!// //"
-                                    self.buff2 = " "
-                                    self.displayBig = True
-                                else:
-                                    self.buff1 = "WARNING!"
-                                    self.buff2 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)
-                                    # here, we will make the yellow LED flash quickly
-                                    # jfk
-                                    self.main_led.set_led_fast_flash()
-                            else:
-                                if CharacterSize == BIG_CHARACTER:
-                                    # the speed is written in large letters
-                                    self.buff1 = self.localTime+" Lap "+str(self.chrono.nblap)+"//"
+                                    # speed is written in large letters
+                                    self.buff1 = self.localTime+" sat: "+str(gps.gpsnbsat)+"//"
                                     self.buff1 = self.buff1+formatVitesse(gps.gpsvitesse)+"// //"
                                     self.buff2 = " "
                                     self.displayBig = True
                                 else:
+                                    self.buff1 = self.localTime
+                                    w = "                    "
+                                    self.buff2 = w[0:6]
+                                    self.buff2 = self.buff2+formatVitesse(gps.gpsvitesse)
+                            else:
+                                # here we can display raspberry and gps status information
+                                # or display the time list of the last session
+                                if self.chrono != False:
+                                    if len(self.chrono.tbsessions) > 0:
+                                        # we will display the list of times from the last session
+                                        self.display_temps_session()
+                                    else:
+                                        self.display_carousel()
+                                else:
+                                    self.display_carousel()
+                        
+                        if (self.display_mode == self.MSG_READY): #
+                            self.waiting_time = 1; # delay 1 second
+                            self.set_contrast(255)
+                            self.buff1 = self.localTime
+                            # line 2: "ready" and the speed are displayed
+                            self.buff2 = "Ready "
+                            self.buff2 = self.buff2+formatVitesse(gps.gpsvitesse)
+    
+                        if (self.display_mode == self.DISPLAY_CHRONO):
+                            self.waiting_time = 0.1; # delay 0.1 second
+                            t = chrono.temps_en_cours - timedelta(microseconds=chrono.temps_en_cours.microseconds)
+                            self.set_contrast(255)
+                            if chrono.in_pitlane == False:
+                                # we look in the parameters if we have to display in big size (1 line = 2 LCD lines)
+                                self.displayBig = False
+                                if CharacterSize == BIG_CHARACTER:
+                                    # the current time is written in large letters
+                                    self.buff1 = formatTimeDelta(chrono.temps_tour)+" Lap "+str(self.chrono.nblap)+"//"
+                                    self.buff1 = self.buff1+formatTimeDelta(t)+"//"
+                                    self.buff1 = self.buff1+self.localTime+" "+formatVitesse(gps.gpsvitesse)
+                                    self.buff2 = " "
+                                    if self.chrono.predict_time != False:
+                                        self.buff1 = self.buff1+" "+self.chrono.predict_time
+                                    self.displayBig = True
+                                else:
                                     # line 1: the elapsed time is displayed
-                                    self.buff1 = self.localTime+" Lap "+str(self.chrono.nblap)
-                                    # ligne 2 : the speed is displayed
+                                    # display a timedelta object as mm:ss.00 (cc = hundredth of a second to 00 for the current time)
+                                    self.buff1 = formatTimeDelta(chrono.temps_tour)+" Lap "+str(self.chrono.nblap)
+                                    # line 2: the lap time is displayed
+                                    self.buff2 = formatTimeDelta(t)+" Lap "+str(self.chrono.nblap)
                                     self.buff2 = self.buff2+" "+formatVitesse(gps.gpsvitesse)
-
-                        self.loop += 1
-                        # we will let 5 cycles pass before changing the display
-                        if (self.loop > 5): # 5 times 0.1 the display changes every 0.5 seconds
-                            self.loop = 0
+                            else: # we are in the pitlane, we watch the speed
+                                self.displayBig = False
+                                if gps.gpsvitesse > self.PitMaxSpeed:
+                                    if CharacterSize == BIG_CHARACTER:
+                                        self.buff1 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)+"//Warning!// //"
+                                        self.buff2 = " "
+                                        self.displayBig = True
+                                    else:
+                                        self.buff1 = "WARNING!"
+                                        self.buff2 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)
+                                        # here, we will make the yellow LED flash quickly
+                                        # jfk
+                                        self.main_led.set_led_fast_flash()
+                                else:
+                                    if CharacterSize == BIG_CHARACTER:
+                                        # the speed is written in large letters
+                                        self.buff1 = self.localTime+" Lap "+str(self.chrono.nblap)+"//"
+                                        self.buff1 = self.buff1+formatVitesse(gps.gpsvitesse)+"// //"
+                                        self.buff2 = " "
+                                        self.displayBig = True
+                                    else:
+                                        # line 1: the elapsed time is displayed
+                                        self.buff1 = self.localTime+" Lap "+str(self.chrono.nblap)
+                                        # ligne 2 : the speed is displayed
+                                        self.buff2 = self.buff2+" "+formatVitesse(gps.gpsvitesse)
+    
+                            self.loop += 1
+                            # we will let 5 cycles pass before changing the display
+                            if (self.loop > 5): # 5 times 0.1 the display changes every 0.5 seconds
+                                self.loop = 0
+                else:
+                    self.buff1 = "GPS not connected"
+                    gpsport = "/dev/serial0"
+                    if "GPSPort" in parms.params:
+                        gpsport = parms.params["GPSPort"]
+                    self.buff1 += "//"+gpsport
+                    self.buff1 += "//Verify GPS connection // "
+                    self.displaySmall = True
+                    self.waiting_time = 1; # delay 1 second
                         
             self.line1 = ""
             self.line2 = ""
