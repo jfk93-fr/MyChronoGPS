@@ -62,6 +62,7 @@ var RT = 6378137;
 
 var largeur_piste = 15; // largeur de la piste en mètre; utilisée pour déterminer le franchissement du point de départ
 
+document.getElementById('map').style.display = 'block';
 var map = false;
 var tab_marker=new Array();
 
@@ -91,7 +92,14 @@ const gravit = 9.80665;
 var gkmh = (gravit * 3600)/ 1000;
 var Frequence = 1; // fréquence d'échantillonage du GPS
 
-loadCircuits();
+if (urlvar.hasOwnProperty('analysis')) {
+	loadCircuits();
+}
+else {
+	// on ouvre le wrapper pour demander à charger le fichier analysis manuellement
+	accueil();
+	loadLocalCoords();
+}
 
 function dataCircuitsReady() {
 	document.getElementById("zone-info").innerHTML = 'les données sont chargées, calcul en cours, veuillez patienter';
@@ -748,7 +756,9 @@ function setOriginZoom(zlat=thisCircuit.Latcenter*1,zlon=thisCircuit.Loncenter*1
 }
 
 function accueil() {
+	document.getElementById('wrapper').style.display = 'block';
 	document.getElementById('analyzer').style.display = 'none';
+	document.getElementById('page-content').style.display = 'none';
 	objStart = new Object(); // Tableau des coordonnées de la ligne de départ
 	Tabint = new Array(); // Tableau des coordonnées des intérmédiaires (partiels)
 	objPitIn = new Object(); // Tableau des coordonnées de l'entrée de la pitlane
@@ -757,10 +767,12 @@ function accueil() {
 
 function doAnalysis() {
 	document.getElementById('analyzer').style.display = 'none';
+	document.getElementById('page-content').style.display = 'block';
 }
 
 function go()
 {
+	document.getElementById('wrapper').style.display = 'none';
 	document.getElementById('analyzer').style.display = 'block';
 	// la première ligne du fichier, contient normalement le circuit sur lequel les sessions ont été enregistrées
 
