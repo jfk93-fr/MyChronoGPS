@@ -527,9 +527,9 @@ function isCoordsSaved()
 }
 
 function dataCoordsSaved() {
-	console.log(JSON.stringify(dataReturn));
+	//console.log(JSON.stringify(dataReturn));
 	Ev = eval(dataReturn);
-	console.log(JSON.stringify(Ev));
+	//console.log(JSON.stringify(Ev));
 	retour = Ev;
 	if (retour.msgerr) {
 		// on n'a pas réussi à sauvegarder les coordonnées
@@ -785,7 +785,11 @@ function go()
 	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
 	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
 	var dT = T1.getTime() - T0.getTime();
-	Frequence = 1000/dT;
+	Frequence = 100/dT;
+	//console.log('T0:'+T0.getTime());
+	//console.log('T1:'+T1.getTime());
+	//console.log('dT:'+dT);
+	//console.log('Frequence:'+Frequence);
 
 	latitude = Points[0].lat1;
 	longitude = Points[0].lon1;
@@ -2424,6 +2428,11 @@ function showMobile() {
 	map.panTo(LatLng);
 	
 	// calcul de l'accélération
+	//console.log('calcul de l\'accélération');
+	//console.log('Fréquence:'+Frequence);
+	//console.log('gkmh:'+gkmh);
+	//console.log('vitesse0 kmh:'+Tours[il].points[i0].vitesse);
+	//console.log('vitesse1 kmh:'+Tours[il].points[i1].vitesse);
 	var accel = (((Tours[il].points[i1].vitesse - Tours[il].points[i0].vitesse)) * Frequence) / gkmh;
 	
 	//var altitude = Tours[il].points[i1].altitude;

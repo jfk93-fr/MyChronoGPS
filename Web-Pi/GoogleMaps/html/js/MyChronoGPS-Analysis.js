@@ -803,7 +803,7 @@ function go()
 	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
 	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
 	var dT = T1.getTime() - T0.getTime();
-	Frequence = 1000/dT;
+	Frequence = 100/dT;
 
 	latitude = Points[0].lat1;
 	longitude = Points[0].lon1;
