@@ -1979,8 +1979,10 @@ class ChronoControl():
                             # calculation of the distance between the current point and the start-finish line
                             dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
                             
-                            v0 = (self.gps_last_speed*1000)/3600 # speed at the previous point
-                            v1 = (self.gps_gpsvitesse*1000)/3600 # speed at current point
+                            #v0 = (self.gps_last_speed*1000)/3600 # speed at the previous point
+                            #v1 = (self.gps_gpsvitesse*1000)/3600 # speed at current point
+                            v0 = self.gps_last_speed # speed at the previous point
+                            v1 = self.gps_gpsvitesse # speed at current point
                             vmoy = (v0+v1)/2 # average speed to travel the straight line segment
                             dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                             dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line

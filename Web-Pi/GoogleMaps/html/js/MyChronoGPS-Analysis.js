@@ -555,9 +555,9 @@ function isCoordsSaved()
 }
 
 function dataCoordsSaved() {
-	console.log(JSON.stringify(dataReturn));
+	//console.log(JSON.stringify(dataReturn));
 	Ev = eval(dataReturn);
-	console.log(JSON.stringify(Ev));
+	//console.log(JSON.stringify(Ev));
 	retour = Ev;
 	if (retour.msgerr) {
 		// on n'a pas réussi à sauvegarder les coordonnées
@@ -1860,6 +1860,10 @@ function designCut(parm) {
 		var dist1 = getDistanceLine(linecoord,new Array(segcoords[2],segcoords[3]));
 
 		var corrtime = dt1.getTime() - dt0.getTime();
+		//console.log(JSON.stringify(parm));
+		//console.log(dt1);
+		//console.log(dt0);
+		//console.log(corrtime);		
 		
 		var vmoy = (v0+v1)/2;
 		
@@ -1867,8 +1871,11 @@ function designCut(parm) {
 		var dc1 = dist1*(v0/vmoy);
 	
 		corrtime = corrtime * (dc0/(dc0+dc1));
+		//console.log(corrtime);
 		corrtime = Math.round(corrtime);
+		//console.log(corrtime);
 		var temps = dt0.getTime() + corrtime;
+		//console.log(temps);
 		
 		if (!tdeb) {
 			tdeb = temps;
