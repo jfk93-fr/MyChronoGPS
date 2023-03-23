@@ -519,7 +519,7 @@ function isInfosReady()
 			}
 		}
 	}
-	catch(e) {//console.log(JSON.stringify(Infos));}
+	catch(e) {console.log(JSON.stringify(Infos));}
 
 	timerInfos = setTimeout(getInfos, 2000);	
 }
