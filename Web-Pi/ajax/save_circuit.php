@@ -21,6 +21,7 @@ if (array_key_exists("NomCircuit",$_POST)) {
 	$trkname = str_replace(" ","-",$trkname);
 }
 foreach($_POST as $key => $value) {
+	//error_log($key.'='.json_encode($value)."\n",0);
 	$propertyval = $value;
 	$valArray = $value;
 	$c1 = 0;
