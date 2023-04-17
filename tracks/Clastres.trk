@@ -1,0 +1,28 @@
+{
+    "IdCircuit": "643c1921a59b0",
+    "NomCircuit": "Clastres",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 49.7486183,
+    "Longitude": 3.2066244,
+    "Latcenter": 49.750826771510475,
+    "Loncenter": 3.2071514540714308,
+    "LongCircuit": 1970,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        49.749948110403125,
+        3.20979577099973,
+        49.74968247853909,
+        3.209866190626011
+    ],
+    "LatFL": 49.74981529422804,
+    "LonFL": 3.2098309808773084,
+    "CapFL": 258.31869004634706,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3"
+}

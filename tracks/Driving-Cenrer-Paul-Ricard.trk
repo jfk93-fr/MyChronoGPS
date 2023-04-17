@@ -1,0 +1,28 @@
+{
+    "IdCircuit": "643c1a23e2278",
+    "NomCircuit": "Driving Cenrer Paul Ricard",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 43.246887,
+    "Longitude": 5.804957,
+    "Latcenter": 43.24701301629511,
+    "Loncenter": 5.80534101957328,
+    "LongCircuit": 1600,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        43.24688504625694,
+        5.805333767833272,
+        43.24691239865715,
+        5.805232008957386
+    ],
+    "LatFL": 43.24689872245705,
+    "LonFL": 5.805282888395329,
+    "CapFL": 20.255039837933566,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3"
+}

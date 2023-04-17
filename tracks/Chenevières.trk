@@ -1,0 +1,28 @@
+{
+    "IdCircuit": "643c176ee2dc3",
+    "NomCircuit": "Chenevi\u00e8res",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 48.5135443,
+    "Longitude": 6.647771,
+    "Latcenter": 48.514696128470774,
+    "Loncenter": 6.647702603670105,
+    "LongCircuit": 3500,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        48.514032793712516,
+        6.648074267037068,
+        48.51391015988817,
+        6.647926390981005
+    ],
+    "LatFL": 48.51397147668567,
+    "LonFL": 6.648000328870758,
+    "CapFL": 301.8948304369994,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3"
+}

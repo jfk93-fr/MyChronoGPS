@@ -9,7 +9,7 @@
     "Longitude": 5.891136617603175,
     "Latcenter": 49.0272942,
     "Loncenter": 5.887431,
-    "LongCircuit": 1,
+    "LongCircuit": 3300,
     "Zoom": 15,
     "PitMaxSpeed": 50,
     "FL": [
@@ -20,5 +20,9 @@
     ],
     "LatFL": 49.02691495951494,
     "LonFL": 5.892286428730845,
-    "CapFL": 96.31987343225583
+    "CapFL": 96.31987343225583,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3"
 }

@@ -9,7 +9,7 @@
     "Longitude": 4.069718554671442,
     "Latcenter": 44.15706928170344,
     "Loncenter": 4.073029775067196,
-    "LongCircuit": 1,
+    "LongCircuit": 2500,
     "Zoom": 16,
     "PitMaxSpeed": 50,
     "FL": [
@@ -48,6 +48,10 @@
     "LatInt3": 44.15504571401577,
     "LonInt3": 4.07321624472611,
     "CapInt3": 353.88768166132394,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Parabolique",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Epingle",
     "PitIn": [
         44.15405500539979,
         4.0712963847802595,

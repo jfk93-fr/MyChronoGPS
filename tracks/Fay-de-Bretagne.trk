@@ -1,0 +1,28 @@
+{
+    "IdCircuit": "643c1b22e688f",
+    "NomCircuit": "Fay de Bretagne",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 47.34518680285223,
+    "Longitude": -1.7982353557646058,
+    "Latcenter": 47.34556445177135,
+    "Loncenter": -1.7978795164718542,
+    "LongCircuit": 3300,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        47.34558807794453,
+        -1.7980507943967572,
+        47.345406338074326,
+        -1.798110569899185
+    ],
+    "LatFL": 47.34549720800943,
+    "LonFL": -1.7980806821479711,
+    "CapFL": 282.5636146185067,
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3"
+}

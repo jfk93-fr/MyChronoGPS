@@ -9,7 +9,7 @@
     "Longitude": 4.069718554671442,
     "Latcenter": 44.154912126330295,
     "Loncenter": 4.0724380182626785,
-    "LongCircuit": 1,
+    "LongCircuit": 2000,
     "Zoom": 16,
     "PitMaxSpeed": 50,
     "FL": [
@@ -39,6 +39,10 @@
         44.15964400523715,
         4.0720090853982125
     ],
+    "NameFL": "Ligne de d\u00e9part\/arriv\u00e9e",
+    "NameInt1": "Interm\u00e9diaire 1",
+    "NameInt2": "Interm\u00e9diaire 2",
+    "NameInt3": "Interm\u00e9diaire 3",
     "PitIn": [
         44.15625984554814,
         4.071198080661445,
