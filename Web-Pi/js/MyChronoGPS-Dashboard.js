@@ -218,10 +218,12 @@ function displayLed(led,color) {
 				led.className = 'led-'+color+'-blink';
 			else
 				led.className = 'led-'+color+'-fast-blink';
+			/*
 			if (flashtime > 0) {
 				flashtime = flashtime * 1000;
 				led_timer[color] = setTimeout(stopBlinkLed, flashtime);
 			}
+			*/
 		}
 	}
 }
@@ -237,12 +239,12 @@ function stopBlinkLed() {
 		clearTimeout(led_timer[color]);
 	}
 }
-
+/*
 function stop_blink() {
 	var led = document.getElementById('ledw');
 	led.className = 'led-green-on';
 }
-
+*/
 // Rechercher le prochain point
 function getNextDisplay() {
 	if (timer) {

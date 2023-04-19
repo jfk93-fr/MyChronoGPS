@@ -10,7 +10,7 @@ then
 		echo "instaling wiringpi"
 		sudo pip3 install wiringpi
 	else
-		echo "wiringpi already instaleld"
+		echo "wiringpi already installed"
 	fi
 fi
 

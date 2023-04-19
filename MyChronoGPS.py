@@ -103,8 +103,8 @@ logger.info('running in '+python_bin+' version '+python_ver)
 
 BUTTON1_ID = 1
 LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
-LED2_GPIO_PIN = 18 # red LED associated with ILS Control
-LED3_GPIO_PIN = 16 # green LED associated with Chrono Control
+LED2_GPIO_PIN = 16 # red LED associated with ILS Control
+LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
 ILS_GPIO_PIN = 23
 
 os.system('gpio export '+str(LED1_GPIO_PIN)+' out')
@@ -2625,6 +2625,8 @@ class PredictiveControl(threading.Thread):
                     self.point["dist"] = self.dist # distance à calculer
                     self.T1.append(self.point) # stockage du point
                     #logger.info(str(len(self.T1)))
+                    self.chrono.main_led.set_led_off() # yellow led
+                    self.chrono.led.set_led_off() # green led
                     if self.lap != self.chrono.nblap: # c'est la fin du tour
                         logger.info(str(len(self.T0)))
                         logger.info(str(len(self.T1)))
@@ -2642,22 +2644,32 @@ class PredictiveControl(threading.Thread):
                         #logger.info(str(len(self.T1)))
                         np  = len(self.T1) # nombre de points acquis sur le tour en cours
                         npt = len(self.T0) # nombre de points acquis sur le tour en précédent
+                        logger.info('npt:'+str(npt))
+                        logger.info('np:'+str(np))
                         j = len(self.T1) - 1
                         i = j
                         if i > len(self.T0) - 1:
                             i = len(self.T0) - 1
+                        logger.info('i:'+str(i))
+                        logger.info('j:'+str(j))
                         d0 = self.T0[i]["dist"]
                         d1 = self.T1[j]["dist"]
+                        logger.info('d0:'+str(d0))
+                        logger.info('d1:'+str(d1))
                         #nwt = self.chrono.temps_tour * d0 / d1
                         #nwt = self.chrono.temps_tour * (d0 * np / npt) / (d1 * np / npt)
+                        logger.info('temps_tour:'+str(self.chrono.temps_tour))
                         nwt = self.chrono.temps_tour * (d0 * npt / np) / (d1 * npt / np)
+                        logger.info('nwt:'+str(nwt))
 
                         if nwt < self.chrono.temps_tour:
                             diff = self.chrono.temps_tour - nwt
                             difft = "-"+formatTimeDelta(diff,"sscc")
+                            self.chrono.led.set_led_on() # green led
                         else:
                             diff = nwt - self.chrono.temps_tour
                             difft = "+"+formatTimeDelta(diff,"sscc")
+                            self.chrono.main_led.set_led_on() # yellow led
                         
                         self.chrono.predict_time = difft
 
@@ -3001,7 +3013,7 @@ if __name__ == "__main__":
         fanalys = AnalysisControl(chrono)
         
         predict = PredictiveControl(chrono)
-        #predict.start() # n'a pas l'air de fonctionner correctement alors, on ne le démarre pas pour l'instant.
+        predict.start() # n'a pas l'air de fonctionner correctement alors, on ne le démarre pas pour l'instant.
         
         #jfk: si on déporte la gestion du Tracker dans le programme principal, çà commencera ici
         # tracker = TrackingControl(chrono)
