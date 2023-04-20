@@ -2,17 +2,17 @@
 _version=$(cat VERSION)
 echo "installation MyChronoGPS Version $_version"
 
-_wiringpi=$(ls /usr/local/lib/python*/dist-packages | grep -c wiringpi) || true
-if [ "$_wiringpi" ]
-then
-	if [ "$_wiringpi" = "0" ]
-	then
-		echo "instaling wiringpi"
-		sudo pip3 install wiringpi
-	else
-		echo "wiringpi already installed"
-	fi
-fi
+#_wiringpi=$(ls /usr/local/lib/python*/dist-packages | grep -c wiringpi) || true
+#if [ "$_wiringpi" ]
+#then
+#	if [ "$_wiringpi" = "0" ]
+#	then
+#		echo "instaling wiringpi"
+#		sudo pip3 install wiringpi
+#	else
+#		echo "wiringpi already installed"
+#	fi
+#fi
 
 # Is Lighttpd installed
 #if [ ! -d /etc/lighttpd ] 

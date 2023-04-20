@@ -101,19 +101,20 @@ logger.info('MyChronoGPS starting')
 logger.info('running in '+python_bin+' version '+python_ver)
 #######################################################################################
 
-BUTTON1_ID = 1
-LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
-LED2_GPIO_PIN = 16 # red LED associated with ILS Control
-LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
-ILS_GPIO_PIN = 23
+#BUTTON1_ID = 1
 
-os.system('gpio export '+str(LED1_GPIO_PIN)+' out')
-os.system('gpio export '+str(LED2_GPIO_PIN)+' out')
-os.system('gpio export '+str(LED3_GPIO_PIN)+' out')
-os.system('gpio export '+str(ILS_GPIO_PIN)+' out')
-time.sleep(0.5)
+# utilisation de RPi.GPIO à la place de WiringPi
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM) #Définit le mode de numérotation
+GPIO.setwarnings(False) #On désactive les messages d'alerte
 
-io=wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_GPIO_SYS)
+###os.system('gpio export '+str(LED1_GPIO_PIN)+' out')
+###os.system('gpio export '+str(LED2_GPIO_PIN)+' out')
+###os.system('gpio export '+str(LED3_GPIO_PIN)+' out')
+###os.system('gpio export '+str(ILS_GPIO_PIN)+' out')
+###time.sleep(0.5)
+###
+###io=wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_GPIO_SYS)
 
 STOP = 0
 READY = 1
@@ -175,6 +176,12 @@ except:
     pass
 
 from MyChronoGPS_Parms import Parms
+
+# Les Pins des leds sont déclarées dans le fichier paramètre
+LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
+LED2_GPIO_PIN = 16 # red LED associated with ILS Control
+LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
+ILS_GPIO_PIN = 23
 
 def send_delayed():
     global chrono
@@ -618,6 +625,7 @@ class LedControl(threading.Thread):
     def __init__(self, gpio_pin):
         threading.Thread.__init__(self)
         self.gpio_pin = gpio_pin
+        GPIO.setup(self.gpio_pin, GPIO.OUT) #Active le contrôle du GPIO
         #jfk on va plutôt écrire dans le cache et un autre programme se chargera de gérer les leds si besoin.
         self.cache_name = pathcache+'/LED'+str(self.gpio_pin)
         self.__last_state = LED_ON
@@ -631,11 +639,13 @@ class LedControl(threading.Thread):
         while i > 0:
             i = i-1
             self.set_led_on()
-            io.digitalWrite(self.gpio_pin,1)
+            #io.digitalWrite(self.gpio_pin,1)
+            GPIO.output(self.gpio_pin, GPIO.HIGH)
             self.write(1,0,0)
             time.sleep(self.TICK)
             self.set_led_off()
-            io.digitalWrite(self.gpio_pin,0)
+            #io.digitalWrite(self.gpio_pin,0)
+            GPIO.output(self.gpio_pin, GPIO.LOW)
             self.write(0,0,0)
             time.sleep(self.TICK)
 
@@ -653,11 +663,13 @@ class LedControl(threading.Thread):
             #logger.debug('LED Status('+str(self.gpio_pin)+'):'+str(self.__led))
             if self.__led != self.__last_state:
                 if self.__led == LED_ON:
-                    io.digitalWrite(self.gpio_pin,1)
+                    #io.digitalWrite(self.gpio_pin,1)
+                    GPIO.output(self.gpio_pin, GPIO.HIGH)
                     flashing = 0
                     self.write(1,flashing,0)
                 elif self.__led == LED_OFF:
-                    io.digitalWrite(self.gpio_pin,0)
+                    #io.digitalWrite(self.gpio_pin,0)
+                    GPIO.output(self.gpio_pin, GPIO.LOW)
                     flashing = 0
                     self.write(0,flashing,0)
                 elif self.__led == LED_FLASH:
@@ -675,7 +687,8 @@ class LedControl(threading.Thread):
                         self.__led = self.statebeforeflash # the status of the LED before the flashing is restored
                         
                 if nbc == 0: # the LED is switched on or off
-                    io.digitalWrite(self.gpio_pin,flash)
+                    #io.digitalWrite(self.gpio_pin,flash)
+                    GPIO.output(self.gpio_pin, flash)
                     if flash == 1:
                         flash = 0
                     else:
@@ -686,7 +699,8 @@ class LedControl(threading.Thread):
 
             time.sleep(self.TICK)
             
-        io.digitalWrite(self.gpio_pin,0)
+        #io.digitalWrite(self.gpio_pin,0)
+        GPIO.output(self.gpio_pin, GPIO.LOW)
         logger.info("end of LedControl Thread of main program")
             
     def get_state(self):
@@ -727,6 +741,8 @@ class LedControl(threading.Thread):
             pass
         
     def stop(self):
+        logger.info("stop led"+str(self.gpio_pin))
+        self.set_led_fast_flash(3)
         self.set_led_off()
         self.__running = False
     
@@ -1241,6 +1257,7 @@ class IlsControl(threading.Thread):
     def __init__(self, ils_pin, led_pin): # la led est facultative
         threading.Thread.__init__(self) 
         self.ils_pin = ils_pin
+        GPIO.setup(self.ils_pin, GPIO.OUT) #Active le contrôle du GPIO
         self.ilstime = False # waiting time before activating the signal to the stopwatch
         self.ilsticktime = False # time of the signal to the stopwatch
         self.chrono = False
@@ -1261,7 +1278,7 @@ class IlsControl(threading.Thread):
             if self.ilstime != False:
                 self.ilstime = False
                 #logger.info("attente avant envoi signal ils")
-                logger.info("tour ils:"+str(self.chrono.nblap))
+                #logger.info("tour ils:"+str(self.chrono.nblap))
                 if self.chrono.nblap == 1:
                     logger.info("tTimer start request")
                     delai = 3.0
@@ -1273,7 +1290,7 @@ class IlsControl(threading.Thread):
                     delai = self.ilsticktime - time.time()
                     tTimer = Timer(delai, self.tick_delayed())
                     time.sleep(0.1)
-                    logger.info("tTimer started after:"+str(delai)+" secs")
+                    #logger.info("tTimer started after:"+str(delai)+" secs")
                     
                 # wait before triggering the signal
                 #time.sleep(self.ilstime)
@@ -1310,11 +1327,13 @@ class IlsControl(threading.Thread):
         self.chrono = chrono
         
     def tick_delayed(self):
-        io.digitalWrite(self.ils_pin,1)
+        #io.digitalWrite(self.ils_pin,1)
+        GPIO.output(self.ils_pin, GPIO.HIGH)
         self.ilsticktime = time.time() # time of the signal to the stopwatch
         time.sleep(0.01)
-        io.digitalWrite(self.ils_pin,0)
-        logger.info("envoi signal ils, time:"+str(self.ilsticktime))
+        #io.digitalWrite(self.ils_pin,0)
+        GPIO.output(self.ils_pin, GPIO.LOW)
+        #logger.info("envoi signal ils, time:"+str(self.ilsticktime))
         
 class SessionControl():
     CLOSED = 0
@@ -2047,7 +2066,7 @@ class ChronoControl():
                                 self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,20)
                             
                             self.nblap += 1
-                            logger.info("nblap:"+str(self.nblap))
+                            #logger.info("nblap:"+str(self.nblap))
 
                         else: # we'll see if we've crossed an intermediate line
                             i = 0
@@ -2632,6 +2651,8 @@ class PredictiveControl(threading.Thread):
                         logger.info(str(len(self.T1)))
                         #logger.info(str(self.T0))
                         #logger.info(str(self.T1))
+                        logger.info(str(self.dist))
+
                         self.lap = self.chrono.nblap
                         self.nblap = self.lap
                         # maintenant on recommence, T0 vaut T1
@@ -2644,23 +2665,23 @@ class PredictiveControl(threading.Thread):
                         #logger.info(str(len(self.T1)))
                         np  = len(self.T1) # nombre de points acquis sur le tour en cours
                         npt = len(self.T0) # nombre de points acquis sur le tour en précédent
-                        logger.info('npt:'+str(npt))
-                        logger.info('np:'+str(np))
+                        #logger.info('npt:'+str(npt))
+                        #logger.info('np:'+str(np))
                         j = len(self.T1) - 1
                         i = j
                         if i > len(self.T0) - 1:
                             i = len(self.T0) - 1
-                        logger.info('i:'+str(i))
-                        logger.info('j:'+str(j))
+                        #logger.info('i:'+str(i))
+                        #logger.info('j:'+str(j))
                         d0 = self.T0[i]["dist"]
                         d1 = self.T1[j]["dist"]
-                        logger.info('d0:'+str(d0))
-                        logger.info('d1:'+str(d1))
+                        #logger.info('d0:'+str(d0))
+                        #logger.info('d1:'+str(d1))
                         #nwt = self.chrono.temps_tour * d0 / d1
                         #nwt = self.chrono.temps_tour * (d0 * np / npt) / (d1 * np / npt)
-                        logger.info('temps_tour:'+str(self.chrono.temps_tour))
+                        #logger.info('temps_tour:'+str(self.chrono.temps_tour))
                         nwt = self.chrono.temps_tour * (d0 * npt / np) / (d1 * npt / np)
-                        logger.info('nwt:'+str(nwt))
+                        #logger.info('nwt:'+str(nwt))
 
                         if nwt < self.chrono.temps_tour:
                             diff = self.chrono.temps_tour - nwt
@@ -2676,9 +2697,9 @@ class PredictiveControl(threading.Thread):
 
 
                         #difft = nwt - self.chrono.temps_tour
-                        logger.info(str(self.T0[i]))
-                        logger.info(str(self.T1[j]))
-                        logger.info('tt:'+str(formatTimeDelta(self.chrono.temps_tour))+'nwt:'+str(formatTimeDelta(nwt))+'d0:'+str(d0)+' d1:'+str(d1)+' t:'+str(difft))
+                        #logger.info(str(self.T0[i]))
+                        #logger.info(str(self.T1[j]))
+                        #logger.info('tt:'+str(formatTimeDelta(self.chrono.temps_tour))+'nwt:'+str(formatTimeDelta(nwt))+'d0:'+str(d0)+' d1:'+str(d1)+' t:'+str(difft))
                         #logger.info(str(formatTimeDelta(difft)))
             time.sleep(self.sleep)
         logger.info(str(self.T0))
@@ -2915,6 +2936,16 @@ if __name__ == "__main__":
 
         # we start by reading the parameters ...
         parms = Parms(Path)
+        ###
+        if "LED1_GPIO_PIN" in parms.params:
+            LED1_GPIO_PIN = parms.params["LED1_GPIO_PIN"]
+        if "LED2_GPIO_PIN" in parms.params:
+            LED2_GPIO_PIN = parms.params["LED2_GPIO_PIN"]
+        if "LED3_GPIO_PIN" in parms.params:
+            LED3_GPIO_PIN = parms.params["LED3_GPIO_PIN"]
+        if "ILS_GPIO_PIN" in parms.params:
+            ILS_GPIO_PIN = parms.params["ILS_GPIO_PIN"]
+
         # we continue by reading the version
         Version = ""
         fversion = pathcmd+'/VERSION'

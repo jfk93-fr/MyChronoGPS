@@ -11,7 +11,8 @@ from MyChronoGPS_Paths import Paths
 Path = Paths();
 
 import os
-import wiringpi
+#import wiringpi
+import RPi.GPIO as GPIO
 import time
 from datetime import timedelta, datetime, tzinfo
 
@@ -35,11 +36,11 @@ BUTTON1_GPIO_PIN = 12
 BUTTON2_ID = 2
 BUTTON2_GPIO_PIN = 22
 
-os.system('gpio export '+str(BUTTON1_GPIO_PIN)+' in')
-os.system('gpio export '+str(BUTTON2_GPIO_PIN)+' in')
-time.sleep(0.5)
-
-io=wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_GPIO_SYS)
+#os.system('gpio export '+str(BUTTON1_GPIO_PIN)+' in')
+#os.system('gpio export '+str(BUTTON2_GPIO_PIN)+' in')
+#time.sleep(0.5)
+#
+#io=wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_GPIO_SYS)
 
 STOP = 0
 READY = 1
@@ -101,6 +102,7 @@ class ButtonControl(threading.Thread):
     def __init__(self, button_id, gpio_pin):
         threading.Thread.__init__(self)
         self.gpio_pin = gpio_pin
+        GPIO.setup(self.gpio_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         self.button_id = button_id
         self.__current_state = self.NOTPRESSED
 
@@ -114,7 +116,9 @@ class ButtonControl(threading.Thread):
         loop = 0
         longpress = 1 / 0.05
         while self.__running:
-            if io.digitalRead(self.gpio_pin):
+            #if io.digitalRead(self.gpio_pin):
+            etat = GPIO.input(pinBtn)
+            if etat != 0:
                 logger.info("read ok")
                 if self.__current_state == self.NOTPRESSED:
                     self.__current_state = self.PRESSED
