@@ -37,7 +37,7 @@ Path = Paths();
 
 import traceback
 import os
-import wiringpi
+#import wiringpi
 import time
 from datetime import timedelta, datetime, tzinfo
 
