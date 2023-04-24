@@ -22,6 +22,7 @@ var fonction_getInfos = 'ajax/get_infos.py';
 var nbsats = ""
 var tempcpu = ""
 var circuit = ""
+var autodef = 0
 var FL = new Array()
 var pointgps = new Array()
 var nearest = new Array()
@@ -299,6 +300,12 @@ function isDisplayReady()
 	}
 
 	thisDashboard = Ev;
+
+	if (autodef == 1) {
+		var el = document.getElementById("info-cmd");
+		if (el)
+			el.innerHTML = 'Attention, la BdD des circuits n\'est pas utilisée';
+	}
 	
 	displayDashboard();
 	
@@ -379,6 +386,28 @@ function clear_autodef() {
 	}
 }
 
+function switch_track() {
+	if (Dashboard) {
+		clearTimeout(dashboard_timer);
+	}
+	if (timer) {
+		clearTimeout(timer);
+	}
+	if (autodef == 1) {
+		var lib = "use all tracks";
+	}
+	else {
+		var lib = "force autodef track";
+	}
+	if (confirm(lib+", do you want to continue ?")) {
+	    ajax_cmd('switch_autodef.py');
+		setInactiv(5000); // on temporise 5 secondes, le temps de voir la réponse ajax
+	}
+	else {
+		setInactiv(8000); // on refuse la confirmation, on recalibre le délai d'inaction à 8 secondes
+	}
+}
+
 function ajax_cmd(cmd) {
 	if (timer) {
 		clearTimeout(timer);
@@ -393,8 +422,13 @@ function ajax_cmd(cmd) {
         if (this.readyState == 4 && this.status == 200) {
 
             myObj = JSON.parse(this.responseText);
+			var msg = myObj.msg;
+			console.log(JSON.stringify(myObj));
+			if (myObj.hasOwnProperty('msgerr')) {
+				msg = myObj.msgerr;
+			}
 
-            document.getElementById("info-cmd").innerHTML = myObj.msg;
+            document.getElementById("info-cmd").innerHTML = msg;
         }
     }
     xmlhttp.open("GET", "ajax/"+cmd+"?nocache=" + Math.random(), true);
@@ -458,10 +492,23 @@ function isInfosReady()
 	}
 	
 	retour = Ev[0];
+	//console.log(JSON.stringify(retour));
 	nbsats = retour.nbsats;
 	tempcpu = retour.tempcpu;
 	circuit = retour.circuit;
 	distcircuit = retour.distcircuit;
+	
+	autodef = retour.autodef;
+	var el = document.getElementById("btn-switchtrack");
+	var el2 = document.getElementById("lib-switchtrack");
+	if (autodef == 1) {
+		el.className = "w3-button btnmenu btnalltracks";
+		el2.innerHTML = "Toutes pistes";
+	}
+	else {
+		el.className = "w3-button btnmenu btnzerotrack";
+		el2.innerHTML = "Zéro piste";
+	}
 
 	var el = document.getElementById("nb-sats");
 	el.innerHTML = nbsats;

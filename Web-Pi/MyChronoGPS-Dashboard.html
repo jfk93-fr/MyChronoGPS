@@ -125,14 +125,6 @@
 					</span>
 				</div>
 				<div class="w3-row w3-padding linebtn"></div>
-				<div id="gpsquest" class="linebtn w3-row">
-					<span>
-					<a href="MyChronoGPS-Status.html" class="w3-button btnmenu btngpsquest" onclick="displayMenu()"></a>
-					</span>
-					<span>
-						Etat
-					</span>
-				</div>
 				<div id="cleartrack" class="w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btnclearlayer" onclick="clear_autodef()"></button>
@@ -141,14 +133,30 @@
 					Efface Piste
 					</span>
 				</div>
+				<div id="switchtrack" class="w3-col s6 linebtn">
+					<span>
+					<button id="btn-switchtrack" type="button" class="w3-button btnmenu btnzerotrack" onclick="switch_track()"></button>
+					</span>
+					<span id="lib-switchtrack">
+					Zéro Piste
+					</span>
+				</div>
 				<div class="w3-row w3-padding linebtn"></div>
-				<div id="gpsmenu" class="linebtn w3-row">
+				<div id="gpsmenu" class="w3-col s6 linebtn">
 					<span>
 					<a href="MyChronoGPS.html" ><button type="button" class="w3-button btnmenu btnmainmenu"></button>
 					</a>
 					</span>
 					<span>
 					Menu G&eacute;n&eacute;ral
+					</span>
+				</div>
+				<div id="gpsquest" class="w3-col s6 linebtn">
+					<span>
+					<a href="MyChronoGPS-Status.html" class="w3-button btnmenu btngpsquest" onclick="displayMenu()"></a>
+					</span>
+					<span>
+						Etat
 					</span>
 				</div>
 				<div id="info-cmd">

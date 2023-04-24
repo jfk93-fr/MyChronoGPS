@@ -44,23 +44,3 @@ if len(result) == 0:
 
 json_str = json.dumps(result)
 print(json_str)
-
-
-    #FD = open(fic, 'r')
-    #recs = FD.read().split('\n')
-    #nn = 0
-    #for ligne in recs:
-    #    #print(str(ligne))
-    #    nn = nn + 1
-    #    if ligne != "":
-    #        print('ligne:##'+str(ligne)+'##\n')
-    #        infos = json.loads(ligne)
-    #        print('infos:##'+str(infos)+'##\n')
-    #        result.append(infos)
-    #FD.close()
-#try:
-#    json_str = json.dumps(result)
-#except:
-#    json_str = 'erreur json dumps'
-#print(json_str)
-#

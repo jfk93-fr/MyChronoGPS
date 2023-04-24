@@ -32,5 +32,6 @@ then
   fi
 fi
 
-su $_user -c "/usr/bin/python3 "$_home"/MyChronoGPS/MyChronoGPS.py >> "$_home"/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
+#su $_user -c "/usr/bin/python3 "$_home"/MyChronoGPS/MyChronoGPS.py >> "$_home"/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
+su $_user -c "/usr/bin/python3 "$_home"/MyChronoGPS/MyChronoGPS.py > "$_home"/MyChronoGPS/log/MyChronoGPS.log 2>&1 &"
 exit 0

@@ -359,6 +359,16 @@
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }
+.btnalltracks {
+	background-image: url(../img/white/database.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnzerotrack {
+	background-image: url(../img/white/database-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
 
 
 #changescreen {

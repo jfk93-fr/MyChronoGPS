@@ -31,7 +31,7 @@
 #       manages the stopwatch functions (start, stop, etc)
 #
 ###########################################################################
-# managed by git from VERSION 1.17
+#
 from MyChronoGPS_Paths import Paths
 Path = Paths();
 
@@ -103,26 +103,16 @@ logger.info('running in '+python_bin+' version '+python_ver)
 
 #BUTTON1_ID = 1
 
-# utilisation de RPi.GPIO à la place de WiringPi
+# use of RPi.GPIO instead of WiringPi
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM) #Définit le mode de numérotation
-GPIO.setwarnings(False) #On désactive les messages d'alerte
-
-###os.system('gpio export '+str(LED1_GPIO_PIN)+' out')
-###os.system('gpio export '+str(LED2_GPIO_PIN)+' out')
-###os.system('gpio export '+str(LED3_GPIO_PIN)+' out')
-###os.system('gpio export '+str(ILS_GPIO_PIN)+' out')
-###time.sleep(0.5)
-###
-###io=wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_GPIO_SYS)
+GPIO.setmode(GPIO.BCM) # Defines the dialing mode
+GPIO.setwarnings(False) # Alert messages are deactivated
 
 STOP = 0
 READY = 1
 RUNNING = 2
 POWER_OFF = 9
-#current_state = False
 current_state = 0
-#running_state = False # status managed by MenuControl
 
 MENU_ON = 1
 MENU_OFF = 0
@@ -155,6 +145,7 @@ PitMaxSpeed = 50 # max speed in the pitlane (default)
 TrackProximity = 2000 # distance to the circuits (in metres)
 TrackAcqTime = 240 # if there is no circuit, time to acquire gps points to determine a default start/finish line
 UseStopwatchDisplayByILS = 0
+PredictiveTimeMode = 0
 LiveSessionMode = 0
 parms = ""
 
@@ -177,7 +168,7 @@ except:
 
 from MyChronoGPS_Parms import Parms
 
-# Les Pins des leds sont déclarées dans le fichier paramètre
+# The Pins of the leds are declared in the parameter file
 LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
 LED2_GPIO_PIN = 16 # red LED associated with ILS Control
 LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
@@ -225,6 +216,7 @@ class GpsControl(threading.Thread):
 
     def __init__(self,lcd):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         
         self.lcd = lcd
 
@@ -247,14 +239,19 @@ class GpsControl(threading.Thread):
         self.prevtime = 0
         self.gpstime = 0
         self.Freq = 1 # gps refresh rate
+        el_parms = parms.get_parms("GPSRate")
         if "GPSRate" in parms.params:
-            self.Freq = parms.params["GPSRate"]
-        self.gpsport = "/dev/serial0"
+            self.Freq = el_parms
+
+        self.gpsport = "serial0"
+        el_parms = parms.get_parms("GPSPort")
         if "GPSPort" in parms.params:
-            self.gpsport = parms.params["GPSPort"]
+            self.gpsport = el_parms
+
         if utc2loc == False:
+            el_parms = parms.get_parms("TimeZone")
             if "TimeZone" in parms.params:
-                self.timeshift = int(parms.params["TimeZone"])
+                self.timeshift = int(el_parms)
         else:
             self.timeshift = utc2loc
         
@@ -289,7 +286,7 @@ class GpsControl(threading.Thread):
             while (self.buffstate == BUSY):
                 if (cpt > 1000):
                     # we have been waiting for more than a second !
-                    logger.error("attente anormale !")
+                    logger.error("abnormal wait !")
                     time.sleep(10)
                 cpt = cpt + 1
                 time.sleep(0.01)
@@ -307,13 +304,6 @@ class GpsControl(threading.Thread):
         logger.info("stop GpsControl Thread")
         if self.gpsactiv == True:
             self.stop()
-
-        #jfk doit-on supprimer le pipe GPSDATA ici ?
-        #    ne devrait-on pas laisser le module GPS s'en occuper ?
-        # fileObj = os.path.exists(self.fifo)
-        # if fileObj == True:
-        #     logger.info("fifo GPSDATA is beeing removed")
-        #     os.remove(self.fifo)
             
         logger.info("end of GpsControl Thread of main program")
 
@@ -347,7 +337,6 @@ class GpsControl(threading.Thread):
         
         self.gpsfix = self.VALID
         if self.nbparse == 0:
-            #logger.debug("gpsdict:"+str(self.gpsdict))
             self.nbparse = self.nbparse + 1
         if "d" in self.gpsdict:
             self.gpsdate = self.gpsdict["d"]
@@ -376,19 +365,9 @@ class GpsControl(threading.Thread):
         ld = datetime(AA,MM,JJ,hh,mm,ss)
         self.localdatetime = ld + timedelta(hours=self.timeshift)
         
-        #if self.Freq == 0:
-        #    if float(self.last_time) > 0:
-        #        if float(self.gpstime) > 0:
-        #            a = self.gpstime
-        #            b = self.last_time
-        #            logger.info("calcul freq:"+str(a)+"-"+str(b))
-        #            self.Freq = int(abs(1 / (float(a) - float(b))))
-        #            logger.info("Freq:"+str(self.Freq))
-        
         self.gpscomplete = True;
 
         self.buffstate = FREE
-        #logger.debug("buffstate:"+str(self.buffstate))
         
     def clear_buff(self):
         cpt = 0
@@ -439,71 +418,13 @@ class GpsControl(threading.Thread):
         
     def get_gpstime(self):
         return self.gpstime
-#         
-# class TrackingControl(threading.Thread):
-# 
-#     def __init__(self,chrono):
-#         threading.Thread.__init__(self)
-#         self.__running = False
-#         self.gpsnmea = ""
-#         self.fifo = pathcmd+'/pipes/GPSNMEA'
-#         fileObj = os.path.exists(self.fifo)
-#         if fileObj == False:
-#             self.creer_fifo()
-#             fileObj = os.path.exists(self.fifo)
-# 
-#         self.track_mode = ON        
-#         self.GpsTrackerMode = 0
-#         # if "GpsTrackerMode" in self.parms.params:
-#         #     self.GpsTrackerMode = self.parms.params["GpsTrackerMode"]
-#         # if self.GpsTrackerMode != 1:
-#         #     self.track_mode = OFF
-# 
-#         logger.info("TrackingControl init complete")        
-# 
-#     def run(self):
-#         self.__running = True
-#         while self.__running:
-#             self.gpsnmea = self.lire_fifo()
-#             if self.track_mode == ON:
-#                 # on va écrire la trace
-#                 logger.info(str(self.gpsnmea))
-#             time.sleep(0.01)
-#         logger.info("end of TrackingControl Thread of main program")
-#         
-#     def stop(self):
-#         logger.info("tracking stop")
-#         if self.__running == False:
-#             return
-#         self.__running = False
-# 
-#     def creer_fifo(self):
-#         logger.info("create fifo GPSNMEA")
-#         try:
-#             os.mkfifo(self.fifo)
-#             os.chmod(self.fifo, 0o777)
-#         except OSError:
-#             logger.error("OSError")
-#             pass
-# 
-#     def lire_fifo(self):
-#         retour = ""
-#         try:
-#             with open(self.fifo, 'r') as fifo:
-#                 retour = fifo.read()
-#                 fifo.close()
-#         except:
-#             logger.error("error detected in GPSControl - "+str(sys.exc_info()[0])+" "+str(sys.exc_info()[1]))
-#             pass
-#         return retour
 
-#class ButtonControl(threading.Thread):
 class MenuControl(threading.Thread):
     # the menu can control up to 3 buttons
 
     def __init__(self,led):
         threading.Thread.__init__(self)
-        #self.__current_state = False
+        logger.info(str(self))
         self.__current_state = 0
         self.menu_state = MENU_OFF
         self.current_button = 0
@@ -512,8 +433,9 @@ class MenuControl(threading.Thread):
         self.__led = LED_OFF
         self.buttonNumber = 0
         self.max_wheel = 2 # 3 states: 0=stop, 1=ready, 2=run
+        el_parms = parms.get_parms("ButtonNumber")
         if "ButtonNumber" in parms.params:
-            self.buttonNumber = parms.params["ButtonNumber"]
+            self.buttonNumber = el_parms
         
         self.fifo = pathcmd+'/pipes/BUTTON'
         fileObj = os.path.exists(self.fifo)
@@ -543,27 +465,27 @@ class MenuControl(threading.Thread):
             if self.__current_state != self.prev_state:
                 self.prev_state = self.__current_state
                 logger.info("previous state:"+str(self.prev_state))
-            # choix des actions en fonction des boutons
+            # choice of actions according to the buttons
             if self.current_button == 1:
-                # bouton 1 = bouton principal
-                # s'il y a un autre bouton, mode manuel => affichage du menu
-                # si menu = off => start menu
-                # si menu = on => select line then do action
-                # si longpress => Power off
-                # s'il n'y a qu'un bouton => caroussel d'état successif à chaque appui sur le bouton
+                # button 1 = main button
+                # if there is another button, manual mode => display menu
+                # if menu = off => start menu
+                # if menu = on => select line then do action
+                # if longpress => power off
+                # if there is only one button => successive status bar at each press of the button
                 if self.__current_state == LONGPRESS:
                     self.running_state = POWER_OFF
                     logger.info("POWER_OFF")
                 else:
                     logger.info("self.__current_state:"+str(self.__current_state))
                     if self.buttonNumber > 1:
-                        # il y a plusieurs boutons => gestion du menu
+                        # there are several buttons => menu management
                         if self.menu_state == MENU_OFF:
                             self.start_menu()
                         else:
                             self.menu_select()
                     else:
-                        # il n'y a qu'un bouton => carousel d'états succsessifs
+                        # there is only one button => carousel of succsessive states
                         # the state of the button depends on the position of the carousel
                         self.running_state = self.running_state + 1
                         if (self.running_state > self.max_wheel):
@@ -571,27 +493,13 @@ class MenuControl(threading.Thread):
                 logger.info("running state:"+str(self.running_state))
 
             elif self.current_button == 2:
-                # bouton 2 = défilement du menu par le bas
+                # button 2 = scroll down the menu
                 if self.menu_state == MENU_ON:
                     self.menu_down()
             elif self.current_button == 3:
-                # bouton 3 = défilement du menu par le haut
+                # button 3 = scroll up the menu
                 if self.menu_state == MENU_ON:
                     self.menu_up()
-
-            # # gestion de l'affichage de la LED principale en fonction de l'état du menu
-            # if self.running_state == STOP or self.running_state == POWER_OFF: # stop
-            #     if (self.__led != LED_OFF):
-            #         self.led.set_led_off()
-            #         self.__led = LED_OFF
-            # elif self.running_state == READY: # ready: the LED flashes
-            #     if (self.__led != LED_FLASH):
-            #         self.led.set_led_flash()
-            #         self.__led = LED_FLASH
-            # else: # last case : run
-            #     if (self.__led != LED_ON):
-            #         self.led.set_led_on()
-            #         self.__led = LED_ON
 
             time.sleep(0.2)
 
@@ -624,9 +532,10 @@ class LedControl(threading.Thread):
         
     def __init__(self, gpio_pin):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.gpio_pin = gpio_pin
         GPIO.setup(self.gpio_pin, GPIO.OUT) #Active le contrôle du GPIO
-        #jfk on va plutôt écrire dans le cache et un autre programme se chargera de gérer les leds si besoin.
+        #jfk: we'll write to the cache instead and another program will take care of managing the leds if needed.
         self.cache_name = pathcache+'/LED'+str(self.gpio_pin)
         self.__last_state = LED_ON
         self.__running = False
@@ -639,12 +548,10 @@ class LedControl(threading.Thread):
         while i > 0:
             i = i-1
             self.set_led_on()
-            #io.digitalWrite(self.gpio_pin,1)
             GPIO.output(self.gpio_pin, GPIO.HIGH)
             self.write(1,0,0)
             time.sleep(self.TICK)
             self.set_led_off()
-            #io.digitalWrite(self.gpio_pin,0)
             GPIO.output(self.gpio_pin, GPIO.LOW)
             self.write(0,0,0)
             time.sleep(self.TICK)
@@ -658,17 +565,12 @@ class LedControl(threading.Thread):
         nbc = 0 # cycle counter
         chronoflash = 0 # to count down the flashing time
         while self.__running:
-            #jfk
-            #logger.setLevel(logging.DEBUG)
-            #logger.debug('LED Status('+str(self.gpio_pin)+'):'+str(self.__led))
             if self.__led != self.__last_state:
                 if self.__led == LED_ON:
-                    #io.digitalWrite(self.gpio_pin,1)
                     GPIO.output(self.gpio_pin, GPIO.HIGH)
                     flashing = 0
                     self.write(1,flashing,0)
                 elif self.__led == LED_OFF:
-                    #io.digitalWrite(self.gpio_pin,0)
                     GPIO.output(self.gpio_pin, GPIO.LOW)
                     flashing = 0
                     self.write(0,flashing,0)
@@ -687,7 +589,6 @@ class LedControl(threading.Thread):
                         self.__led = self.statebeforeflash # the status of the LED before the flashing is restored
                         
                 if nbc == 0: # the LED is switched on or off
-                    #io.digitalWrite(self.gpio_pin,flash)
                     GPIO.output(self.gpio_pin, flash)
                     if flash == 1:
                         flash = 0
@@ -699,7 +600,6 @@ class LedControl(threading.Thread):
 
             time.sleep(self.TICK)
             
-        #io.digitalWrite(self.gpio_pin,0)
         GPIO.output(self.gpio_pin, GPIO.LOW)
         logger.info("end of LedControl Thread of main program")
             
@@ -758,12 +658,12 @@ class DisplayControl(threading.Thread):
     CLEAR = "C"
     #BLACK = "B"
     CONTRAST = "A"
-    #pipe_name = pathcmd+'/pipes/DISPLAY'
     cache_name = pathcache+'/DISPLAY' 
     lcd_data = "" # contains the command + the text to display (written in the named pipe DISPLAY)
         
     def __init__(self):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.displayBig = False
         self.displaySysBig = False
         self.displaySmall = False
@@ -772,13 +672,11 @@ class DisplayControl(threading.Thread):
         self.start_screen()
         
         self.displayBig = True
-        #self.display("MyChronoGPS// //"+get_ipadr())
         self.display("MyChronoGPS// //V-"+str(Version))
         self.displayBig = False
         time.sleep(5)
         self.clear()
         time.sleep(0.5)
-        #self.black()
         self.clear()
         self.display_mode = self.DATE_TIME
         logger.info("DisplayControl init complete")
@@ -790,6 +688,11 @@ class DisplayControl(threading.Thread):
         self.localTime = False
         self.chrono = False
         self.waiting_time = 1 #
+        
+        self.speedometer = 0
+        el_parms = parms.get_parms("SpeedOmeter")
+        if "SpeedOmeter" in parms.params:
+            self.speedometer = int(el_parms)
         
     def run(self):
         global gps
@@ -841,7 +744,7 @@ class DisplayControl(threading.Thread):
                         if (self.display_mode == self.DATE_TIME):
                             self.waiting_time = 1; # delay 1 second
                             # if the speed is <= SpeedOmeter (about 15 km/h) the self.carousel is not taken care of and only the speed is displayed
-                            if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
+                            if gps.gpsvitesse > self.speedometer:
                                 self.set_contrast(255)
                                 if CharacterSize == BIG_CHARACTER:
                                     # speed is written in large letters
@@ -888,7 +791,7 @@ class DisplayControl(threading.Thread):
                                     self.buff1 = self.buff1+self.localTime+" "+formatVitesse(gps.gpsvitesse)
                                     self.buff2 = " "
                                     if self.chrono.predict_time != False:
-                                        self.buff1 = self.buff1+" "+self.chrono.predict_time
+                                        self.buff1 = self.buff1+" "+self.chrono.predict_time[0:1]
                                     self.displayBig = True
                                 else:
                                     # line 1: the elapsed time is displayed
@@ -908,7 +811,6 @@ class DisplayControl(threading.Thread):
                                         self.buff1 = "WARNING!"
                                         self.buff2 = formatVitesse(gps.gpsvitesse)+"-"+formatVitesse(self.PitMaxSpeed)
                                         # here, we will make the yellow LED flash quickly
-                                        # jfk
                                         self.main_led.set_led_fast_flash()
                                 else:
                                     if CharacterSize == BIG_CHARACTER:
@@ -929,9 +831,10 @@ class DisplayControl(threading.Thread):
                                 self.loop = 0
                 else:
                     self.buff1 = "GPS not connected"
-                    gpsport = "/dev/serial0"
+                    gpsport = "serial0"
+                    el_parms = parms.get_parms("GPSPort")
                     if "GPSPort" in parms.params:
-                        gpsport = parms.params["GPSPort"]
+                        gpsport = el_parms
                     self.buff1 += "//"+gpsport
                     self.buff1 += "//Verify GPS connection // "
                     self.displaySmall = True
@@ -1028,12 +931,6 @@ class DisplayControl(threading.Thread):
             self.set_contrast(255)
             self.displaySmall = True
             lstlines = [] # list of lines to display (4 lines in displaySmall mode)
-            #ns = len(self.chrono.tbsessions)
-            #dsess = self.chrono.tbsessions[ns-1]
-            #best = dsess["best"] # index sur le meilleur tour de la session
-            #numbestLap = best+1 # numéro du tour du meilleur temps
-            #bestLap = dsess["tblaps"][best] # meilleur temps de la session
-            #nblaps = len(dsess["tblaps"])
             if self.carousel == 0:
                 # first carousel message: line 1 = date & time
                 line = self.localTime+" "+get_ipadr()
@@ -1072,20 +969,10 @@ class DisplayControl(threading.Thread):
             self.loop = 0        
             
     def start_screen(self):
-        #is_pipe = os.path.exists(self.pipe_name)
-        #if is_pipe == True:
-        #    return
-
-        #global running
-        #global parms
-        #global path
-        #global pathlog
-        #global cmdscreen
         self.clear()
+        el_parms = parms.get_parms("ScreenCmd")
         if "ScreenCmd" in parms.params:
-            cmdscreen = parms.params["ScreenCmd"]
-        #cmdos = "python "+pathcmd+"/"+cmdscreen+".py > "+pathlog+"/"+cmdscreen+".log &"
-        #cmdos = "python3 "+pathcmd+"/"+cmdscreen+".py &"
+            cmdscreen = el_parms
         cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
         print(cmdos)
         
@@ -1095,16 +982,6 @@ class DisplayControl(threading.Thread):
         except:
             running = False
         print('verify if %s started' % (cmdscreen))
-        
-        #is_pipe = os.path.exists(self.pipe_name)
-        #nb = 0
-        #while is_pipe == False:
-        #    time.sleep(1)
-        #    is_pipe = os.path.exists(self.pipe_name)
-        #    nb = nb+1
-        #    if nb > 15:
-        #        logger.info(str(self.pipe_name)+" not found")
-        #        is_pipe = True # to get out of the loop
             
     def display(self,str):
         if self.displayBig == True:
@@ -1115,11 +992,6 @@ class DisplayControl(threading.Thread):
             self.write(self.DISPLAY_SMALL+str)
         else:
             self.write(self.DISPLAY+str)
-        #self.displayBig = False
-        #self.displaySmall = False
-            
-    #def black(self):
-    #    self.write(self.BLACK+" ")
             
     def clear(self):
         self.write(self.CLEAR+" ")
@@ -1141,14 +1013,11 @@ class DisplayControl(threading.Thread):
         time.sleep(0.4)
         self.display("LCD turn off")
         time.sleep(3)
-        #self.black()
         self.clear()
 
         self.write("X") # demande d'arrêt du programme d'affichage
         time.sleep(2)
 
-        #self.set_display_sysmsg("End of//MyChronoGPS//Bye",self.DISPLAY,1)
-        #self.set_display_sysmsg("DisplayControl//init complete",self.DISPLAY,1)
         self.display("End of//MyChronoGPS//Bye")
         
         self.__running = False
@@ -1164,7 +1033,6 @@ class DisplayControl(threading.Thread):
         self.chrono = chrono # the chrono object contains the times to be displayed
         self.display_mode = self.DISPLAY_CHRONO    
 
-        #logger.info("circuit:"+str(type(self.chrono.circuit)))
         if self.chrono.circuit != False:
             if "PitMaxSpeed" in self.chrono.circuit:
                 self.PitMaxSpeed = self.chrono.circuit["PitMaxSpeed"]
@@ -1175,7 +1043,6 @@ class DisplayControl(threading.Thread):
         else:
             self.displaySysBig = False
         self.sys_message = msg
-        #self.sysloop = timer * 10 # 10 cycles = about 1 second
         self.sysloop = timer * 1 # 10 cycles = about 1 second
         
     def set_contrast(self,contrast):
@@ -1199,9 +1066,17 @@ class IpControl(threading.Thread):
         self.chrono = chrono
         self.gps = chrono.gps
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.ipadr = "no ip address"
         self.cache_name = pathcache+'/INFOS' 
         self.Infos = False
+        try:
+            with open(self.cache_name, 'w') as cache: # the file is initialized
+                cache.close()
+                os.chmod(self.cache_name, 0o777)
+        except OSError as err:
+            logger.error("cannot use cache file OS error: {0}".format(err))
+            pass
         logger.info("IpControl init complete")
     
     def run(self):
@@ -1215,8 +1090,6 @@ class IpControl(threading.Thread):
                 loop = 0
                 self.writeInfos() # Infos
             loop = loop+1
-            #logger.info("call write Infos")
-            #self.writeInfos() # Infos
             time.sleep(2) # every minute (30 loops * 2 seconds), we check if we have not changed the network
         logger.info("end of IpControl Thread of main program")
         
@@ -1227,25 +1100,22 @@ class IpControl(threading.Thread):
         self.__running = False
             
     def writeInfos(self):
-        #logger.info("begin write Infos")
+        global NoTrack
         NomCircuit = "inconnu"
-        #logger.info(str(self.chrono.circuit))
         if self.chrono.circuit != False:
             if "NomCircuit" in self.chrono.circuit:
                 NomCircuit = self.chrono.circuit["NomCircuit"]
-        #logger.info("build Infos")
         self.Infos = '[{"nbsats":"'+str(self.gps.gpsnbsat)+'"'
         self.Infos += ',"tempcpu":"'+str(round(get_thermal()))+'"'
         self.Infos += ',"volts":"'+str(get_volts())+'"'
+        self.Infos += ',"autodef":"'+str(NoTrack)+'"'
         self.Infos += ',"circuit":"'+NomCircuit+'"'
         self.Infos += ',"distcircuit":"'+str(round(self.chrono.neardist))+'"'
         self.Infos += '}]'
-        #logger.info("try to write Infos")
         try:
             with open(self.cache_name, 'w') as cache: # the file is initialized
                 cache.write(self.Infos+'\r\n')
                 cache.close()
-                #logger.info("write Infos ok")
         except OSError as err:
             logger.error("cannot use cache file OS error: {0}".format(err))
             pass
@@ -1256,6 +1126,7 @@ class IlsControl(threading.Thread):
 
     def __init__(self, ils_pin, led_pin): # la led est facultative
         threading.Thread.__init__(self) 
+        logger.info(str(self))
         self.ils_pin = ils_pin
         GPIO.setup(self.ils_pin, GPIO.OUT) #Active le contrôle du GPIO
         self.ilstime = False # waiting time before activating the signal to the stopwatch
@@ -1277,8 +1148,6 @@ class IlsControl(threading.Thread):
         while self.__running:
             if self.ilstime != False:
                 self.ilstime = False
-                #logger.info("attente avant envoi signal ils")
-                #logger.info("tour ils:"+str(self.chrono.nblap))
                 if self.chrono.nblap == 1:
                     logger.info("tTimer start request")
                     delai = 3.0
@@ -1290,17 +1159,9 @@ class IlsControl(threading.Thread):
                     delai = self.ilsticktime - time.time()
                     tTimer = Timer(delai, self.tick_delayed())
                     time.sleep(0.1)
-                    #logger.info("tTimer started after:"+str(delai)+" secs")
                     
-                # wait before triggering the signal
-                #time.sleep(self.ilstime)
-                #io.digitalWrite(self.ils_pin,1)
-                #logger.info("envoi signal ils")
-                #time.sleep(0.01)
-                #io.digitalWrite(self.ils_pin,0)
                 if self.led != False:
                     self.led.set_led_fast_flash(3)
-                #self.ilstime = False
 
             time.sleep(0.01)
         # end of thread
@@ -1327,13 +1188,10 @@ class IlsControl(threading.Thread):
         self.chrono = chrono
         
     def tick_delayed(self):
-        #io.digitalWrite(self.ils_pin,1)
         GPIO.output(self.ils_pin, GPIO.HIGH)
         self.ilsticktime = time.time() # time of the signal to the stopwatch
         time.sleep(0.01)
-        #io.digitalWrite(self.ils_pin,0)
         GPIO.output(self.ils_pin, GPIO.LOW)
-        #logger.info("envoi signal ils, time:"+str(self.ilsticktime))
         
 class SessionControl():
     CLOSED = 0
@@ -1349,7 +1207,6 @@ class SessionControl():
         self.best = 0
 
     def start_session(self):
-        #if self.__current_state != self.OPEN:
         if self.Line1 == False:
             # we write the coordinates of the FL and the Intermediaries
             line = ""
@@ -1372,7 +1229,7 @@ class SessionControl():
             self.Line1 = line
             self.line = line
             # we will populate the list of sessions of the ChronoControl class
-            self.chrono.dsess = ({"time":temps,"best":0,"tblaps":[]}) #time = heure de début de sessions #best = numéro du meilleur tour #tblaps = liste des chronos 
+            self.chrono.dsess = ({"time":temps,"best":0,"tblaps":[]}) #time = session start time #best = best lap number #tblaps = list of times 
             
         
     def stop(self):
@@ -1384,7 +1241,7 @@ class SessionControl():
             self.chrono.tbsessions.append(self.chrono.dsess)
             self.best_time = False
             self.best = 0
-            self.Line1 = self.line # pour écrire la ligne 1 quand on démarrera une autre session
+            self.Line1 = self.line # to write line 1 when starting another session
         
         
     def close(self):
@@ -1395,12 +1252,9 @@ class SessionControl():
         
     def commit(self):
         if self.__current_state != self.CLOSED:
-            #logger.info(str(self.fileDescriptor))
             name = self.fileDescriptor.close
             self.fileDescriptor.close()
-            #self.fileDescriptor = open(name, 'a')
             self.fileDescriptor = open(pathdata+'/sessions/session-'+self.chrono.fileTime+'.txt', 'a')
-            #logger.info("session file commit")
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
@@ -1410,11 +1264,11 @@ class SessionControl():
             logger.info("session file open")
             if self.Line1 != False:
                 self.write(self.Line1)
-                self.Line1 = False # pour prévenir de ne pas réécrire la ligne 1 
+                self.Line1 = False # to warn not to rewrite line 1 
             # we will populate the list of sessions of the ChronoControl class
             temps = formatGpsTime(self.chrono.gps)
             self.chrono.dsess = ({"time":temps,"best":0,"tblaps":[]}) #time = session start time #best = best lap number #tblaps = time list
-        if line == "": #on formate une ligne de session par défaut
+        if line == "": # we format a default session line
             # actual date(jj/mm/aaaa);actual time;tour;temps du tour (mm:ss.cc)
             line = ""
             line += formatGpsDate(self.chrono.gps)+";"
@@ -1442,7 +1296,6 @@ class SessionControl():
             self.chrono.dsess["tblaps"].append(temps_tour)
 
         line += "\r\n"
-        #self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
         self.fileDescriptor.write(line)
         
 class LiveSession(threading.Thread):
@@ -1451,25 +1304,20 @@ class LiveSession(threading.Thread):
 
     def __init__(self,chrono):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.__running = False
         self.chrono = chrono # we will get the data from ChronoControl
         self.gps = self.chrono.gps
-        #self.live = pathdata+'/sessions/live.txt' # location of the live file
         self.live = pathcache+'/LIVE' # location of the live file
         self.Line = False
         self.Line1 = False
 
-        # self.trace = pathdata+'/sessions/trace.txt' # location of the trace file
-        # with open(self.trace, 'w') as trace: # the file is initialized
-        #     trace.write("")
-        #     trace.close()
         logger.info("LiveSession init complete")        
 
     def run(self):
         self.__running = True
         self.cpt = 0
         while self.__running:
-            #if self.chrono.circuit != False:
             # we write only if there is a timestamp
             if self.gps.gpstime != 0:
                 if self.chrono.startlat1 != False:
@@ -1478,24 +1326,17 @@ class LiveSession(threading.Thread):
                         self.createLine1() # line 1 contains the coordinates of the circuit
                     if self.Line1 != False:
                         # we will write the line in the live session file
-                        #logger.info("try open live Line1")
                         with open(self.live, 'w') as live: # the data is overwritten with more recent data
-                            #logger.info("try write live Line1")
                             live.write("{\"circuit\":"+self.Line1+",\r\n") # the coordinates of the current circuit are systematically written
                             self.createPoint()
-                            #logger.info("try write live point")
                             live.write("\"point\":"+self.Line+"}\r\n")
                             live.close()
                 else:
                     # we will write the line in the live session file without line 1
                     self.createPoint()
-                    #logger.info("try open live")
                     with open(self.live, 'w') as live: # the data is overwritten with more recent data
-                        #logger.info("try write live only point")
                         live.write(self.Line+"\r\n")
                         live.close()
-                    ## as long as we are not on an identified or created circuit, it is useless to write every second
-                    #time.sleep(9)
             time.sleep(1)
         logger.info("end of LiveSession Thread of main program")
         
@@ -1518,17 +1359,10 @@ class LiveSession(threading.Thread):
         else:
             self.Line += ',"neartrk":["'+self.chrono.neartrack+'",'+str(round(self.chrono.neardist))+']'
         self.Line += '}]'
-        #logger.debug("***"+str(self.Line)+"***")
-
-        # with open(self.trace, 'a') as trace: # we write the trace file
-        #     trace.write(self.Line+"\r\n")
-        #     trace.close()
 
     def createLine1(self):
-        #logger.info(str(self.chrono.circuit))
         line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         NomCircuit = "inconnu"
-        #logger.debug("circuit:"+str(type(self.chrono.circuit)))
         if self.chrono.circuit != False:
             if "NomCircuit" in self.chrono.circuit:
                 NomCircuit = self.chrono.circuit["NomCircuit"]
@@ -1555,7 +1389,6 @@ class AnalysisControl():
         self.__current_state = self.CLOSED
         self.Line1 = False
         self.Line = False
-        #self.Lap0 = False
         logger.info("AnalysisControl init complete")
 
     def start_analysis(self):
@@ -1577,24 +1410,12 @@ class AnalysisControl():
         if self.Line1 == False:
             self.writeLine1()
         self.Line = '[{"timestamp":"'+str(self.chrono.time0)+'"'
-        #self.Line += ',"tour":'+str(self.chrono.nblap)
         self.Line += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
-        #logger.debug("pointgps:"+str(self.chrono.lat0)+","+str(self.chrono.lon0))
         self.Line += '],"vitesse":'+str(self.chrono.speed0)
-        #self.Line += ',"altitude":'+str(self.chrono.alt0)
         self.Line += ',"cap":'+str(self.chrono.cap0)+'}]'
         self.write(self.Line)
-    #    
-    #def saveLap0(self):
-    #    self.Lap0 = '[{"timestamp":"'+str(self.chrono.time0)+'"'
-    #    self.Lap0 += ',"tour":1'
-    #    self.Lap0 += ',"pointgps":['+str(self.chrono.lat0)+","+str(self.chrono.lon0)
-    #    self.Lap0 += '],"vitesse":'+str(self.chrono.speed0)
-    #    self.Lap0 += ',"altitude":'+str(self.chrono.alt0)
-    #    self.Lap0 += ',"cap":'+str(self.chrono.cap0)+'}]'
         
     def writeLine1(self):
-        #line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         line = '[{"date":"'+formatGpsDate(self.gps)+'"'
         NomCircuit = ""
         if self.chrono.circuit != False and self.chrono.circuit != "":
@@ -1612,16 +1433,12 @@ class AnalysisControl():
         line += '}]'
         self.write(line)
         self.Line1 = True
-        #if self.Lap0 != False:
-        #    logger.info("Lap0:"+str(self.Lap0))
-        #    self.write(self.Lap0)
         
     def write(self,line=""):
         if self.__current_state != self.OPEN:
             self.start_analysis()
         if self.__current_state == self.OPEN:
             line += "\r\n"
-            #self.fileDescriptor.write('{0:}'.format(line.encode('utf8')))
             self.fileDescriptor.write(line)
         else:
             logger.info("unexcepted analysis file closed !")
@@ -1787,7 +1604,6 @@ class ChronoControl():
     def begin(self):
         if self.chrono_begin == True:
             return True
-        #logger.info('begin chrono_begin:'+str(self.chrono_begin))
         self.chrono_begin = True
         self.nblap = 0
         self.nblap = 0
@@ -1796,7 +1612,6 @@ class ChronoControl():
         self.distseg = 0
         
         self.chronoStartTime = self.getTime(gps.gpstime)
-        #self.chronoStartTime = self.getTime(gps.prevtime)
         
         self.chronoPrevTime = timedelta(seconds=0)
         self.chronoGpsTime = timedelta(seconds=0)
@@ -1811,10 +1626,9 @@ class ChronoControl():
         self.temps_i = timedelta(seconds=0)
         self.in_pitlane = False # we don't know if we are in the pitlane so, by default, we ignore it
         self.fileTime = formatGpsDateTime(self.gps,format="FILE")
-        #jfk
+        #
         self.main_led.set_led_off()
         self.main_led.set_led_very_slow_flash()
-        #logger.info('begin lap:'+str(self.nblap))
         
     def define_start_wcap(self,lat,lon,cap):
         # definition of the start-finish line according to the coordinates of the middle of the start-finish line and the heading
@@ -1823,7 +1637,6 @@ class ChronoControl():
         self.startline.lon = lon
         self.startline.cap = cap
         # in order not to overflow into the pitlane, we will only take 60% of the width of the track
-        # self.startline.draw(TrackWidth * 0.6);
         self.startline.draw(TrackWidth); # we take the whole width of the track
         self.startlat1 = self.startline.coord1.lat
         self.startlon1 = self.startline.coord1.lon
@@ -1998,8 +1811,6 @@ class ChronoControl():
                             # calculation of the distance between the current point and the start-finish line
                             dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
                             
-                            #v0 = (self.gps_last_speed*1000)/3600 # speed at the previous point
-                            #v1 = (self.gps_gpsvitesse*1000)/3600 # speed at current point
                             v0 = self.gps_last_speed # speed at the previous point
                             v1 = self.gps_gpsvitesse # speed at current point
                             vmoy = (v0+v1)/2 # average speed to travel the straight line segment
@@ -2066,7 +1877,6 @@ class ChronoControl():
                                 self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,20)
                             
                             self.nblap += 1
-                            #logger.info("nblap:"+str(self.nblap))
 
                         else: # we'll see if we've crossed an intermediate line
                             i = 0
@@ -2098,7 +1908,7 @@ class ChronoControl():
                             
                                 temps = temps_estime - self.chronoStartTime # temps = time passed since the start
                                 self.temps_inter = temps - self.temps_i
-                                # si HillRaceMode = 1 on ne réinitialise pas le temps intermédiaire
+                                # if HillRaceMode = 1 the intermediate time is not reset
                                 if HillRaceMode != 1:
                                     self.temps_i = temps #
                                 
@@ -2183,19 +1993,17 @@ class ChronoControl():
         hh = timestr[0:2]
         mm = timestr[2:4]
         ss = timestr[4:6]
-        #ms = timestr[7:10]
         ms = timestr[7:9]
         try:
-            #return timedelta(hours=int(hh),minutes=int(mm),seconds=int(ss),milliseconds=int(ms))
             return timedelta(hours=int(hh),minutes=int(mm),seconds=int(ss),milliseconds=int(ms)*10)
         except:
             return timedelta(hours=0,minutes=0,seconds=0,milliseconds=0)
 
     def auto_start_line(self):
-        #logger.info('auto_start_line start_line:'+str(self.start_line))
+        #global circuits
         if self.start_line == False:
             if GpsChronoMode == 0:
-                # on détermine la ligne de départ-arrivée sur le point actuel
+                # the start-finish line is determined at the current point
                 self.getGpsData();
                 self.define_start_wcap(self.gps_latitude,self.gps_longitude,self.gps_gpscap)
                 # creation of the self-defined track
@@ -2204,7 +2012,6 @@ class ChronoControl():
             if GpsChronoMode > 0:
                 self.neardist = 999999
                 self.neartrack = ""
-                #logger.debug("circuit:"+str(type(circuits)))
                 for track in circuits:
                     LatFL = 0
                     LonFL = 0
@@ -2231,25 +2038,23 @@ class ChronoControl():
                             lon2 = self.capline.coords[3]
                             
                     distcir = distanceGPS(gps.latitude, gps.longitude, LatFL, LonFL)
-                    # logger.info('distance circuit:'+str(distcir)+' '+str(self.neardist)+' '+str(TrackProximity))
 
                     if distcir < self.neardist: # we found an even closer circuit
                         self.neartrack = circuits[track]["NomCircuit"]
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
-                            # on va regarder si on a coupé la ligne de départ du circuit à proximité
+                            # we'll look to see if we've cut the starting line of the circuit nearby
                             # was the start/finish line cut ?
                             if self.gps.prevlat != 0:
                                 cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
-                                #logger.info('is prox track cut:'+str(cut))
                                 
                                 if cut == True:
-                                    # si la définition automatique de la ligne est en cours, on l'arrête
+                                    # if the automatic definition of the line is in progress, it is stopped
                                     if acq != False:
                                         if acq.active == True:
                                             logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
-                                            acq.cancel() # on abandonne le thread d'acquisition automatique de la ligne de départ-arrivée                  
-                                    self.getGpsData(); # pour avoir accès aux données du GPS avec protection du rafraichissement pendant les calculs
+                                            acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
+                                    self.getGpsData(); # to have access to GPS data with refresh protection during calculations
 
                                     self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
                                     self.define_start_wcoord(lat1, lon1, lat2, lon2)
@@ -2373,6 +2178,7 @@ class AcqControl(threading.Thread):
 
     def __init__(self,chrono):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.active = False
         self.chrono = chrono
         self.gps = chrono.gps
@@ -2405,7 +2211,6 @@ class AcqControl(threading.Thread):
         self.dist2points = 120 # distance below which we look if we cut a line
         self.md2m = 15 # minimum distance between 2 measurements
         self.timestamp = 0.
-        #self.distmin = TrackWidth*2. # minimum distance to shorten the acquisition phase = 2 times the track width
         logger.info("AcqControl init complete")
 
     def run(self):
@@ -2484,13 +2289,8 @@ class AcqControl(threading.Thread):
                                     
                                     temps = timedelta(microseconds=corrmic)
                                     
-                                    #logger.debug("temps compensé:"+str(temps))
-                                    #logger.debug("temps départ:"+str(dt0))
                                     dt0mic = getMicroseconds(dt0)
-                                    #logger.debug("mic départ:"+str(dt0mic))
-                                    #logger.debug("temps +1:"+str(dt1))
                                     dt1mic = getMicroseconds(dt1)
-                                    #logger.debug("mic +1:"+str(dt1mic))
 
                                     self.chrono.chronoStartTime = dt0
                                     
@@ -2503,9 +2303,6 @@ class AcqControl(threading.Thread):
                                     self.chrono.speed0 = self.acqlines[k]["vit"]
                                     self.chrono.alt0   = self.acqlines[k]["alt"]
                                     self.chrono.cap0   = self.acqlines[k]["cap"]
-                                    #logger.debug("coord k:"+str(k)+" "+str(self.acqlines[k]["lat"])+","+str(self.acqlines[k]["lon"]))
-                                    #logger.debug("coord i:"+str(i)+" "+str(self.acqlines[i]["lat"])+","+str(self.acqlines[i]["lon"]))
-                                    #logger.debug("coord j:"+str(j)+" "+str(self.acqlines[j]["lat"])+","+str(self.acqlines[j]["lon"]))
                                     
                                     fanalys.writePoint()
                                                                       
@@ -2518,19 +2315,15 @@ class AcqControl(threading.Thread):
                             self.sleep = self.pulse/self.vit
                         if self.sleep > self.maxsleep:
                             self.sleep = self.maxsleep
-                        #logger.debug("sleep for "+str(self.sleep)+" secondes")
                         time.sleep(self.sleep)
                 else:
                     self.sleep = 1
-                    #logger.debug("sleep for "+str(self.sleep)+" secondes")
                     time.sleep(self.sleep)
-        #logger.info("AcqControl cancel ?"+str(self.__cancel))
         if self.__cancel == True: #the thread, has been aborted
             logger.info("AcqControl aborted")
         if self.__cancel == False: #the thread, has not been aborted
             # we have just crossed the line that has just been defined  !
             self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
-            #logger.debug("len acqlines after line is defined:"+str(len(self.acqlines)))
         self.active = False;
         logger.info("AcqControl ended")
                 
@@ -2571,19 +2364,15 @@ class AcqControl(threading.Thread):
         
     def measurement(self):
         if self.timestamp == self.gps.gpstime:
-            #logger.debug(str(self.timestamp)+"="+str(self.gps.gpstime))
             return False
         self.timestamp = self.gps.gpstime
-        #logger.info("len acqlines before:"+str(len(self.acqlines)))
         j = len(self.acqlines) - 1
         self.seglat1 = self.acqlines[j]["lat"]
         self.seglon1 = self.acqlines[j]["lon"]
         self.getline()
         dist = distanceGPS(self.seglat1, self.seglon1, self.acqline["lat"], self.acqline["lon"])
         if dist < self.md2m: # at least 15m between 2 measurements
-            #logger.debug("dist between 2 segments:"+str(dist))
             return False
-        #logger.debug("dist between 2 segments:"+str(dist))
         return True
 #
 # predictive time control thread
@@ -2592,14 +2381,15 @@ class PredictiveControl(threading.Thread):
 
     def __init__(self,chrono):
         threading.Thread.__init__(self)
+        logger.info(str(self))
         self.active = False
         self.chrono = chrono
         self.gps = chrono.gps
         self.prevtime = False
-        # tableau des distances parcourues (timeline)
-        self.BT = [] # tableau du meilleur tour
-        self.T0 = [] # tableau du tour précédent
-        self.T1 = [] # tableau du tour en cours
+        # table of distances covered (timeline)
+        self.BT = [] # array of the best lap
+        self.T0 = [] # table of the previous lap
+        self.T1 = [] # table of the current lap
         self.point = dict()
         self.lap = 0
         self.nblap = 0
@@ -2616,72 +2406,51 @@ class PredictiveControl(threading.Thread):
         self.active = True;
         logger.info("PredictiveControl is running")
         while self.__running:
-            if self.chrono.npoint > 0 and self.chrono.npoint != self.npoint: # on est en cours d'acquisition de points pour le tour en cours
-                self.npoint = self.chrono.npoint # pour éviter de traiter plusieurs fois le même point
+            if self.chrono.npoint > 0 and self.chrono.npoint != self.npoint: # points are being acquired for the current lap
+                self.npoint = self.chrono.npoint # to avoid processing the same point several times
                 if self.lap == 0:
                     self.lap = self.chrono.nblap
                 if self.prevtime == False:
                     self.prevtime = self.chrono.time0
                     self.prevtime = self.chrono.chronoStartTime
-                #logger.info('point:'+str(self.chrono.npoint)+'lap:'+str(self.lap)+'nblap:'+str(self.nblap)+'chrono.nblap:'+str(self.chrono.nblap))
                 self.dist += self.chrono.distseg
-                if self.nblap == 0: # il n'y a pas de tour précédent, on peuple T0
+                if self.nblap == 0: # there is no previous lap, we populate T0
                     self.point = dict()
                     self.point["point"] = self.npoint
                     self.point["time"] = self.chrono.getTime(self.chrono.time0) - self.chrono.getTime(self.prevtime)
-                    self.point["dist"] = self.dist # distance à calculer
-                    self.T0.append(self.point) # stockage du point
-                    #logger.info(str(len(self.T0)))
-                    if self.lap != self.chrono.nblap: # c'est la fin du tour
+                    self.point["dist"] = self.dist # distance to calculate
+                    self.T0.append(self.point) # store the point
+                    if self.lap != self.chrono.nblap: # this is the end of the lap
                         self.nblap = self.lap
                         self.lap = self.chrono.nblap
                         self.prevtime = self.chrono.time0
                         self.dist = 0
-                else: # le tour précédent est chargé, on peuple le tour courant
+                else: # the previous round is loaded, we populate the current round
                     self.point = dict()
                     self.point["point"] = self.npoint
                     self.point["time"] = self.chrono.getTime(self.chrono.time0) - self.chrono.getTime(self.prevtime)
-                    self.point["dist"] = self.dist # distance à calculer
-                    self.T1.append(self.point) # stockage du point
-                    #logger.info(str(len(self.T1)))
+                    self.point["dist"] = self.dist # distance to calculate
+                    self.T1.append(self.point) # store the point
                     self.chrono.main_led.set_led_off() # yellow led
                     self.chrono.led.set_led_off() # green led
-                    if self.lap != self.chrono.nblap: # c'est la fin du tour
-                        logger.info(str(len(self.T0)))
-                        logger.info(str(len(self.T1)))
-                        #logger.info(str(self.T0))
-                        #logger.info(str(self.T1))
-                        logger.info(str(self.dist))
-
+                    if self.lap != self.chrono.nblap: # this is the end of the lap
                         self.lap = self.chrono.nblap
                         self.nblap = self.lap
-                        # maintenant on recommence, T0 vaut T1
+                        # now we start again, T0 is T1
                         self.T0 = self.T1
                         self.T1 = []
                         self.prevtime = self.chrono.time0
                         self.dist = 0
-                    else: # on essaie de prédire le temps T1 par rapport à T0
-                        #logger.info(str(len(self.T0)))
-                        #logger.info(str(len(self.T1)))
-                        np  = len(self.T1) # nombre de points acquis sur le tour en cours
-                        npt = len(self.T0) # nombre de points acquis sur le tour en précédent
-                        #logger.info('npt:'+str(npt))
-                        #logger.info('np:'+str(np))
+                    else: # we try to predict the time T1 with respect to T0
+                        np = len(self.T1) # number of points acquired in the current round
+                        npt = len(self.T0) # number of points acquired in the previous round
                         j = len(self.T1) - 1
                         i = j
                         if i > len(self.T0) - 1:
                             i = len(self.T0) - 1
-                        #logger.info('i:'+str(i))
-                        #logger.info('j:'+str(j))
                         d0 = self.T0[i]["dist"]
                         d1 = self.T1[j]["dist"]
-                        #logger.info('d0:'+str(d0))
-                        #logger.info('d1:'+str(d1))
-                        #nwt = self.chrono.temps_tour * d0 / d1
-                        #nwt = self.chrono.temps_tour * (d0 * np / npt) / (d1 * np / npt)
-                        #logger.info('temps_tour:'+str(self.chrono.temps_tour))
                         nwt = self.chrono.temps_tour * (d0 * npt / np) / (d1 * npt / np)
-                        #logger.info('nwt:'+str(nwt))
 
                         if nwt < self.chrono.temps_tour:
                             diff = self.chrono.temps_tour - nwt
@@ -2693,17 +2462,7 @@ class PredictiveControl(threading.Thread):
                             self.chrono.main_led.set_led_on() # yellow led
                         
                         self.chrono.predict_time = difft
-
-
-
-                        #difft = nwt - self.chrono.temps_tour
-                        #logger.info(str(self.T0[i]))
-                        #logger.info(str(self.T1[j]))
-                        #logger.info('tt:'+str(formatTimeDelta(self.chrono.temps_tour))+'nwt:'+str(formatTimeDelta(nwt))+'d0:'+str(d0)+' d1:'+str(d1)+' t:'+str(difft))
-                        #logger.info(str(formatTimeDelta(difft)))
             time.sleep(self.sleep)
-        logger.info(str(self.T0))
-        logger.info(str(self.T1))
         self.active = False;
         logger.info("PredictiveControl ended")
     
@@ -2713,9 +2472,10 @@ class PredictiveControl(threading.Thread):
             return
         self.__running = False
         self.active = False;
-            
-        
-    
+
+###
+# general functions
+###
 def deg2rad(dg):
     return dg/180*pi
 
@@ -2885,7 +2645,6 @@ def get_module(moduleName):
     ps = str(proc_retval.strip().decode())
     Tps = ps.split('\n')
     for chaine in Tps:
-        #logger.info(chaine)
         if moduleName in chaine:
             if ".py" in chaine:
                 return chaine
@@ -2898,7 +2657,7 @@ def get_ipadr():
     return ""
 
 def get_baudrate(device):
-       command = 'stty -F {0}'.format(device)
+       command = 'stty -F /dev/{0}'.format(device)
        try:
            proc_retval = subprocess.check_output(shlex.split(command))
            baudrate = int(proc_retval.split()[1])
@@ -2937,14 +2696,21 @@ if __name__ == "__main__":
         # we start by reading the parameters ...
         parms = Parms(Path)
         ###
+        el_parms = parms.get_parms("LED1_GPIO_PIN")
         if "LED1_GPIO_PIN" in parms.params:
-            LED1_GPIO_PIN = parms.params["LED1_GPIO_PIN"]
+            LED1_GPIO_PIN = el_parms
+
+        el_parms = parms.get_parms("LED2_GPIO_PIN")
         if "LED2_GPIO_PIN" in parms.params:
-            LED2_GPIO_PIN = parms.params["LED2_GPIO_PIN"]
+            LED2_GPIO_PIN = el_parms
+
+        el_parms = parms.get_parms("LED3_GPIO_PIN")
         if "LED3_GPIO_PIN" in parms.params:
-            LED3_GPIO_PIN = parms.params["LED3_GPIO_PIN"]
+            LED3_GPIO_PIN = el_parms
+
+        el_parms = parms.get_parms("ILS_GPIO_PIN")
         if "ILS_GPIO_PIN" in parms.params:
-            ILS_GPIO_PIN = parms.params["ILS_GPIO_PIN"]
+            ILS_GPIO_PIN = el_parms
 
         # we continue by reading the version
         Version = ""
@@ -2958,48 +2724,69 @@ if __name__ == "__main__":
             pass
         logger.info("Version:"+str(Version))
 
+        el_parms = parms.get_parms("PitMaxSpeed")
         if "PitMaxSpeed" in parms.params:
-            PitMaxSpeed = parms.params["PitMaxSpeed"]
+            PitMaxSpeed = el_parms
+
+        el_parms = parms.get_parms("TrackWidth")
         if "TrackWidth" in parms.params:
-            TrackWidth = parms.params["TrackWidth"]
+            TrackWidth = el_parms
+
+        el_parms = parms.get_parms("GpsChronoMode")
         if "GpsChronoMode" in parms.params:
-            GpsChronoMode = parms.params["GpsChronoMode"]
-        logger.info("GpsChronoMode:"+str(GpsChronoMode))
+            GpsChronoMode = el_parms
+
+        el_parms = parms.get_parms("TrackProximity")
         if "TrackProximity" in parms.params:
-            TrackProximity = parms.params["TrackProximity"]
+            TrackProximity = el_parms
+
+        el_parms = parms.get_parms("TrackAcqTime")
         if "TrackAcqTime" in parms.params:
-            TrackAcqTime = parms.params["TrackAcqTime"]
-        TrackPref = 'track-'
-        TrackExt = '.json'
-        if "TrackExt" in parms.params:
-            TrackPref = False
-            TrackExt = parms.params["TrackExt"] # par défaut .trk
+            TrackAcqTime = el_parms
+
+        NoTrack = 0 # 0: by default, a search is made in the database of circuits if a start-finish line is cut
+                    # 1: no search, an "autodef" track will be created automatically in the database of circuits.
+        el_parms = parms.get_parms("NoTrack")
+        if "NoTrack" in parms.params:
+            NoTrack = el_parms
             
+        el_parms = parms.get_parms("PredictiveTimeMode")
+        if "PredictiveTimeMode" in parms.params:
+            PredictiveTimeMode = el_parms
+
+        el_parms = parms.get_parms("UseStopwatchDisplayByILS")
         if "UseStopwatchDisplayByILS" in parms.params:
-            UseStopwatchDisplayByILS = parms.params["UseStopwatchDisplayByILS"]
+            UseStopwatchDisplayByILS = el_parms
+
+        el_parms = parms.get_parms("LiveSessionMode")
         if "LiveSessionMode" in parms.params:
-            LiveSessionMode = parms.params["LiveSessionMode"]
-        #logger.info("LiveSessionMode:"+str(LiveSessionMode))
+            LiveSessionMode = el_parms
             
+        el_parms = parms.get_parms("HillRaceMode")
         if "HillRaceMode" in parms.params:
-            HillRaceMode = parms.params["HillRaceMode"]
+            HillRaceMode = el_parms
 
         if GpsChronoMode > 0:
             # we will read the tracks
             dirtracks = pathdata+"/tracks"
             dirlist = os.listdir(dirtracks)
             circuits = {}
-            i = 0
-            for el in dirlist:
-                TFD = open(dirtracks+"/"+el, 'r')
-                if TrackPref != False:
-                    Num = el.split('track-')
-                    Num = Num[1].split(TrackExt)
-                else:
-                    Num = el.split(TrackExt)
-                Id = Num[0]
-                circuits[Id] = json.loads(TFD.read())
-                TFD.close()
+                
+            if NoTrack == 1:
+                logger.info("dirlist:"+str(dirlist))
+                if "autodef.trk" in dirlist:
+                    TFD = open(dirtracks+"/autodef.trk", 'r')
+                    circuits["autodef"] = json.loads(TFD.read())
+                    TFD.close()
+            else:
+                i = 0
+                for el in dirlist:
+                    TFD = open(dirtracks+"/"+el, 'r')
+                    Num = el.split(".trk")
+                    #logger.info('Num circuit:'+str(Num))
+                    Id = Num[0]
+                    circuits[Id] = json.loads(TFD.read())
+                    TFD.close()
 
         led1 = LedControl(LED1_GPIO_PIN) # LED 1 (yellow) is associated to many processes
         led1.start()
@@ -3009,8 +2796,9 @@ if __name__ == "__main__":
         last_state = 1
         
         # before starting the screen control, we will look for the CharacterSize parameter
+        el_parms = parms.get_parms("CharacterSize")
         if "CharacterSize" in parms.params:
-            CharacterSize = parms.params["CharacterSize"]
+            CharacterSize = el_parms
         
         lcd = DisplayControl()
         lcd.start()
@@ -3021,7 +2809,6 @@ if __name__ == "__main__":
         gps = GpsControl(lcd)
         gps.start()
         
-        #jfk: peut-être à lancer si paramètre ils = on ?
         if UseStopwatchDisplayByILS != 0:
             ils = IlsControl(ILS_GPIO_PIN, LED2_GPIO_PIN)
             ils.start()
@@ -3030,8 +2817,6 @@ if __name__ == "__main__":
         if ils != False:
             chrono.ils.set_chrono(chrono)
         
-        #jfk: peut-être à lancer si paramètre live = on ?
-        logger.info("LiveSessionMode:"+str(LiveSessionMode))
         if LiveSessionMode != 0:
             flive = LiveSession(chrono)
             flive.start()
@@ -3043,10 +2828,11 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
-        predict = PredictiveControl(chrono)
-        predict.start() # n'a pas l'air de fonctionner correctement alors, on ne le démarre pas pour l'instant.
+        if PredictiveTimeMode != 0:
+            predict = PredictiveControl(chrono)
+            predict.start() # does not seem to work properly.
         
-        #jfk: si on déporte la gestion du Tracker dans le programme principal, çà commencera ici
+        #jfk: if we move the Tracker management to the main program, it will start here
         # tracker = TrackingControl(chrono)
         # tracker.start()
         
@@ -3055,10 +2841,23 @@ if __name__ == "__main__":
         #we will launch the GPS or SIMU program
         # if the program is launched with arguments then sys.argv[1] contains the name of the file containing the NMEA frames to be simulated, we launch the simulator
         # or run the GPS program
+        el_parms = parms.get_parms("GPSCmd")
         if "GPSCmd" in parms.params:
-            cmdgps = parms.params["GPSCmd"]
+            cmdgps = el_parms
+
+        el_parms = parms.get_parms("SimuCmd")
         if "SimuCmd" in parms.params:
-            cmdsimu = parms.params["SimuCmd"]
+            cmdsimu = el_parms
+
+        speedometer = 0
+        el_parms = parms.get_parms("SpeedOmeter")
+        if "SpeedOmeter" in parms.params:
+            speedometer = int(el_parms)
+
+        sleeptime = 30
+        el_parms = parms.get_parms("SleepTime")
+        if "SleepTime" in parms.params:
+            sleeptime = int(el_parms)
         
         l = len(sys.argv)
         i = 0
@@ -3068,17 +2867,13 @@ if __name__ == "__main__":
         if l >= 2:
             fnamesimu = sys.argv[1]
         if fnamesimu != "": # we run a simulation
-            #cmdos = "python "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" > "+pathlog+"/"+cmdsimu+".log &"
-            #cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py &"
             module = cmdsimu
             cmdos = python_bin+" "+pathcmd+"/"+cmdsimu+".py "+fnamesimu+" &"
         else:
             module = cmdgps
-            #cmdos = "python "+pathcmd+"/"+cmdgps+".py > "+pathlog+"/"+cmdgps+".log &"
             cmdos = python_bin+" "+pathcmd+"/"+cmdgps+".py &"
         print(cmdos)
         isModule = get_module(module)
-        logger.info(str(isModule))
         
         if isModule == False:
             try:
@@ -3087,15 +2882,8 @@ if __name__ == "__main__":
                 running = False
             time.sleep(5)
 
-        #dbg = 0
         while running:
-            #current_state = button1.get_state()
-            #current_state = running_state
             current_state = menu.get_state()
-            #if dbg > 100:
-            #    dbg = 0
-            #    print("current_state:"+str(current_state))
-            #dbg = dbg+1
             
             if current_state != prev_state:
                 prev_state = current_state
@@ -3105,15 +2893,11 @@ if __name__ == "__main__":
                 last_state = current_state
                 if current_state == STOP:
                     led1.set_led_fast_flash(3)
-                    #logger.debug('chrono stop')
                     chrono.stop()
                     lcd.set_display_time()
                 elif current_state == READY:
                     if chrono.chrono_begin != True:
                         chrono.begin()
-                    #logger.info('main current_state:'+str(current_state))
-                    #logger.info('menu current_state:'+str(menu.get_state()))
-                    #logger.info('main lap:'+str(chrono.nblap))
                     lcd.set_display_ready()
                 elif current_state == RUNNING:
                     chrono.start_chrono()
@@ -3133,15 +2917,11 @@ if __name__ == "__main__":
                                             if acq.active != False:
                                                 logger.info("we are near a circuit ("+str(distcir)+"m), GPS point acquisition thread is stopped. ")
                                                 acq.stop()
-                                            if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
-                                                #button1.button_state = READY
-                                                #running_state = READY
+                                            if gps.gpsvitesse > speedometer:
                                                 menu.running_state = READY
                                                 chrono.begin()
                                     else: # we will try to automatically determine a start/finish line
                                         if chrono.start_line != False: # the line is determined, the stopwatch is started                                  
-                                            #button1.button_state = READY
-                                            #running_state = READY
                                             menu.running_state = READY
                                             chrono.begin()
                                         else:
@@ -3150,16 +2930,12 @@ if __name__ == "__main__":
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
-                                    #logger.debug("current_sate:"+str(current_state))
                                     if acq != False:
-                                        #logger.debug("acq.active:"+str(acq.active))
                                         # if the GPS point acquisition thread is running, it is stopped
                                         if acq.active != False:
                                             acq.stop()
-                                    if gps.gpsvitesse > int(parms.params["SpeedOmeter"]):
+                                    if gps.gpsvitesse > speedometer:
                                         if chrono.circuit != False:
-                                            #button1.button_state = RUNNING
-                                            #running_state = READY
                                             menu.running_state = RUNNING
                     
                     if GpsChronoMode == 0: # manual operation
@@ -3174,20 +2950,15 @@ if __name__ == "__main__":
                         if chrono.start_line == True: # the line is well defined
                             distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
                             if distcir > TrackProximity: # we moved away from the circuit
-                                #button1.button_state = STOP
-                                #running_state = STOP
                                 menu.running_state = STOP
                                 current_state = STOP
                                 if chrono.circuit != False:
-                                    #logger.info("distance circuit:"+str(distcir)+"/"+str(TrackProximity))
                                     chrono.circuit = False # the circuit object is deleted
                                     chrono.start_line = False # the start line is cleared
                     #
                     chrono.is_sleep() #
                     # if the position has been frozen for more than x gps cycles, the stopwatch is stopped
-                    if chrono.nbSleep > int(parms.params["SleepTime"]) :
-                       #button1.button_state = STOP
-                       #running_state = STOP
+                    if chrono.nbSleep > sleeptime :
                        menu.running_state = STOP
                        chrono.nbSleep = 0
                        current_state = STOP
@@ -3212,55 +2983,41 @@ if __name__ == "__main__":
             if predict.started == True:
                 predict.join()
         #
-        chrono.terminate() # arrête proprement la classe ChronoControl
+        chrono.terminate() # terminates the ChronoControl class cleanly
         #
-        #logger.debug("menu:"+str(menu))
         if menu != False:
             menu.stop()
             menu.join()
-        #logger.debug("gps:"+str(gps))
         if gps != False:
             if gps.gpsactiv == True:
                 gps.stop()
             gps.join()
-        #logger.debug("tracker:"+str(tracker))
         if tracker != False:
             tracker.stop()
             tracker.join()
-        #logger.debug("fsession:"+str(fsession))
         if fsession != False:
             fsession.stop()
-            #fsession.join()
-        #logger.debug("fanalys:"+str(fanalys))
         if fanalys != False:
             fanalys.stop()
-            #fanalys.join()
-        #logger.debug("flive:"+str(flive))
         if flive != False:
             flive.stop()
             flive.join()
-        #logger.debug("led1:"+str(led1))
         if led1 != False:
             led1.stop()
             led1.join()
-        #logger.debug("lcd:"+str(lcd))
         if lcd != False:
             lcd.stop()
             logger.info("main lcd stop")
             lcd.join()
-        #logger.debug("ipClass:"+str(ipClass))
         if ipClass != False:
             ipClass.stop()
             ipClass.join()
-        #logger.debug("acq:"+str(acq))
         if acq != False:
             acq.stop()
             acq.join()
-        #logger.debug("ils:"+str(ils))
         if ils != False:
             ils.stop()
             ils.join()
-        #logger.debug("END of main program MyChronoGPS")
                 
     except KeyboardInterrupt:
         logger.info("User Cancelled (Ctrl C)")

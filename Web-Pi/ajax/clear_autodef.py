@@ -5,7 +5,6 @@ Path = Paths();
 autotrack = Path.pathdata+"/tracks/autodef.trk"
 
 import glob 
-#import os.path
 import os
 import json
 import cgi

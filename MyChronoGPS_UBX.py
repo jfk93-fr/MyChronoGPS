@@ -36,7 +36,7 @@ ON = 1
 OFF = 0
 
 BAUDRATE = 9600 # default value, can be changed in parameters
-PORT = '/dev/serial0' # default value, can be changed in parameters
+PORT = 'serial0' # default value, can be changed in parameters
 
 NOEUD_KM = 1.852 # 1 nautical mile = 1852 m
 
@@ -99,7 +99,7 @@ class GpsControl(threading.Thread):
         self.parms = Parms(Path)
         self.gpsport = PORT
         if "GPSPort" in self.parms.params:
-            PORT = self.parms.params["GPSPort"]
+            self.gpsport = self.parms.params["GPSPort"]
         self.serialrate = BAUDRATE
         if "SerialRate" in self.parms.params:
             BAUDRATE = self.parms.params["SerialRate"]
@@ -170,14 +170,13 @@ class GpsControl(threading.Thread):
         self.commandInProgress = False
 
     def activateGPS(self):
-        # if get_baudrate(PORT) < 0:
-        if self.nmea.get_baudrate(PORT) < 0:
+        if self.nmea.get_baudrate(self.gpsport) < 0:
             # vérifier le branchement du GPS
             logger.error("communication with the gps cannot be established. Check the gps connection.")
             self.stop()
         else:
             self.serialGps.baudrate = BAUDRATE
-            self.serialGps.port = PORT
+            self.serialGps.port = "/dev/"+self.gpsport
             #self.serialGps.timeout = 4
             #
             self.serialGps.parity=serial.PARITY_NONE
@@ -186,7 +185,7 @@ class GpsControl(threading.Thread):
             self.serialGps.timeout=1
             #
             self.serialGps.open()
-            logger.info("communication with "+str(PORT)+" established at "+str(BAUDRATE)+" bauds")
+            logger.info("communication with "+str("/dev/"+PORT)+" established at "+str(BAUDRATE)+" bauds")
             self.enable()
 
     def closeSerialGPS(self):

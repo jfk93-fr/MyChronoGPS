@@ -337,7 +337,7 @@ class NmeaControl():
         return rbuff
 
     def get_baudrate(self,device):
-        command = 'stty -F {0}'.format(device)
+        command = 'stty -F /dev/{0}'.format(device)
         baudrate = -1
         try:
             proc_retval = subprocess.check_output(shlex.split(command))
