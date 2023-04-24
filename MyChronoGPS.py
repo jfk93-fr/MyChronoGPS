@@ -2828,6 +2828,7 @@ if __name__ == "__main__":
         
         fanalys = AnalysisControl(chrono)
         
+        predict = False
         if PredictiveTimeMode != 0:
             predict = PredictiveControl(chrono)
             predict.start() # does not seem to work properly.
