@@ -231,6 +231,7 @@ class GpsControl(threading.Thread):
         
         self.gpsfix = self.INVALID
         self.gpsline = ""
+        self.gpsdict = ""
         self.gpsnbsat = 0
         self.latitude = 0.
         self.longitude = 0.
@@ -485,7 +486,7 @@ class MenuControl(threading.Thread):
                         else:
                             self.menu_select()
                     else:
-                        # there is only one button => carousel of succsessive states
+                        # there is only one button => carousel of successive states
                         # the state of the button depends on the position of the carousel
                         self.running_state = self.running_state + 1
                         if (self.running_state > self.max_wheel):
@@ -660,10 +661,71 @@ class DisplayControl(threading.Thread):
     CONTRAST = "A"
     cache_name = pathcache+'/DISPLAY' 
     lcd_data = "" # contains the command + the text to display (written in the named pipe DISPLAY)
+
+    class InfoData():
+        def __init__(self):
+            self.chrono = self.update_chrono()
+            self.gps = False
+            self.cache_name = pathcache+'/CHRONO'
+            try:
+                with open(self.cache_name, 'w') as cache: # the file is initialized
+                    cache.close()
+                    os.chmod(self.cache_name, 0o777)
+            except OSError as err:
+                logger.error("cannot use cache file OS error: {0}".format(err))
+                pass
+        def update_chrono(self):
+            global chrono
+            return chrono
+        def set_infos(self):
+            self.chrono = self.update_chrono()
+            if self.chrono != False:
+                self.gps = self.chrono.gps
+                self.write_chrono()
+
+        def write_chrono(self):
+            self.infos = dict()
+            self.point = self.chrono.ChronoData()
+            NomCircuit = "inconnu"
+            if self.chrono.circuit != False:
+                if "NomCircuit" in self.chrono.circuit:
+                    NomCircuit = self.chrono.circuit["NomCircuit"]
+            self.infos["ip"] = get_ipadr()
+            self.infos["gpsfix"] = self.gps.gpsfix
+            self.infos["nbsats"] = self.gps.gpsnbsat
+            self.infos["circuit"] = NomCircuit
+            self.infos["dict"] = self.gps.gpsdict
+            #self.infos["line"] = self.gps.gpsline
+            self.infos["tt"] = formatTimeDelta(self.chrono.temps_tour)
+            i = 0
+            temps_secteurs = []
+            while i < len(self.chrono.temps_secteurs):
+                temps_secteurs[i] = formatTimeDelta(self.chrono.temps_secteurs[i])
+                i = i+1
+            
+            self.infos["sect"] = temps_secteurs
+            self.infos["best"] = formatTimeDelta(self.chrono.best_lap)
+            self.infos["lap"] = self.chrono.lap
+            self.infos["nblap"] = self.chrono.nblap
+            self.infos["line"] = self.gps.gpsline
+            self.record = json.dumps(self.infos)
+            try:
+                with open(self.cache_name, 'w') as cache: # the file is initialized
+                    cache.write(self.record+'\r\n')
+                    cache.close()
+            except OSError as err:
+                logger.error("cannot use cache file OS error: {0}".format(err))
+                pass
+
         
     def __init__(self):
+        global gps
         threading.Thread.__init__(self)
         logger.info(str(self))
+            
+        self.infos = self.InfoData() # classe qui recueille les infos à écrire dans le cache /INFOS
+        self.infos.set_infos()
+
         self.displayBig = False
         self.displaySysBig = False
         self.displaySmall = False
@@ -992,6 +1054,9 @@ class DisplayControl(threading.Thread):
             self.write(self.DISPLAY_SMALL+str)
         else:
             self.write(self.DISPLAY+str)
+        # à chaque appel de display on va alimenter le fichier CHRONO en cache
+        self.infos.set_infos()
+        
             
     def clear(self):
         self.write(self.CLEAR+" ")

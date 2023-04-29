@@ -7,3 +7,8 @@ userdata/traces/
 userdata/sessions/
 userdata/savetracks/
 *.pyc
+*.bmp
+lib/TP_lib/__init__.py
+lib/TP_lib/epd2in13_V2.py
+lib/TP_lib/epd2in9_V2.py
+lib/TP_lib/weather_2in9_V2.py
