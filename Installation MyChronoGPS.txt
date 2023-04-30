@@ -51,6 +51,7 @@ Terminer la config du Raspberry
 Passer la commande :
 $ sudo raspi-config
 3 - Interface Options
+	P4 SPI => Oui
 	P5 I2C => Oui
 	P6 Serial Port => shell:non / serial port hardware:oui
 
@@ -137,6 +138,26 @@ Rechercher les lignes contenant "GPSPort"
 
 C'est la dernière ligne qui est prise en compte.
 Dans l'exemple ci-dessus, le GPS est associé au fichier /dev/ttyACM0
+=============================================================================================================
+Ce qui suit est nécessaire pour les afficheurs e-Paper Waveshare (2.13inch_Touch_e-Paper_HAT ):
+
+installer les librairies BCM2835 :
+$ wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.71.tar.gz
+$ tar zxvf bcm2835-1.71.tar.gz
+$ cd bcm2835-1.71/
+$ sudo ./configure && sudo make && sudo make check && sudo make install
+
+installer les librairies wiringPi :
+The #Bullseye branch system uses the following commands:
+$ git clone https://github.com/WiringPi/WiringPi
+$ cd WiringPi
+$ ./build
+$ gpio -v
+# Run gpio -v and version 2.70 will appear if there is no installation error
+
+installer la librairie smbus :
+$ pip install smbus2
+
 =============================================================================================================
 Ce qui suit est nécessaire pour les afficheurs OLED:
 

@@ -422,11 +422,7 @@ class Screen():
             self.buff2 = ""
             self.buff3 = ""
             self.buff4 = ""
-            logging.info("Clear...")
-            self.epd.init()
-            self.epd.Clear(0xFF)
             logging.info("Goto Sleep...")
-            self.epd.sleep()
             #self.disp.display()
             return False
             
@@ -439,7 +435,7 @@ class Screen():
 
         # Display image.
         # on va enregistrer l'image dans un fichier
-        self.image.save("essai.bmp", "BMP")
+        # self.image.save("essai.bmp", "BMP")
         #img5 = self.image.transpose(Image.ROTATE_90)        
         #img5.save("essai90.bmp", "BMP")
         #img6 = self.image.transpose(Image.ROTATE_180)        
@@ -499,6 +495,11 @@ if __name__ == '__main__':
         font36 = ImageFont.truetype(os.path.join(fontdir, 'Font.ttc'), 36)
         
         Screen().boucle()
+        
+        epd.init(epd.FULL_UPDATE)
+        gt.GT_Init()
+        epd.Clear(0xFF)
+        #epd.Clear(0x00)
                 
     except KeyboardInterrupt:
         print("User Cancelled (Ctrl C)")
