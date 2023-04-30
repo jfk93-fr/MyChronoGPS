@@ -328,7 +328,11 @@ class GpsControl(threading.Thread):
         
     def parse(self,sentence):
         self.buffstate = BUSY
-        self.gpsdict = json.loads(sentence) 
+        try:
+            self.gpsdict = json.loads(sentence)
+        except:
+            logger.info("error loading sentence")
+            pass
         self.prevlat = self.latitude # prevlat and prevlon are used to calculate the last travelled line segment
         self.prevlon = self.longitude
         self.prevtime = self.gpstime

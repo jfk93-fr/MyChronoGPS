@@ -20,9 +20,6 @@ import os
 import time
 import sys
 
-#picdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic/2in13')
-#fontdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'pic')
-#libdir = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'lib')
 fontdir = pathdata+'/fonts/'
 libdir = pathdata+'/lib/'
 if os.path.exists(libdir):
@@ -125,10 +122,7 @@ class Screen():
         self.draw = ImageDraw.Draw(self.image)
         
         # clear the image.
-        #self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=0)
-        #self.draw.rectangle((0,0,self.height,self.width), fill=0)
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        #self.draw.rectangle((0, 0, 250, 40), fill = 0)
         
         # Draw some shapes.
         # First define some constants to allow easy resizing of shapes.
@@ -147,10 +141,6 @@ class Screen():
         self.fontsmallsize = 24
         self.fontsmall = ImageFont.truetype(self.ttf,self.fontsmallsize)
 
-        #self.font = font24
-        #self.fontbig = font36
-        #self.fontsmall = font15
-
         self.cache = pathdata+'/cache/DISPLAY'
         print(self.cache)
 
@@ -165,18 +155,10 @@ class Screen():
             logger.debug(message)
         commande = message[0:1]
         texte = message[1:]
-        
-        #self.epd.init(self.epd.PART_UPDATE)
-        #self.epd.displayPartial(self.epd.getbuffer(self.image))
-
-        #self.image = Image.new('1', (self.epd.height, self.epd.width), 255)
-        #self.draw = ImageDraw.Draw(self.image)
-        #self.epd.displayPartBaseImage(self.epd.getbuffer(self.image))
 
         if commande == DISPLAY:        
             logger.debug(message)
-            # Draw a black filled box to clear the image.
-            #self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
+            # Draw a white filled box to clear the image.
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
             haut = ""
             bas = ""
@@ -205,21 +187,13 @@ class Screen():
             if line2 != "":
                 if line2 != self.buff2:
                     self.buff2 = line2
-            logger.debug(line1)
-            logger.debug(line2)
 
-            #self.draw.text((self.x, self.top), line1,  font=self.font, fill=255)
-            #self.draw.text((self.x, self.top+32), line2,  font=self.font, fill=255)
-            #print("line1="+str(line1)+",x="+str(self.x)+",y="+str(self.top))
             self.draw.text((self.x, self.top), line1,  font=self.font, fill=0)
-            #print("line2="+str(line2)+",x="+str(self.x)+",y="+str(self.top+62))
             self.draw.text((self.x, self.top+62), line2,  font=self.font, fill=0)
 
             
         elif commande == DISPLAY_BIG:        
-            logger.debug('BIG'+message)
-            # Draw a black filled box to clear the image.
-            #self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
+            # Draw a white filled box to clear the image.
             self.draw.rectangle((0,0,self.height,self.width), fill=255)
             # we will only write the first line
             haut = ""
@@ -257,21 +231,13 @@ class Screen():
             if line3 != "":
                 if line3 != self.buff3:
                     self.buff3 = line3
-            logger.debug(line1)
-            logger.debug(line2)
-            logger.debug(line3)
-
-            #self.draw.text((self.x, self.top), line1,  font=self.fontsmall, fill=255)
-            #self.draw.text((self.x, self.top+16), line2,  font=self.fontbig, fill=255)
-            #self.draw.text((self.x, self.top+50), line3,  font=self.fontsmall, fill=255)
 
             self.draw.text((self.x, self.top), line1,  font=self.fontsmall, fill=0)
             self.draw.text((self.x, self.top+24), line2,  font=self.fontbig, fill=0)
             self.draw.text((self.x, self.bottom-26), line3,  font=self.fontsmall, fill=0)
 
         elif commande == DISPLAY_SMALL:        
-            # Draw a black filled box to clear the image.
-            #self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
+            # Draw a white filled box to clear the image.
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
             # we will only write the first line on several floors (4 for the moment)
             st1 = ""
@@ -320,26 +286,21 @@ class Screen():
                 if line4 != self.buff4:
                     self.buff4 = line
 
-            #self.draw = ImageOps.invert(self.draw)
-            #self.draw.text((self.x, self.top), line1,  font=self.fontsmall, fill=255)
-            #self.draw.text((self.x, self.top+16), line2,  font=self.fontsmall, fill=255)
-            #self.draw.text((self.x, self.top+32), line3,  font=self.fontsmall, fill=255)
-            #self.draw.text((self.x, self.top+48), line4,  font=self.fontsmall, fill=255)
             self.draw.text((self.x, self.top), line1,  font=self.fontsmall, fill=0)
             self.draw.text((self.x, self.top+30), line2,  font=self.fontsmall, fill=0)
             self.draw.text((self.x, self.top+60), line3,  font=self.fontsmall, fill=0)
             self.draw.text((self.x, self.top+90), line4,  font=self.fontsmall, fill=0)
 
         elif commande == DISPLAY_MENU:
-            # le caractère qui suit la commande correspond au numéro de la ligne (de 0 à 3) à écrire en surbrillance
-            # Draw a black filled box to clear the image.
+            # the character following the command is the number of the line (from 0 to 3) to be highlighted
+            # Draw a white filled box to clear the image.
             self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
             # we will only write the first line on several floors (4 for the moment)
             st1 = ""
             st2 = ""
             st3 = ""
             st4 = ""
-            brightline = 0 # pour ne pas mettre en surbrillance en cas d'erreur sur le numéro de ligne
+            brightline = 0 # to not highlight if there is an error on the line number
             try:
                 brightline = int(texte[0:1])
             except:
@@ -387,7 +348,6 @@ class Screen():
                 if line4 != self.buff4:
                     self.buff4 = line
 
-            #self.draw = ImageOps.invert(self.draw)
             bright=[255,255,255,255]
             fill=[0,0,0,0]
             bright=[0,0,0,0]
@@ -411,49 +371,27 @@ class Screen():
             self.draw.rectangle((0,self.top+48,self.width,self.top+64), outline=0, fill=fill[3])
             self.draw.text((self.top+48, self.x), line4,  font=self.fontsmall, fill=bright[3])
             
-        elif commande == CLEAR: # effacement de l'écran
+        elif commande == CLEAR: 
             logging.info("Clear...")
             #self.epd.init()
             #self.epd.Clear(0xFF)
             
-        elif commande == POWER_OFF: # arrêt du programme demandé
-            #self.disp.clear()
+        elif commande == POWER_OFF: # a stop to the programm is requested
             self.buff1 = ""
             self.buff2 = ""
             self.buff3 = ""
             self.buff4 = ""
             logging.info("Goto Sleep...")
-            #self.disp.display()
             return False
             
         else:
-            #print("commande invalide:",commande)
             logger.info("commande invalide:"+commande)
             line1 = "invalid command:"+commande
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=0)
             self.draw.text((self.top, self.x), line1,  font=self.font, fill=255)
 
-        # Display image.
-        # on va enregistrer l'image dans un fichier
-        # self.image.save("essai.bmp", "BMP")
-        #img5 = self.image.transpose(Image.ROTATE_90)        
-        #img5.save("essai90.bmp", "BMP")
-        #img6 = self.image.transpose(Image.ROTATE_180)        
-        #img6.save("essai180.bmp", "BMP")
-        
-
         # partial update
-        #self.epd.displayPartBaseImage(self.epd.getbuffer(self.image))
         self.epd.displayPartial(self.epd.getbuffer(self.image))
-        
-        #self.epd.init(self.epd.PART_UPDATE)
-        #self.epd.displayPartial(self.epd.getbuffer(self.image))
-        
-        #self.epd.Clear(0xFF)
-        #self.epd.display(self.epd.getbuffer(self.image.rotate(180,expand=True)))
-        #self.epd.display(self.epd.getbuffer(self.image))
-        #self.epd.sleep()
-        
 
         time.sleep(0.2)
         return True
