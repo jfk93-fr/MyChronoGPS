@@ -1742,10 +1742,14 @@ class ChronoControl():
         line += ',"FL":['+str(self.startlat1)+","+str(self.startlon1)+","+str(self.startlat2)+","+str(self.startlon2)+"]"
         line += '}'
         self.track = pathdata+'/tracks/autodef.trk' # location of the autodef track file
-        with open(self.track, 'w') as track: # the data is overwritten with more recent data
-            track.write(line+"\r\n")
-            track.close()
-        os.chmod(self.track, 0o777)
+        try:
+            with open(self.track, 'w') as track: # the data is overwritten with more recent data
+                track.write(line+"\r\n")
+                track.close()
+            os.chmod(self.track, 0o777)
+        except OSError:
+            logger.error("OSError")
+            pass
 
     
     def define_start_wcoord(self,lat1,lon1,lat2,lon2):

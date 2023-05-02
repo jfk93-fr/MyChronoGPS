@@ -13,7 +13,7 @@ Avec l'outil Pi Imager
 A partir d'un PC Windows, télécharger Raspberry Pi Imager et l'installer
 A partir d'un Raspberry, Pi Imager est déjà installé.
 1 - Lancez Pi Imager
-2 - Choisir l'OS selon le Raspberry destiné à accueillir MyChronoGPS (32-bit tout type de rpi, 64-bit rpi 3,4,400) de préférence avec l'environnement de bureau.
+2 - Choisir l'OS selon le Raspberry destiné à accueillir MyChronoGPS (32-bit tout type de rpi, 64-bit rpi 3, 4, 400, 0W V2) de préférence avec l'environnement de bureau.
 3 - Allez dans les paramètres de Pi Imager
     Cochez la case Enable SSH.
 	La case Username and password est automatiquement cochée.
