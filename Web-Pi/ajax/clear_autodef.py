@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 from MyChronoGPS_WebPaths import Paths
 Path = Paths();
-autotrack = Path.pathdata+"/tracks/autodef.trk"
+autotrack = Path.pathdata+"/tracks/Autotrack.trk"
 
 import glob 
 import os

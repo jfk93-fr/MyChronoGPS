@@ -1738,10 +1738,10 @@ class ChronoControl():
 
     def create_sfTrack(self):
         line = '{"date":"'+str(formatGpsDate(self.gps))+'"'
-        line += ',"NomCircuit":"autotrack"'
+        line += ',"NomCircuit":"Autotrack"'
         line += ',"FL":['+str(self.startlat1)+","+str(self.startlon1)+","+str(self.startlat2)+","+str(self.startlon2)+"]"
         line += '}'
-        self.track = pathdata+'/tracks/autodef.trk' # location of the autodef track file
+        self.track = pathdata+'/tracks/Autotrack.trk' # location of the Autotrack track file
         try:
             with open(self.track, 'w') as track: # the data is overwritten with more recent data
                 track.write(line+"\r\n")
@@ -2818,7 +2818,7 @@ if __name__ == "__main__":
             TrackAcqTime = el_parms
 
         NoTrack = 0 # 0: by default, a search is made in the database of circuits if a start-finish line is cut
-                    # 1: no search, an "autodef" track will be created automatically in the database of circuits.
+                    # 1: no search, an "Autotrack" track will be created automatically in the database of circuits.
         el_parms = parms.get_parms("NoTrack")
         if "NoTrack" in parms.params:
             NoTrack = el_parms
@@ -2847,9 +2847,9 @@ if __name__ == "__main__":
                 
             if NoTrack == 1:
                 logger.info("dirlist:"+str(dirlist))
-                if "autodef.trk" in dirlist:
-                    TFD = open(dirtracks+"/autodef.trk", 'r')
-                    circuits["autodef"] = json.loads(TFD.read())
+                if "Autotrack.trk" in dirlist:
+                    TFD = open(dirtracks+"/Autotrack.trk", 'r')
+                    circuits["Autotrack"] = json.loads(TFD.read())
                     TFD.close()
             else:
                 i = 0

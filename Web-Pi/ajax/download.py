@@ -47,7 +47,7 @@ zip = zipfile.ZipFile(diru+zipid,'w')
 fl = json.loads(lines[0])
 NomCircuit = fl[0]["NomCircuit"]
 if NomCircuit == "":
-    NomCircuit = "autotrack"
+    NomCircuit = "Autotrack"
 filename = NomCircuit+".trk"
 filetrack = dirt+"/"+filename
 
