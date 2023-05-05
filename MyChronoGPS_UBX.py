@@ -81,7 +81,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-logger.setLevel(logging.INFO)
+#logger.setLevel(logging.INFO)
 logger.info('debut de '+cmdgps)
 #######################################################################################
 from MyChronoGPS_NMEA import NmeaControl
@@ -205,6 +205,7 @@ class GpsControl(threading.Thread):
                 time.sleep(0.01)
             if self.buffstate == FREE:
                 gpsline = self.serialGps.readline()
+                logger.debug(str(gpsline))
                 self.gpsline = str(gpsline)
 
                 try:
