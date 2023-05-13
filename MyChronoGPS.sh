@@ -13,7 +13,7 @@ echo "installation MyChronoGPS Version $_version"
 #		echo "wiringpi already installed"
 #	fi
 #fi
-
+sudo pip install gpio
 # Is Lighttpd installed
 #if [ ! -d /etc/lighttpd ] 
 #then 

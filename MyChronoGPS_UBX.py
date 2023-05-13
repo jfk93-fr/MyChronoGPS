@@ -81,7 +81,7 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-#logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 logger.info('debut de '+cmdgps)
 #######################################################################################
 from MyChronoGPS_NMEA import NmeaControl
