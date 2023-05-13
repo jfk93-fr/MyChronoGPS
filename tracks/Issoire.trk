@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "645cb3411f5ed",
+    "NomCircuit": "Issoire",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 45.5363027,
+    "Longitude": 3.2600079,
+    "Latcenter": 45.53609246426764,
+    "Loncenter": 3.2654808985532267,
+    "LongCircuit": 2480,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        45.53443503617539,
+        3.2624348223294923,
+        45.534520600009934,
+        3.26228959965099
+    ],
+    "LatFL": 45.53447781797448,
+    "LonFL": 3.2623622111908284,
+    "CapFL": 43.61318230806586
+}

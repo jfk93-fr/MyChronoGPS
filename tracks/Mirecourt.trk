@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "645cb86fd621b",
+    "NomCircuit": "Mirecourt",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 48.3197216,
+    "Longitude": 6.0767092,
+    "Latcenter": 48.32025859355196,
+    "Loncenter": 6.08043640486503,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        48.32108955617541,
+        6.079667685818212,
+        48.32091833512671,
+        6.0796945079083615
+    ],
+    "LatFL": 48.32099895179717,
+    "LonFL": 6.079847931205467,
+    "CapFL": 0.00015134802868033148
+}

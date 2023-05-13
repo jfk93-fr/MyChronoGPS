@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "645cb490a5fe4",
+    "NomCircuit": "Mas du Clos",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 45.935124932050606,
+    "Longitude": 2.299247685205859,
+    "Latcenter": 45.9345577,
+    "Loncenter": 2.3021737,
+    "LongCircuit": 3070,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        45.93618732420478,
+        2.301827517019442,
+        45.93608368429114,
+        2.301628501699356
+    ],
+    "LatFL": 45.93613550413667,
+    "LonFL": 2.301728009145694,
+    "CapFL": 334.9833796446803
+}

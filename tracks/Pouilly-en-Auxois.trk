@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "645cbb5938e89",
+    "NomCircuit": "Pouilly en Auxois",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 47.2230424,
+    "Longitude": 4.5531773,
+    "Latcenter": 47.22321643468599,
+    "Loncenter": 4.560214332755281,
+    "LongCircuit": 1,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        47.222269596945644,
+        4.559251134584136,
+        47.22233240059543,
+        4.5590661174539235
+    ],
+    "LatFL": 47.22230099874196,
+    "LonFL": 4.5591586261032235,
+    "CapFL": 27.49153879322006
+}

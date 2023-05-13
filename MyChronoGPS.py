@@ -1039,14 +1039,19 @@ class DisplayControl(threading.Thread):
         el_parms = parms.get_parms("ScreenCmd")
         if "ScreenCmd" in parms.params:
             cmdscreen = el_parms
+        #cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
+        #print(cmdos)
+        
+        module = cmdscreen
         cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
         print(cmdos)
-        
-        try:
-            os.system(cmdos)
+        isModule = get_module(module)
+        if isModule == False:
+            try:
+                os.system(cmdos)
+            except:
+                running = False
             time.sleep(2)
-        except:
-            running = False
         print('verify if %s started' % (cmdscreen))
             
     def display(self,str):
@@ -1088,6 +1093,8 @@ class DisplayControl(threading.Thread):
         time.sleep(2)
 
         self.display("End of//MyChronoGPS//Bye")
+        time.sleep(3)
+        self.clear()
         
         self.__running = False
         logger.info("lcd stop")
@@ -2153,7 +2160,10 @@ class ChronoControl():
                                     dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
                                     dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
                                 #
-                                    corrtime = corrtime * (dc0/(dc0+dc1));
+                                    try:
+                                        corrtime = corrtime * (dc0/(dc0+dc1));
+                                    except:
+                                        continue
                                     corrmic = getMicroseconds(corrtime)
                                     
                                     temps = timedelta(microseconds=corrmic)
@@ -2727,7 +2737,7 @@ def get_ipadr():
     global ipClass
     if ipClass != False:
         return str(ipClass.getip())
-    return ""
+    return "No Network"
 
 def get_baudrate(device):
        command = 'stty -F /dev/{0}'.format(device)

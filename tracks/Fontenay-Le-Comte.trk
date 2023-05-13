@@ -1,0 +1,24 @@
+{
+    "IdCircuit": "645c89f2e62e9",
+    "NomCircuit": "Fontenay Le Comte",
+    "Adresse": "Adresse Circuit",
+    "CodePostal": "Code Postal",
+    "Ville": "Ville",
+    "URL": "URL",
+    "Latitude": 46.4371256,
+    "Longitude": -0.7913052,
+    "Latcenter": 46.43739201598295,
+    "Loncenter": -0.7954923794105162,
+    "LongCircuit": 2400,
+    "Zoom": 16,
+    "PitMaxSpeed": 50,
+    "FL": [
+        46.4383180535068,
+        -0.79205428631399,
+        46.43809517672873,
+        -0.7918344114606533
+    ],
+    "LatFL": 46.438206614982704,
+    "LonFL": -0.7919443487540813,
+    "CapFL": 0
+}

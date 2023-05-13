@@ -152,6 +152,11 @@ function displayProcess() {
 		el.className = "btnprocess";
 	}
 	else {
+		timer = '';
+		Status = false;
+		tempcpu = ""
+		loadStatus(fonction_getGeneral);
+		
 		processShowed = true;
 		el.style.display = "block";
 		document.getElementById("show-process").innerHTML = 'X';
@@ -162,15 +167,20 @@ function displayProcess() {
 
 function displayDisks() {
 	var el = document.getElementById("disks");
-	if (processShowed == true) {
-		processShowed = false;
+	if (processDisk == true) {
+		processDisk = false;
 		el.style.display = "none";
 		document.getElementById("show-disks").innerHTML = 'Show Disks';
 		el = document.getElementById("btndisks");
 		el.className = "btndisks";
 	}
 	else {
-		processShowed = true;
+		timer = '';
+		Status = false;
+		tempcpu = ""
+		loadStatus(fonction_getGeneral);
+				
+		processDisk = true;
 		el.style.display = "block";
 		document.getElementById("show-disks").innerHTML = 'X';
 		el = document.getElementById("btndisks");
