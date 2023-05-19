@@ -10,6 +10,7 @@ var fullscreen = isDocInFullscreen();
 var timer = '';
 var Status = false;
 var fonction_getGeneral = 'ajax/get_status.py';
+var fonction_killProcess = 'ajax/kill_process.py';
 var tempcpu = ""
 var processShowed = false; 
 var processDisk = false;
@@ -95,8 +96,13 @@ function dataStatusReady() {
 	document.getElementById("cputemp").innerHTML = thisStatus.cputemp;
 	var el = document.getElementById("process");
 	var HTML = '<table class="status-table"><tr>';
+	pid = false
 	for (var i=0; i < thisStatus.pheader.length; i++) {
 		HTML += "<th>"+thisStatus.pheader[i]+"</th>";
+		if (thisStatus.pheader[i] == "PID") {
+			pid = true;
+			ipid = i;
+		}
 	}
 	HTML += "</tr>";
 	for (var i=0; i < thisStatus.myprocess.length; i++) {
@@ -105,7 +111,21 @@ function dataStatusReady() {
 		for (var j=0; j < thisStatus.pheader.length-1; j++) {
 			var ip = buf.indexOf(' ');
 			var zd = buf.substr(0,ip)
-			HTML += "<td>"+zd+"</td>";
+			npid = false
+			if (pid) {
+				if (j == ipid) {
+					npid = zd
+				}
+			}
+			HTML += "<td>";
+			if (npid > 0) {
+				HTML += "<b><a href=\"#\" onclick=\"killProcess("+npid+")\"  class=\"w3-btn\" style=\"padding:0px 0px;\">"
+			}
+			HTML += zd;
+			if (npid > 0) {
+				HTML += "<\a></b>"
+			}
+			HTML += "</td>";
 			buf = buf.substr(ip).trim();
 		}
 		HTML += "<td>"+thisStatus.myprocess[i].substr(48)+"</td>"; // la commande complète est située à l'offset 48
@@ -143,6 +163,7 @@ function dataStatusReady() {
 }
 
 function displayProcess() {
+	document.getElementById("info-cmd").innerHTML = "";
 	var el = document.getElementById("process");
 	if (processShowed == true) {
 		processShowed = false;
@@ -165,7 +186,42 @@ function displayProcess() {
 	}
 }
 
+function killProcess(pid) {
+	if (!confirm("vous êtes sur le point de tuer le processus n°"+pid+", voulez-vous continuer ?"))
+		return;
+	ajax_cmd('kill_process.py?pid='+pid);	
+}
+
+function ajax_cmd(cmd) {
+	if (timer) {
+		clearTimeout(timer);
+	}
+	//if (Dashboard) {
+	//	clearTimeout(dashboard_timer);
+	//}
+	//setInactiv(2000); // une commande a été lancée, on recalibre le délai d'inaction à 2 secondes
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            myObj = JSON.parse(this.responseText);
+			var msg = myObj.msg;
+			console.log(JSON.stringify(myObj));
+			if (myObj.hasOwnProperty('msgerr')) {
+				msg = myObj.msgerr;
+			}
+
+            document.getElementById("info-cmd").innerHTML = msg;
+        }
+    }
+    //xmlhttp.open("GET", "ajax/"+cmd+"?nocache=" + Math.random(), true);
+    xmlhttp.open("GET", "ajax/"+cmd, true);
+    xmlhttp.send();
+}
+
 function displayDisks() {
+	document.getElementById("info-cmd").innerHTML = "";
 	var el = document.getElementById("disks");
 	if (processDisk == true) {
 		processDisk = false;

@@ -308,7 +308,7 @@ function deleteLine(line) {
 	var obj = getObjLine(line)
 	if (!obj)
 		return;
-	if (!confirm("vous êtes sur le point de supprimer la ligne "+obj.idelem+", voulez-vous ontinuer ?"))
+	if (!confirm("vous êtes sur le point de supprimer la ligne "+obj.idelem+", voulez-vous continuer ?"))
 		return;
 
 	// on efface tous les marqueurs

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Execution rights must be given to this file :
-# sudo chmod +x /usr/lib/cgi-bin/shutdown_pi.py
+# sudo chmod +x /usr/lib/cgi-bin/reboot_pi.py
 
 from MyChronoGPS_WebPaths import Paths
 Path = Paths();
