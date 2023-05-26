@@ -655,20 +655,26 @@ function go()
 	buildTours(FL);
 	// le tableau des Tours est construit
 
+	var info = "";
 	// dès la première ligne du fichier, on va chercher le circuit correspondant
 	nb_tours = Tours.length;
-	var i = 0;
-	Tour = Tours[i];
-	Points = Tour.points;
-
-	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
-	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
-	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
-	var dT = T1.getTime() - T0.getTime();
-	Frequence = 100/dT;
-
-	latitude = Points[0].lat1;
-	longitude = Points[0].lon1;
+	if (nb_tours > 0) {
+		var i = 0;
+		Tour = Tours[i];
+		Points = Tour.points;
+	
+		// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
+		var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
+		var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
+		var dT = T1.getTime() - T0.getTime();
+		Frequence = 100/dT;
+	
+		latitude = Points[0].lat1;
+		longitude = Points[0].lon1;
+		}
+		else {
+			info = "pas de tour enregistré dans cette session";
+		}
 	
 	var trackfound = scanCircuit();
 	
@@ -700,7 +706,7 @@ function go()
 	}
 	
 	displayMap()
-	document.getElementById("zone-info").innerHTML = '';
+	document.getElementById("zone-info").innerHTML = info;
 }
 
 function buildTours(FL) {
@@ -726,6 +732,7 @@ function buildTours(FL) {
 		}
 		var segcoords = new Array(Point0.pointgps[0]*1,Point0.pointgps[1]*1,Point1.pointgps[0]*1,Point1.pointgps[1]*1)
 		var pointCut = getIntersection(FL,segcoords);
+		console.log(JSON.stringify(FL)+" "+JSON.stringify(segcoords));
 		
 		if (pointCut) {
 			if (tour > 0) {
@@ -808,7 +815,6 @@ function buildTours(FL) {
 
 		np++;
 	}
-
 	// ne ratons pas le dernier tour
 	if (Tour) {
 		Tours.push(Tour);

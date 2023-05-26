@@ -625,24 +625,26 @@ function go()
 	buildTours(FL);
 	// le tableau des Tours est construit
 
+	var info = "";
 	// dès la première ligne du fichier, on va chercher le circuit correspondant
 	nb_tours = Tours.length;
-	var i = 0;
-	Tour = Tours[i];
-	Points = Tour.points;
+	if (nb_tours > 0) {
+		var i = 0;
+		Tour = Tours[i];
+		Points = Tour.points;
+		
+		// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
+		var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
+		var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
+		var dT = T1.getTime() - T0.getTime();
+		Frequence = 100/dT;
 	
-	// on va déterminer la fréquence d'envoi des trames (généralement entre 1 et 10 Hz)
-	var T0 = getObjTime(Points[2].timestamp); // on prend un premier point un peu plus loin que la ligne de coupure
-	var T1 = getObjTime(Points[3].timestamp); // car si la ligne est autodéfinie, il peut y avoir un grand écart de temps entre les points 0 & 1
-	var dT = T1.getTime() - T0.getTime();
-	Frequence = 100/dT;
-	//console.log('T0:'+T0.getTime());
-	//console.log('T1:'+T1.getTime());
-	//console.log('dT:'+dT);
-	//console.log('Frequence:'+Frequence);
-
-	latitude = Points[0].lat1;
-	longitude = Points[0].lon1;
+		latitude = Points[0].lat1;
+		longitude = Points[0].lon1;
+	}
+	else {
+		info = "pas de tour enregistré dans cette session";
+	}
 	
 	var trackfound = scanCircuit();
 	

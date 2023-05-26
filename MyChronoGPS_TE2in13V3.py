@@ -208,7 +208,7 @@ class Screen():
 #######################################################################
 # fonctions de gestion des menus        
 #######################################################################
-    def addMenu(self,id):
+    def addMenu(self,id,func=False,pid=0):
         if self.searchMenu(id) != False: #est-ce que le menu existe déjà ?
             print("le menu "+str(id)+" existe déjà")
             return False
@@ -216,35 +216,44 @@ class Screen():
         dict["id"] = id
         dict["level"] = self.level
         dict["item"] = []
+        dict["function"] = func
+        dict["parent"] = pid
         dict["touch"] = []
         self.tMenus.append(dict)
         #print(str(json.dumps(self.tMenus)))
         #self.id += 1
         self.level += 1
+        self.item = 0
         return len(self.tMenus)
         
     def searchMenu(self,id):
+        logger.info("recherche menu:"+str(id))
         i = 0
         while i < len(self.tMenus):
             menu = self.tMenus[i]
             if "id" in menu:
                 if menu["id"] == id:
-                    print("menu trouvé:"+str(menu["id"]))
+                    logger.info("menu trouvé:"+str(menu["id"])+", level:"+str(i))
                     return i
             i += 1
         return False
         
     #def addItem(self,pos,lib,touch,func):
-    def addItem(self,rect,txt,img):
+    def addItem(self,rect=False,txt=False,img=False,func=False):
         dict = {}
-        dict["rect"] = rect # rect = [[x,y],[x,y]] "[[coin supérieur gauche[x,y], [coin inférieur droit[x,y]]" 
+        dict["rect"] = rect # rect = [x0,y0,x1,y1]] "[[coin supérieur gauche[x0,y0], [coin inférieur droit[x1,y1]]" 
         dict["txt"] = txt # position du texte, texte & taille police = [x,y,"lib",tp]  
         dict["img"] = img # position de l'image & chemin accès image = [x,y,"img"]
         #dict.touch = touch # pos = [[x,y],[x,y]] "[[coin supérieur gauche[x,y], [coin inférieur droit[x,y]]" 
         #dict.lib = func
         #print(str(json.dumps(self.tMenus[self.level])))
         self.tMenus[self.level]["item"].append(dict)
-        #print(str(json.dumps(self.tMenus)))
+        
+        if func == False:
+            return
+        x = [rect[0],rect[2]]
+        y = [rect[1],rect[3]]
+        self.addTouch(x,y,False,func)
 
     def addTouch(self,x,y,l,func):
         dict = {}
@@ -257,7 +266,7 @@ class Screen():
     def display(self,level):
         #self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        print("display level "+str(level))
+        logger.info("display level "+str(level))
          
         for itm in self.tMenus[level]["item"]:
             #print(str(json.dumps(itm)))
@@ -572,12 +581,9 @@ class Screen():
         self.level = 0        
         
         while running == True:
-            #self.epd.init(self.epd.PART_UPDATE)
-            #gt.GT_Reset()
             # Read the touch input
             gt.GT_Scan(GT_Dev, GT_Old)
             logger.debug("State "+str(self.stateDisplay)+"/"+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-            #if(self.stateDisplay == 0 and GT_Old.X[0] == GT_Dev.X[0] and GT_Old.Y[0] == GT_Dev.Y[0] and GT_Old.S[0] == GT_Dev.S[0]):
             if(self.stateDisplay == 0 and self.touch() == False):
                 logger.debug("lire cache")
                 running = self.lire_cache()
@@ -588,9 +594,6 @@ class Screen():
         logger.debug("end of loop")
 
     def touch(self):
-        #self.epd.ReadBusy()
-        #if GT_Dev.Touch == 0:
-        #    return False
         if GT_Dev.TouchCount == 0:
             return False
         if GT_Dev.X[0] == 0 and GT_Dev.Y[0] == 0 and GT_Dev.S[0] == 0:
@@ -614,9 +617,10 @@ class Screen():
         while running == True:
             if self.stateDisplay > 0:
                 if self.stateDisplay == self.laststate:
-                    if ct > 60: # 300 cycles de 0.1" = 30 secondes
+                    if ct > 120: # 300 cycles de 0.1" = 30 secondes
                         # au bout d'un certain temps d'inactivité, on sort du dialogue
                         self.stateDisplay = 0
+                        logger.info("trop de temps")
                         running = False
                         ct = 0
                     logger.debug("ct:"+str(ct))
@@ -649,9 +653,9 @@ class Screen():
         #logger.info(str(self.tMenus))
 
     def performState(self):
-        #logger.info("def performState:")
+        logger.info("def performState level:"+str(self.level))
         running = True
-        #logger.info("state:"+str(self.stateDisplay))
+        logger.info("state:"+str(self.stateDisplay))
         if self.stateDisplay == 0: # on vient du chronomètre
             #if self.touch() == True:
             #    self.displayMenuG()
@@ -662,44 +666,8 @@ class Screen():
         elif self.stateDisplay == 1: # on vient du menu principal
             if self.touch() == True:
                 running = self.performMenuG()
-                #logger.info("running:"+str(running))
-            logger.debug("running:"+str(running))
+            logger.info("running:"+str(running))
             logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 2: # choix CMDs
-        #    self.displayCmds()
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 21: # on vient du menu commandes
-        #    if self.touch() == True:
-        #        running = self.performCmds()
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 210: # on vient du choix arrêt rpi
-        #    self.displayChoice()
-        #    self.stateDisplay = 2100
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 2100: # on vient de la confirmation du choix
-        #    if self.touch() == True:
-        #        running = self.performChoice()
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 211: # on vient du choix redémarrage rpi
-        #    self.displayChoice()
-        #    self.stateDisplay = 2110
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #elif self.stateDisplay == 2110: # on vient de la confirmation du choix
-        #    if self.touch() == True:
-        #        running = self.performChoice()
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        #
-        #elif self.stateDisplay == 3: # choix GPS
-        #    self.displayGPS()
-        #    logger.debug("running:"+str(running))
-        #    logger.debug("state:"+str(self.stateDisplay))
-        
         else:
             self.draw.rectangle((0,0,self.height,self.width), fill=255)
             self.draw.text((self.x, self.top), str(self.stateDisplay)+" inconnu",  font=self.font, fill=0)
@@ -736,136 +704,17 @@ class Screen():
                 break
         #logger.info("touch:"+str(zone))
         return zone
-
-        ## zone du choix à confirmer
-        #if self.stateDisplay == 2100 or self.stateDisplay == 2110:
-        #    # Menu confirmation affiché
-        #    # zone rectangles du menu
-        #    if y > 41 and x < 126:
-        #        zone = 1
-        #    elif y > 41 and x > 125:
-        #        zone = 2
-        ## zone icônes du menu principal
-        #elif x < 41 and y < 61:
-        #    zone = RET
-        ##elif x < 31 and y > 30 and y < 62:
-        #elif x < 41 and y > 60:
-        #    zone = HOME
-        #elif x > 209 and y < 61:
-        #    zone = UP
-        #elif x > 209 and y > 60:
-        #    zone = DOWN
-        #elif self.stateDisplay == 1:
-        #    # Menu principal affiché
-        #    # zone rectangles du menu principal
-        #    if x > 40 and x < 120 and y < 61:
-        #        zone = 1
-        #    elif x > 119 and y < 61 :
-        #        zone = 2
-        #    elif x > 40 and x < 120 and y > 60:
-        #        zone = 3
-        #    elif x > 119 and x < 210 and y > 60 :
-        #        zone = 4
-        #elif self.stateDisplay == 21:
-        #    # Menu commandes affiché
-        #    # zone rectangles du menu
-        #    if x > 40 and x < 210 and y < 61:
-        #        zone = 1
-        #    elif x > 40 and x < 210 and y > 60:
-        #        zone = 2
-        #return zone
-    
-#    def displayMenuG(self):
-#        # affichage du menu 1
-#        logger.debug("Arrêt ? "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-#        logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-#        self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
-#        
-#        self.displayIcons()
-#
-#        self.draw.rectangle((40,0,119,60), outline=0, fill=255)
-#        self.draw.rectangle((120,0,209,60), outline=0, fill=255)
-#        self.draw.rectangle((40,61,119,121), outline=0, fill=255)
-#        self.draw.rectangle((120,61,210,121), outline=0, fill=255)
-#        l1c1 = [16,46,"CMDs"]
-#        l1c2 = [16,125,"GPS"]
-#        l2c1 = [81,46,"Status"]
-#        l2c2 = [81,125,"Datas"]
-#
-#        font = ImageFont.truetype(self.ttf,20)
-#
-#        self.draw.text((l1c1[1], l1c1[0]), l1c1[2],  font=font, fill=0)
-#        self.draw.text((l1c2[1], l1c2[0]), l1c2[2],  font=font, fill=0)
-#        self.draw.text((l2c1[1], l2c1[0]), l2c1[2],  font=font, fill=0)
-#        self.draw.text((l2c2[1], l2c2[0]), l2c2[2],  font=font, fill=0)
-#        self.epd.displayPartial(self.epd.getbuffer(self.image))
-#        self.epd.ReadBusy()
-#        self.stateDisplay = 1
     
     def displayMenuG(self):
-        #logger.info("def displayMenuG:"+str(self.level))
-        # affichage du menu 1
-        #self.image = self.display(0)
+        logger.info("def displayMenuG:"+str(self.level))
         self.display(self.level)
-        #self.image = self.get_image()
 
-        #logger.debug("Arrêt ? "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-        #logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-        #self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
-        #
-        ##self.displayIcons()
-        #
-        #for itm in self.tMenus[level]["item"]:
-        #    print(str(json.dumps(itm)))
-        #    print(str(itm["rect"]))
-        #    if itm["rect"] != False:
-        #        self.draw.rectangle(itm["rect"], outline=0, fill=255)
-        #    if itm["txt"] != False:
-        #        tp = 24
-        #        if len(itm["txt"]) == 4:
-        #            tp = itm["txt"][3] # taille police = dernier élément du tableau
-        #        font = ImageFont.truetype(self.ttf,tp)
-        #
-        #        x = itm["txt"][0]
-        #        y  = itm["txt"][1]
-        #        lib  = itm["txt"][2]
-        #        print(str(x))
-        #        print(str(y))
-        #        print(str(lib))
-        #        self.draw.text((y, x), lib,  font=font, fill=0)
-        #    
-        #    if itm["img"] != False:
-        #        x = itm["img"][0]
-        #        y = itm["img"][1]
-        #        picture = itm["img"][2]
-        #        print(str(picture))
-        #        img = Image.open(picture)
-        #        img = img.resize((40, 40),Image.NEAREST)
-        #        self.image.paste(img, (x,y))
-        #
-        #
-        ##self.draw.rectangle((40,0,119,60), outline=0, fill=255)
-        ##self.draw.rectangle((120,0,209,60), outline=0, fill=255)
-        ##self.draw.rectangle((40,61,119,121), outline=0, fill=255)
-        ##self.draw.rectangle((120,61,210,121), outline=0, fill=255)
-        ##l1c1 = [16,46,"CMDs"]
-        ##l1c2 = [16,125,"GPS"]
-        ##l2c1 = [81,46,"Status"]
-        ##l2c2 = [81,125,"Datas"]
-        ##
-        ##font = ImageFont.truetype(self.ttf,20)
-        ##
-        ##self.draw.text((l1c1[1], l1c1[0]), l1c1[2],  font=font, fill=0)
-        ##self.draw.text((l1c2[1], l1c2[0]), l1c2[2],  font=font, fill=0)
-        ##self.draw.text((l2c1[1], l2c1[0]), l2c1[2],  font=font, fill=0)
-        ##self.draw.text((l2c2[1], l2c2[0]), l2c2[2],  font=font, fill=0)
-        #self.image = self.get_image()
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
     
     def performMenuG(self):
-        #logger.info("def performMenuG:"+str(self.level))
+        logger.info("def performMenuG:"+str(self.level))
         running = True
         zone = self.get_touch()
         #logger.info("zone:"+str(zone))
@@ -969,223 +818,7 @@ class Screen():
         img = Image.open(picdown)
         img = img.resize((40, 40),Image.NEAREST)
         self.image.paste(img, (210,80))    
-    
-    def displayCmds(self):
-        #logger.info("def displayCmds:")
-        # affichage du menu commande
-        logger.debug("Arrêt ? "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-        logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        
-        self.displayIcons()
-
-        self.draw.rectangle((40,0,209,60), outline=0, fill=255)
-        self.draw.rectangle((40,61,209,121), outline=0, fill=255)
-        l1c1 = [16,46,"Arrêt RPi"]
-        l2c1 = [81,46,"Rdémarrage RPi"]
-
-        font = ImageFont.truetype(self.ttf,20)
-
-        self.draw.text((l1c1[1], l1c1[0]), l1c1[2],  font=font, fill=0)
-        self.draw.text((l2c1[1], l2c1[0]), l2c1[2],  font=font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-        self.stateDisplay = 21
-    
-    def performCmds(self):
-        #logger.info("def performCmds:")
-        running = True
-        zone = self.get_touch()
-        logger.debug("performCmds:"+str(zone))
-        
-        if logger.level == logging.DEBUG:
-            logger.debug("Sortir d'Arrêt "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-            logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            line = "Sortie Zone "+str(zone)
-            self.draw.text((self.x, self.top), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Dev.X[0])+",Y="+str(GT_Dev.Y[0])+",S="+str(GT_Dev.S[0])
-            self.draw.text((self.x, self.top+30), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Old.X[0])+",Y="+str(GT_Old.Y[0])+",S="+str(GT_Old.S[0])
-            self.draw.text((self.x, self.top+60), line,  font=self.fontsmall, fill=0)
-    
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            time.sleep(3)
-        
-        # test de la position pour savoir si on arrête vraiment ou si on sort d'arrêt
-        if zone == HOME:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Home",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 0
-            running = False
-        elif zone == RET:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Ret",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            logger.debug("displayMenuG")
-            self.displayMenuG()
-            #time.sleep(3)
-
-            #self.stateDisplay = 2
-        elif zone == 1:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Arrêt RPi",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 210
-            #running = False
-        elif zone == 2:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Redémarrage RPi",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 211
-            #running = False
-        else:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Zone non traitée",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-            self.stateDisplay = 2
-            #running = False
-        return running
-    
-    def displayChoice(self):
-        #logger.info("def displayChoice:")
-        # affichage d'une demande de confirmation
-        logger.debug("Arrêt ? "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-        logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        
-        #self.displayIcons()
-        font = ImageFont.truetype(self.ttf,16)
-        lib = "Vous avez demandé "
-        if self.stateDisplay == 210:
-            lib += "Arrêt RPi"
-        elif self.stateDisplay == 211:
-            lib += "Redémarrage RPi"
-        lib += ", voulez-vous continuer ?"
-
-        #self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
-        self.draw.rectangle((0,0,self.height,20), outline=0, fill=255)
-        self.draw.text((0,0), lib,  font=font, fill=0)
-
-        l1c1 = [40,6,"OUI"]
-        l2c1 = [40,131,"NON"]
-
-        self.draw.text((l1c1[1], l1c1[0]), l1c1[2],  font=font, fill=0)
-        self.draw.text((l2c1[1], l2c1[0]), l2c1[2],  font=font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-    
-    def performChoice(self):
-        #logger.info("def performChoice:")
-        running = True
-        zone = self.get_touch()
-        logger.debug("performChoice:"+str(zone))
-        
-        if logger.level == logging.DEBUG:
-            logger.debug("Sortir d'Arrêt "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-            logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            line = "Sortie Zone "+str(zone)
-            self.draw.text((self.x, self.top), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Dev.X[0])+",Y="+str(GT_Dev.Y[0])+",S="+str(GT_Dev.S[0])
-            self.draw.text((self.x, self.top+30), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Old.X[0])+",Y="+str(GT_Old.Y[0])+",S="+str(GT_Old.S[0])
-            self.draw.text((self.x, self.top+60), line,  font=self.fontsmall, fill=0)
-    
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            time.sleep(3)
-        
-        font = ImageFont.truetype(self.ttf,16)
-
-        lib1 = "Arrêt RPi en cours"
-        if self.stateDisplay == 2110:
-            lib1 = "Redémarrage RPi en cours"
-        # test de la position
-        if zone == 1:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), lib1,  font=font, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            time.sleep(3)
-            self.okChoice()
-
-            #self.stateDisplay = 0
-            #running = False
-        elif zone == 2:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Abandon",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 0
-            running = False
-        else:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Zone non traitée",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-            self.stateDisplay = 0
-            #running = False
-        return running
-        
-    def okChoice(self):
-        #logger.info("def okChoice:")
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-        if self.stateDisplay == 2100: # arrêt RPi demandé
-            try:
-                os.system("sudo shutdown -h now")
-            except OSError as err:
-                self.draw.rectangle((0,0,self.height,self.width), fill=255)
-                lib = ("OS error: {0}".format(err))
-                self.draw.text((self.x, self.top), lib,  font=self.fontsmall, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
-            except:
-                lib = ("Unexpected error:", sys.exc_info()[0], sys.exc_info()[1])
-                self.draw.text((self.x, self.top), lib,  font=self.fontsmall, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
-                raise
-        
-        if self.stateDisplay == 2110: # redémarrage RPi demandé
-            try:
-                os.system("sudo reboot")
-            except OSError as err:
-                self.draw.rectangle((0,0,self.height,self.width), fill=255)
-                lib = ("OS error: {0}".format(err))
-                self.draw.text((self.x, self.top), lib,  font=self.fontsmall, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
-            except:
-                lib = ("Unexpected error:", sys.exc_info()[0], sys.exc_info()[1])
-                self.draw.text((self.x, self.top), lib,  font=self.fontsmall, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
-                raise
-        
-        #self.stateDisplay = 0
-        #running = False
-        #if self.stateDisplay = 2100:
-        
+            
     def errorZone(self):
         #logger.info("def errorZone:")        
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
@@ -1210,6 +843,47 @@ class Screen():
         self.level = 0
         self.stateDisplay = 0
         return False
+        
+    def returnParent(self):
+        backscreen = self.tMenus[self.level]["parent"]
+        logger.info("retour parent:"+str(backscreen))
+        self.draw.rectangle((0,0,self.height,self.width), fill=255)
+        self.draw.text((self.x, self.top), "retour vers "+str(backscreen),  font=self.fontsmall, fill=0)
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        
+        time.sleep(0.5)
+        if backscreen == 0:
+            self.level = 0
+            self.stateDisplay = 0
+            return False
+        
+        logger.info("recherche parent:"+str(backscreen))
+        backfunc = self.searchMenu(backscreen)
+        logger.info("retour search parent:"+str(backfunc))
+        running = False
+        if backfunc != False:
+            func = self.tMenus[backfunc]["function"]
+            logger.info("fonction:"+str(func))
+            if func != False:
+                logger.info("appel fonction:"+str(func))
+                running = self.tMenus[backfunc]["function"]()
+                logger.info("retour fonction:"+str(running))
+            else:
+                self.level = 0
+                return False
+            #self.level = backfunc
+        else:
+            self.level = 0
+            return False
+        logger.info("running:"+str(running))
+        if running != False:
+            self.level = 0
+            return False
+        self.stateDisplay = 1
+        logger.info("level:"+str(self.level))
+        logger.info("state:"+str(self.stateDisplay))
+        return True
         
     def downMenu(self):
         #logger.info("def downMenu:")
@@ -1255,7 +929,8 @@ class Screen():
         menu = self.searchMenu("Menu Commandes")
         #logger.info("résultat search menu:"+str(menu))
         if menu != False:
-            self.image = self.display(menu)
+            #self.image = self.display(menu)
+            self.display(menu)
             #self.image = self.get_image()
             self.level = menu
         else:
@@ -1263,6 +938,8 @@ class Screen():
             #print(str(self.tMenus))
             self.level = 0
             return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
         self.stateDisplay = 1
         return True
         
@@ -1271,13 +948,16 @@ class Screen():
         menu = self.searchMenu("MyChronoGPS")
         #logger.info("résultat search menu:"+str(menu))
         if menu != False:
-            self.image = self.display(menu)
+            #self.image = self.display(menu)
+            self.display(menu)
             self.level = menu
         else:
             #logger.info("Menu MyChronoGPS non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
             self.level = 0
             return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
         self.stateDisplay = 1
         return True
         
@@ -1364,13 +1044,16 @@ class Screen():
         menu = self.searchMenu("Demande Arrêt RPi")
         #logger.info("résultat search menu:"+str(menu))
         if menu != False:
-            self.image = self.display(menu)
+            #self.image = self.display(menu)
+            self.display(menu)
             self.level = menu
         else:
             #logger.info("Menu Demande Arrêt RPi non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
             self.level = 0
             return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
         self.stateDisplay = 1
         return True
         
@@ -1410,13 +1093,16 @@ class Screen():
         menu = self.searchMenu("Demande Redémarrage RPi")
         #logger.info("résultat search menu:"+str(menu))
         if menu != False:
-            self.image = self.display(menu)
+            #self.image = self.display(menu)
+            self.display(menu)
             self.level = menu
         else:
             #logger.info("Menu Demande Redémarrage RPi non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
             self.level = 0
             return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
         self.stateDisplay = 1
         return True
         
@@ -1450,12 +1136,14 @@ class Screen():
         
     def createMenus(self):
         #logger.info("def createMenus:")
-        ret = self.addMenu("Menu Principal")
+        #ret = self.addMenu("Menu Principal")
         #logger.info("ret addMenu:"+str(ret))
-        if ret == False:
+        #if ret == False:
+        if self.addMenu("Menu Principal",self.displayMenuG) == False:
             #logger.info("erreur création menu principal")
             return False
-        self.level = len(self.tMenus)-1
+        #self.level = len(self.tMenus)-1
+        self.level = 0
         
         # item des icônes
         self.addItem(False, False, [0,10,picret])
@@ -1466,7 +1154,8 @@ class Screen():
         # item des menus
         r = [40,0,119,60] # position du rectangle
         t = [16,46,"CMDs"] # position du texte, libellé & taille police (défaut = 24 si absent)
-        self.addItem(r, t, False)
+        f = self.menuCMDs
+        self.addItem(r, t, False,f)
         r = [120,0,209,60]
         t = [16,125,"GPS"]
         self.addItem(r, t, False)
@@ -1481,17 +1170,16 @@ class Screen():
         self.touchIcons()
         
         # zones touch des sous-menus
-        # Menu principal affiché
-        x = [41,119]
-        y = [0,61]
-        l = "CMDs"
-        f = self.menuCMDs
-        self.addTouch(x, y, l, f)
+        # # Menu principal affiché
+        # x = [41,119]
+        # y = [0,61]
+        # l = "CMDs"
+        # f = self.menuCMDs
+        # self.addTouch(x, y, l, f)
 
         # Menu Commandes
-        ret = self.addMenu("Menu Commandes")
         #logger.info("ret addMenu:"+str(ret))
-        if ret == False:
+        if self.addMenu("Menu Commandes",self.menuCMDs,"Menu Principal") == False:
             #logger.info("erreur création menu commandes")
             return False
         
@@ -1535,9 +1223,8 @@ class Screen():
         self.addTouch(x, y, l, f)
 
         # Menu MyChronoGPS (arrêt/démarrage)
-        ret = self.addMenu("MyChronoGPS")
         #logger.info("ret addMenu:"+str(ret))
-        if ret == False:
+        if self.addMenu("MyChronoGPS",self.request_MyChronoGPS,"Menu Commandes") == False:
             #logger.info("erreur création MyChronoGPS")
             return False
         # item des icônes
@@ -1574,9 +1261,8 @@ class Screen():
         self.touchIcons()
 #
         # Menu Choix (confirmation)
-        ret = self.addMenu("Demande Arrêt RPi")
         #logger.info("ret addMenu:"+str(ret))
-        if ret == False:
+        if self.addMenu("Demande Arrêt RPi",self.request_stopRPi,"Menu Commandes") == False:
             #logger.info("erreur création Demande Arrêt RPi")
             return False
 
@@ -1601,9 +1287,7 @@ class Screen():
         f = self.home
         self.addTouch(x, y, l, f)
 
-        ret = self.addMenu("Demande Redémarrage RPi")
-        #logger.info("ret addMenu:"+str(ret))
-        if ret == False:
+        if self.addMenu("Demande Redémarrage RPi",self.request_restartRPi,"Menu Commandes") == False:
             #logger.info("erreur création Demande Redémarrage RPi")
             return False
 
@@ -1645,7 +1329,7 @@ class Screen():
         x = [0,40] # valeur x et x+1 de la zone touch
         y = [0,61] # valeur y et y+1 de la zone touch
         l = "RET"  # libellé zone touch
-        f = self.home   # fonction appelée
+        f = self.returnParent   # fonction appelée
         self.addTouch(x, y, l, f)
         x = [0,40]
         y = [62,122]

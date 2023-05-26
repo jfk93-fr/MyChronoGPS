@@ -1482,6 +1482,12 @@ class AnalysisControl():
             self.Line1 = False # to force the writing of line 1 when the file is opened again
             logger.info("analysis file closed")
         
+    def commit(self):
+        if self.__current_state != self.CLOSED:
+            name = self.fileDescriptor.close
+            self.fileDescriptor.close()
+            self.fileDescriptor = open(pathdata+'/analysis/analysis-'+self.chrono.fileTime+'.json', 'a')
+        
     def writePoint(self):
         if self.Line1 == False:
             self.writeLine1()
@@ -1941,6 +1947,7 @@ class ChronoControl():
                             if self.nblap > 0:
                                 fsession.write()
                                 fsession.commit() # the file is closed and reopened so as not to lose information in the event of a power cut
+                                fanalysis.commit() # the file is closed and reopened so as not to lose information in the event of a power cut
     
                             if (len(self.intline)) > 0:
                                self.temps_secteurs = [] # the times of the sectors are erased

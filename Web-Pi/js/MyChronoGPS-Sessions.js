@@ -94,7 +94,7 @@ function afficheListeSessions()
 		HTML += '<td>';
 		HTML += '<a ';
 		HTML += 'href="'+href+session_file+'">';
-		HTML += session.date_session;
+		HTML += session.heure_session;
 		HTML += '</a>';
 		HTML += '</td>';
 
