@@ -1760,8 +1760,9 @@ class ChronoControl():
                 track.write(line+"\r\n")
                 track.close()
             os.chmod(self.track, 0o777)
-        except OSError:
-            logger.error("OSError")
+        except OSError as err:
+            #logger.error("OSError")
+            logger.error("OSError: {0}".format(err))
             pass
 
     

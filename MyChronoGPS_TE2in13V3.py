@@ -87,7 +87,7 @@ logger = get_logger(__name__)
 print("DEBUG:"+str(logging.DEBUG))
 print("INFO:"+str(logging.INFO))
 print("level"+str(logger.level))
-logger.setLevel(logging.INFO)
+#logger.setLevel(logging.INFO)
 print("level"+str(logger.level))
 logger.info('debut de '+cmdgps)
 
@@ -125,7 +125,7 @@ def Read_BMP(File, x, y):
 
 def get_module(moduleName):
     command = 'ps -ef '
-    #logger.info(command)
+    logger.debug(command)
     proc_retval = subprocess.check_output(shlex.split(command))
     ps = str(proc_retval.strip().decode())
     Tps = ps.split('\n')
@@ -209,6 +209,7 @@ class Screen():
 # fonctions de gestion des menus        
 #######################################################################
     def addMenu(self,id,func=False,pid=0):
+        self.level += 1
         if self.searchMenu(id) != False: #est-ce que le menu existe déjà ?
             print("le menu "+str(id)+" existe déjà")
             return False
@@ -222,8 +223,9 @@ class Screen():
         self.tMenus.append(dict)
         #print(str(json.dumps(self.tMenus)))
         #self.id += 1
-        self.level += 1
+        #self.level += 1
         self.item = 0
+        logger.debug(str(self.tMenus))
         return len(self.tMenus)
         
     def searchMenu(self,id):
@@ -231,10 +233,12 @@ class Screen():
         i = 0
         while i < len(self.tMenus):
             menu = self.tMenus[i]
+            logger.debug(str(i)+":"+str(menu))
             if "id" in menu:
                 if menu["id"] == id:
                     logger.info("menu trouvé:"+str(menu["id"])+", level:"+str(i))
-                    return i
+                    #return i
+                    return menu
             i += 1
         return False
         
@@ -269,8 +273,8 @@ class Screen():
         logger.info("display level "+str(level))
          
         for itm in self.tMenus[level]["item"]:
-            #print(str(json.dumps(itm)))
-            #print(str(itm["rect"]))
+            logger.debug(str(json.dumps(itm)))
+            logger.debug(str(itm["rect"]))
             if itm["rect"] != False:
                 self.draw.rectangle(itm["rect"], outline=0, fill=255)
             if itm["txt"] != False:
@@ -587,10 +591,11 @@ class Screen():
             if(self.stateDisplay == 0 and self.touch() == False):
                 logger.debug("lire cache")
                 running = self.lire_cache()
+                logger.debug("lire_cache:"+str(running))
             else:
                 logger.debug("dialog")
                 self.dialog()
-                logger.debug("running loop:"+str(running)+" State "+str(self.stateDisplay))
+            logger.debug("running loop:"+str(running)+" State "+str(self.stateDisplay))
         logger.debug("end of loop")
 
     def touch(self):
@@ -611,7 +616,7 @@ class Screen():
         return True
 
     def dialog(self):
-        #logger.info("def dialog:")
+        logger.debug("def dialog:")
         running = True
         ct = 0
         while running == True:
@@ -630,13 +635,15 @@ class Screen():
                     self.laststate = self.stateDisplay
             logger.debug("GT_Dev.Touch: "+str(GT_Dev.Touch))
 
+            logger.debug("before call performState:"+str(running))
             if running == True:
                 running = self.performState()
+                logger.debug("after call performState:"+str(running))
             
             #logger.info(str(running))
-            logger.debug(str(running))
 
             time.sleep(0.1)
+            logger.debug("running after sleep:"+str(running))
             # Read the touch input
             gt.GT_Scan(GT_Dev, GT_Old)
             
@@ -659,11 +666,12 @@ class Screen():
         if self.stateDisplay == 0: # on vient du chronomètre
             #if self.touch() == True:
             #    self.displayMenuG()
+            #self.displayDialog()
             self.displayMenuG()
-            #self.displayMenuG()
+            #self.stateDisplay = 1
             logger.debug("running:"+str(running))
             logger.debug("state:"+str(self.stateDisplay))
-        elif self.stateDisplay == 1: # on vient du menu principal
+        elif self.stateDisplay == 1: # on vient du dialogue
             if self.touch() == True:
                 running = self.performMenuG()
             logger.info("running:"+str(running))
@@ -705,6 +713,15 @@ class Screen():
         #logger.info("touch:"+str(zone))
         return zone
     
+    #   def displayDialog(self):
+    #       logger.info("def displayDialog:"+str(self.level))
+    #       self.display(self.level)
+    #   
+    #       self.epd.displayPartial(self.epd.getbuffer(self.image))
+    #       self.epd.ReadBusy()
+    #       self.stateDisplay = 1
+    #       return True        
+    
     def displayMenuG(self):
         logger.info("def displayMenuG:"+str(self.level))
         self.display(self.level)
@@ -712,6 +729,7 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
+        return True        
     
     def performMenuG(self):
         logger.info("def performMenuG:"+str(self.level))
@@ -859,15 +877,16 @@ class Screen():
             return False
         
         logger.info("recherche parent:"+str(backscreen))
-        backfunc = self.searchMenu(backscreen)
-        logger.info("retour search parent:"+str(backfunc))
+        backmenu = self.searchMenu(backscreen)
+        logger.info("retour search parent:"+str(backmenu))
         running = False
-        if backfunc != False:
-            func = self.tMenus[backfunc]["function"]
+        if backmenu != False:
+            func = backmenu["function"]
             logger.info("fonction:"+str(func))
             if func != False:
                 logger.info("appel fonction:"+str(func))
-                running = self.tMenus[backfunc]["function"]()
+                self.stateDisplay = 0
+                running = backmenu["function"]()
                 logger.info("retour fonction:"+str(running))
             else:
                 self.level = 0
@@ -877,10 +896,11 @@ class Screen():
             self.level = 0
             return False
         logger.info("running:"+str(running))
-        if running != False:
+        if running != True:
             self.level = 0
             return False
-        self.stateDisplay = 1
+        self.stateDisplay = 0
+        self.level = backmenu["level"]
         logger.info("level:"+str(self.level))
         logger.info("state:"+str(self.stateDisplay))
         return True
@@ -927,12 +947,12 @@ class Screen():
     def menuCMDs(self):
         #logger.info("def menuCMDs:")
         menu = self.searchMenu("Menu Commandes")
-        #logger.info("résultat search menu:"+str(menu))
+        logger.debug("résultat search menu:"+str(menu))
         if menu != False:
             #self.image = self.display(menu)
-            self.display(menu)
+            self.display(menu["level"])
             #self.image = self.get_image()
-            self.level = menu
+            self.level = menu["level"]
         else:
             #logger.info("Menu Commandes non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
@@ -946,11 +966,11 @@ class Screen():
     def request_MyChronoGPS(self):
         #logger.info("def request_MyChronoGPS:")
         menu = self.searchMenu("MyChronoGPS")
-        #logger.info("résultat search menu:"+str(menu))
+        logger.debug("résultat search menu:"+str(menu))
         if menu != False:
             #self.image = self.display(menu)
-            self.display(menu)
-            self.level = menu
+            self.display(menu["level"])
+            self.level = menu["level"]
         else:
             #logger.info("Menu MyChronoGPS non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
@@ -1042,11 +1062,11 @@ class Screen():
     def request_stopRPi(self):
         #logger.info("def request_stopRPi:")
         menu = self.searchMenu("Demande Arrêt RPi")
-        #logger.info("résultat search menu:"+str(menu))
+        logger.debug("résultat search menu:"+str(menu))
         if menu != False:
             #self.image = self.display(menu)
-            self.display(menu)
-            self.level = menu
+            self.display(menu["level"])
+            self.level = menu["level"]
         else:
             #logger.info("Menu Demande Arrêt RPi non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
@@ -1091,11 +1111,11 @@ class Screen():
     def request_restartRPi(self):
         #logger.info("def request_restartRPi:")
         menu = self.searchMenu("Demande Redémarrage RPi")
-        #logger.info("résultat search menu:"+str(menu))
+        logger.debug("résultat search menu:"+str(menu))
         if menu != False:
             #self.image = self.display(menu)
-            self.display(menu)
-            self.level = menu
+            self.display(menu["level"])
+            self.level = menu["level"]
         else:
             #logger.info("Menu Demande Redémarrage RPi non trouvé "+str(len(self.tMenus)))
             #print(str(self.tMenus))
@@ -1135,15 +1155,12 @@ class Screen():
         return False
         
     def createMenus(self):
-        #logger.info("def createMenus:")
-        #ret = self.addMenu("Menu Principal")
-        #logger.info("ret addMenu:"+str(ret))
-        #if ret == False:
+        self.level = -1
         if self.addMenu("Menu Principal",self.displayMenuG) == False:
             #logger.info("erreur création menu principal")
             return False
         #self.level = len(self.tMenus)-1
-        self.level = 0
+        #self.level = 0
         
         # item des icônes
         self.addItem(False, False, [0,10,picret])
