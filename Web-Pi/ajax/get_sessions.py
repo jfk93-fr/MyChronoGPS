@@ -60,9 +60,27 @@ for fic in listfic:
             session["date_session"] = T[0]
             session["heure_session"] = T[1]
             session["circuit_session"] = T[2]
+            #print(str(session)+"\n")
+            #dd = session["date_session"][0:2]
+            #mm = session["date_session"][3:5]
+            #yy = session["date_session"][6:10]
+            #print(str(dd)+"\n")
+            #print(str(mm)+"\n")
+            #print(str(yy)+"\n")
+            #print(session["date_session"][6:4])
+            #print(session["date_session"][3:2])
+            #print(session["date_session"][0:2])
+            session["sort"] = str(session["date_session"][6:10])+str(session["date_session"][3:5])+str(session["date_session"][0:2])+str(session["heure_session"])
+            #print(str(session["sort"])+"\n")
             session["infos"] = info
             #print(str(session))
             FD.close()
             result.append(session)
+#passe1 = sorted(result, key=lambda d: d["heure_session"], reverse=True)
+#result = sorted(passe1, key=lambda d: d["date_session"], reverse=True)
+#result = sorted(result, key=lambda d: d["filetime"], reverse=True)
+result = sorted(result, key=lambda d: d["sort"], reverse=True)
+#result = sorted(result, key=lambda d: d["date_session"][6:4]+d["date_session"][3:2]+d["date_session"][0:2]+d["heure_session"], reverse=True)
+
 json_str = json.dumps(result)
 print(json_str)

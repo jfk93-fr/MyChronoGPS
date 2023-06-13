@@ -22,7 +22,8 @@ var fonction_getInfos = 'ajax/get_infos.py';
 var nbsats = ""
 var tempcpu = ""
 var circuit = ""
-var autodef = 0
+//var autodef = 0
+var dbtracks = 1
 var FL = new Array()
 var pointgps = new Array()
 var nearest = new Array()
@@ -301,7 +302,7 @@ function isDisplayReady()
 
 	thisDashboard = Ev;
 
-	if (autodef == 1) {
+	if (dbtracks == 0) {
 		var el = document.getElementById("info-cmd");
 		if (el)
 			el.innerHTML = 'Attention, la BdD des circuits n\'est pas utilisée';
@@ -393,11 +394,11 @@ function switch_track() {
 	if (timer) {
 		clearTimeout(timer);
 	}
-	if (autodef == 1) {
-		var lib = "use all tracks";
+	if (dbtracks == 0) {
+		var lib = "use all tracks in DB";
 	}
 	else {
-		var lib = "force autodef track";
+		var lib = "don't use DB tracks";
 	}
 	if (confirm(lib+", do you want to continue ?")) {
 	    ajax_cmd('switch_autodef.py');
@@ -498,10 +499,10 @@ function isInfosReady()
 	circuit = retour.circuit;
 	distcircuit = retour.distcircuit;
 	
-	autodef = retour.autodef;
+	dbtracks = retour.dbtracks;
 	var el = document.getElementById("btn-switchtrack");
 	var el2 = document.getElementById("lib-switchtrack");
-	if (autodef == 1) {
+	if (dbtracks == 0) {
 		el.className = "w3-button btnmenu btnalltracks";
 		el2.innerHTML = "Toutes pistes";
 	}

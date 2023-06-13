@@ -1,9 +1,13 @@
 #!/bin/sh
-sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.py $HOME/MyChronoGPS/MyChronoGPS.py
-sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.sh $HOME/MyChronoGPS/MyChronoGPS.sh
-sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_GoogleMaps.sh $HOME/MyChronoGPS/MyChronoGPS_GoogleMaps.sh
-sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_Leaflet.sh $HOME/MyChronoGPS/MyChronoGPS_Leaflet.sh
-sudo cp $HOME/temp/MyChronoGPS/VERSION $HOME/MyChronoGPS/VERSION
+sudo cp -R $HOME/temp/MyChronoGPS/portable $HOME/MyChronoGPS/portable
+sudo cp -R $HOME/temp/MyChronoGPS/fonts $HOME/MyChronoGPS/fonts
+sudo cp -R $HOME/temp/MyChronoGPS/img $HOME/MyChronoGPS/img
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_TE2in13V3.py $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.py $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.sh $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_GoogleMaps.sh $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_Leaflet.sh $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/VERSION $HOME/MyChronoGPS
 sudo cp $HOME/temp/MyChronoGPS/Web-Pi $HOME/MyChronoGPS -r
 sudo cp $HOME/MyChronoGPS/tracks $HOME/MyChronoGPS/save-tracks -r
 sudo cp $HOME/temp/MyChronoGPS/tracks $HOME/MyChronoGPS -r

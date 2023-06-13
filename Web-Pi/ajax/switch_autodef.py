@@ -59,21 +59,21 @@ mydict = dict()
 # we start by reading the parameters ...
 parms = Parms(Path)
 
-NoTrack = 0 # 0: par défaut, on recherche dans la base des circuits si on coupe une ligne départ-arrivée
-            # 1: on ne recherche pas, on va créer automatiquement une piste "autodef" dans la base des circuits.
-el_parms = parms.get_parms("NoTrack")
-if "NoTrack" in parms.params:
-    NoTrack = el_parms
-# switch NoTrack
-#print(str(NoTrack))
-if NoTrack == 0:
-    NoTrack = 1
-    msg = "autodef track successfully forced"
+UseDBTrack = 0 # 0: par défaut, on recherche dans la base des circuits si on coupe une ligne départ-arrivée
+            # 1: on ne recherche pas, on va créer automatiquement une piste "Autotrack" dans la base des circuits.
+el_parms = parms.get_parms("UseDBTrack")
+if "UseDBTrack" in parms.params:
+    UseDBTrack = el_parms
+# switch UseDBTrack
+#print(str(UseDBTrack))
+if UseDBTrack == 0:
+    UseDBTrack = 1
+    msg = "DB Tracks use, all tracks successfully forced"
 else:
-    NoTrack = 0
-    msg = "all tracks successfully forced"
-parms.set_parms("NoTrack",NoTrack)
-#print(str(NoTrack))
+    UseDBTrack = 0
+    msg = "no DB Tracks use, autodef track successfully forced"
+parms.set_parms("UseDBTrack",UseDBTrack)
+#print(str(UseDBTrack))
 
 mydict["msg"] = msg
 mydict["return"] = 0
@@ -85,7 +85,7 @@ if os.path.isfile(finfos):
         FD = open(finfos, 'r')
         infos = json.loads(FD.read())
         FD.close()
-        infos[0]["autodef"] = NoTrack
+        infos[0]["dbtracks"] = UseDBTrack
         #print(str(infos))
         # rewrite INFOS
         try:
@@ -110,7 +110,7 @@ else:
     try:
         FO = open(finfos, "w+")
         dautodef = dict()
-        dautodef["autodef"] = NoTrack
+        dautodef["dbtracks"] = UseDBTrack
         infos = []
         infos.append(dautodef)
         FO.write(json.dumps(infos))

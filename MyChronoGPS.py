@@ -1176,7 +1176,7 @@ class IpControl(threading.Thread):
         self.__running = False
             
     def writeInfos(self):
-        global NoTrack
+        global UseDBTrack
         NomCircuit = "inconnu"
         if self.chrono.circuit != False:
             if "NomCircuit" in self.chrono.circuit:
@@ -1184,7 +1184,7 @@ class IpControl(threading.Thread):
         self.Infos = '[{"nbsats":"'+str(self.gps.gpsnbsat)+'"'
         self.Infos += ',"tempcpu":"'+str(round(get_thermal()))+'"'
         self.Infos += ',"volts":"'+str(get_volts())+'"'
-        self.Infos += ',"autodef":"'+str(NoTrack)+'"'
+        self.Infos += ',"dbtracks":'+str(UseDBTrack)
         self.Infos += ',"circuit":"'+NomCircuit+'"'
         self.Infos += ',"distcircuit":"'+str(round(self.chrono.neardist))+'"'
         self.Infos += '}]'
@@ -2835,11 +2835,11 @@ if __name__ == "__main__":
         if "TrackAcqTime" in parms.params:
             TrackAcqTime = el_parms
 
-        NoTrack = 0 # 0: by default, a search is made in the database of circuits if a start-finish line is cut
+        UseDBTrack = 0 # 0: by default, a search is made in the database of circuits if a start-finish line is cut
                     # 1: no search, an "Autotrack" track will be created automatically in the database of circuits.
-        el_parms = parms.get_parms("NoTrack")
-        if "NoTrack" in parms.params:
-            NoTrack = el_parms
+        el_parms = parms.get_parms("UseDBTrack")
+        if "UseDBTrack" in parms.params:
+            UseDBTrack = el_parms
             
         el_parms = parms.get_parms("PredictiveTimeMode")
         if "PredictiveTimeMode" in parms.params:
@@ -2863,7 +2863,7 @@ if __name__ == "__main__":
             dirlist = os.listdir(dirtracks)
             circuits = {}
                 
-            if NoTrack == 1:
+            if UseDBTrack == 0:
                 logger.info("dirlist:"+str(dirlist))
                 if "Autotrack.trk" in dirlist:
                     TFD = open(dirtracks+"/Autotrack.trk", 'r')

@@ -11,7 +11,10 @@
 from MyChronoGPS_Paths import Paths
 Path = Paths();
 
+from MyChronoGPS_Parms import Parms
+
 import os
+import glob
 import time
 import sys
 import json
@@ -35,15 +38,17 @@ cmd_start = "sudo sh "+pathcmd+"/start_gps.sh > "+pathlog+"/"+"start_gps.log 2>&
 
 fontdir = pathdata+'/fonts/'
 picdir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'img')
+picend  = os.path.join(picdir, 'location-exit.png')
 pichome = os.path.join(picdir, 'home.png')
 picup   = os.path.join(picdir, 'arrow-up-bold.png')
+picnext = os.path.join(picdir, 'arrow-right-bold.png')
 picret  = os.path.join(picdir, 'arrow-left-bold.png')
 picdown = os.path.join(picdir, 'arrow-down-bold.png')
 
 libdir = pathdata+'/lib/'
 if os.path.exists(libdir):
     sys.path.append(libdir)
-print(str(libdir))
+#print(str(libdir))
 from TP_lib import gt1151
 from TP_lib import epd2in13_V3
 
@@ -55,6 +60,11 @@ import threading
 
 import subprocess
 
+autotrack = Path.pathdata+"/tracks/Autotrack.trk"
+
+from operator import itemgetter, attrgetter
+dirsess = Path.pathdata+"/sessions"
+
 RST = 0
 
 #######################################################################################
@@ -63,8 +73,8 @@ RST = 0
 import logging
 from logging.handlers import TimedRotatingFileHandler
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(funcName)s — %(levelname)s — %(lineno)d — %(thread)d — %(message)s")
-LOG_FILE = pathlog+cmdgps+".log"
-print(LOG_FILE)
+LOG_FILE = pathlog+"/"+cmdgps+".log"
+#print(LOG_FILE)
 
 def get_console_handler():
    console_handler = logging.StreamHandler(sys.stdout)
@@ -84,11 +94,13 @@ def get_logger(logger_name):
    return logger
 
 logger = get_logger(__name__)
-print("DEBUG:"+str(logging.DEBUG))
-print("INFO:"+str(logging.INFO))
-print("level"+str(logger.level))
-#logger.setLevel(logging.INFO)
-print("level"+str(logger.level))
+#print("DEBUG:"+str(logging.DEBUG))
+#print("INFO:"+str(logging.INFO))
+#print("level"+str(logger.level))
+
+logger.setLevel(logging.INFO)
+
+#print("level"+str(logger.level))
 logger.info('debut de '+cmdgps)
 
 #######################################################################################
@@ -153,24 +165,19 @@ class Screen():
 
     def __init__(self):
         global epd
+        global parms
         self.epd = epd
-
         
         # Create blank image for drawing.
         # Make sure to create image with mode '1' for 1-bit color.
         self.width = self.epd.width
         self.height = self.epd.height
-        print('width='+str(self.width))
-        print('height='+str(self.height))
+        #print('width='+str(self.width))
+        #print('height='+str(self.height))
         self.image = Image.new('1', (self.height, self.width), 255)
         
         # Get drawing object to draw on image.
         self.draw = ImageDraw.Draw(self.image)
-        
-        # variables pour gérer les menus
-        self.tMenus = []
-        self.level = 0
-        self.item = 0
         
         # clear the image.
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
@@ -197,108 +204,187 @@ class Screen():
         logger.debug(self.cache)
         self.message = ""
         #
-        # variables pour gérer les affichages de menu et autres
+        # variables pour gérer les affichages de maps et autres
         self.stateDisplay = 0
         self.laststate = 0
         
-        if self.createMenus() == False:
-            print("erreur création menus")
+        # variables pour gérer les différentes maps
+        self.tMaps = []
+        self.pileW = []
+
+        self.mapL = 0 # ligne courante de l'affichage (numéro de fenêtre)
+        self.item = 0 # ligne de fenêtre
+
+        self.createMaps()
+        
+        self.ztouch = [] # zone touchée
 
 
 #######################################################################
-# fonctions de gestion des menus        
+# fonctions de gestion des maps    
 #######################################################################
-    def addMenu(self,id,func=False,pid=0):
-        self.level += 1
-        if self.searchMenu(id) != False: #est-ce que le menu existe déjà ?
-            print("le menu "+str(id)+" existe déjà")
+    def addMap(self,id,window=False,hwin=122):
+        #self.level += 1
+        if self.searchMap(id) != False: #est-ce que la map existe déjà ?
+            logger.info("la map "+str(id)+" existe déjà")
             return False
+        logger.debug("création map:"+str(id))
         dict = {}
         dict["id"] = id
-        dict["level"] = self.level
-        dict["item"] = []
-        dict["function"] = func
-        dict["parent"] = pid
-        dict["touch"] = []
-        self.tMenus.append(dict)
-        #print(str(json.dumps(self.tMenus)))
-        #self.id += 1
-        #self.level += 1
-        self.item = 0
-        logger.debug(str(self.tMenus))
-        return len(self.tMenus)
+        dict["level"] = len(self.tMaps)
+        dict["witem"] = [] # élément fenêtre
+        dict["hwin"] = hwin # hauteur fenêtre
+        dict["window"] = window # rect = [x0,y0,x1,y1] "[[coin supérieur gauche[x0,y0], [coin inférieur droit[x1,y1]]"
+        #dict["parent"] = pid
+        dict["nav"] = [] # éléments de navigation
+        self.tMaps.append(dict)
+        logger.debug(str(self.tMaps))
+        self.mapLevel = len(self.tMaps)-1
+        self.mapL = 0
+        return len(self.tMaps)
         
-    def searchMenu(self,id):
-        logger.info("recherche menu:"+str(id))
+    def searchMap(self,id):
+        logger.debug("recherche map:"+str(id))
         i = 0
-        while i < len(self.tMenus):
-            menu = self.tMenus[i]
-            logger.debug(str(i)+":"+str(menu))
-            if "id" in menu:
-                if menu["id"] == id:
-                    logger.info("menu trouvé:"+str(menu["id"])+", level:"+str(i))
+        while i < len(self.tMaps):
+            map = self.tMaps[i]
+            logger.debug(str(i)+":"+str(map))
+            if "id" in map:
+                if map["id"] == id:
+                    logger.debug("map trouvée:"+str(map["id"])+", level:"+str(i))
                     #return i
-                    return menu
+                    return map
             i += 1
         return False
         
-    #def addItem(self,pos,lib,touch,func):
-    def addItem(self,rect=False,txt=False,img=False,func=False):
+    def addWindow(self,id,func=False,pid=0,xtra=False):
         dict = {}
-        dict["rect"] = rect # rect = [x0,y0,x1,y1]] "[[coin supérieur gauche[x0,y0], [coin inférieur droit[x1,y1]]" 
+        dict["id"] = id
+        dict["line"] = len(self.tMaps[self.mapLevel]["witem"])
+        dict["item"] = []
+        dict["func"] = func
+        dict["xtra"] = xtra #paramètres à passer à la fonction
+        dict["parent"] = pid
+        self.tMaps[self.mapLevel]["witem"].append(dict)
+        logger.debug(str(self.tMaps))
+        return
+        
+    def addItem(self,txt=False,img=False,rect=False,vars=False):
+        dict = {}
         dict["txt"] = txt # position du texte, texte & taille police = [x,y,"lib",tp]  
         dict["img"] = img # position de l'image & chemin accès image = [x,y,"img"]
-        #dict.touch = touch # pos = [[x,y],[x,y]] "[[coin supérieur gauche[x,y], [coin inférieur droit[x,y]]" 
-        #dict.lib = func
-        #print(str(json.dumps(self.tMenus[self.level])))
-        self.tMenus[self.level]["item"].append(dict)
-        
-        if func == False:
-            return
-        x = [rect[0],rect[2]]
-        y = [rect[1],rect[3]]
-        self.addTouch(x,y,False,func)
+        dict["rect"] = rect # rect = [x0,y0,x1,y1]] "[[coin supérieur gauche[x0,y0], [coin inférieur droit[x1,y1]]" 
+        dict["vars"] = vars # vars = [v0,v1,...,vn]] "[variables de remplacement des ?"
 
-    def addTouch(self,x,y,l,func):
+        if dict["txt"] != False:
+            tp = 24
+            if len(dict["txt"]) == 4:
+                tp = dict["txt"][3] # taille police = dernier élément du tableau
+            font = ImageFont.truetype(self.ttf,tp)
+            lib  = dict["txt"][2]
+            #txtsize = 
+            dict["lngt"] = font.getlength(lib)
+            #logger.debug(str(font.getbbox(lib)))
+            #logger.debug(str(font.getlength(lib)))
+        
+        self.tMaps[self.mapLevel]["witem"][self.mapL]["item"].append(dict)
+        logger.debug(str(self.tMaps))
+
+    def addNav(self,x,y,img,l,func=False):
         dict = {}
         dict["x"] = x
         dict["y"] = y
+        dict["img"] = img
         dict["lib"] = l
         dict["func"] = func
-        self.tMenus[self.level]["touch"].append(dict)
+        self.tMaps[self.mapLevel]["nav"].append(dict)
+        
+#######################################################################
+    def display(self,Level):
+        logger.debug("Level:"+str(Level))
 
-    def display(self,level):
-        #self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        logger.info("display level "+str(level))
-         
-        for itm in self.tMenus[level]["item"]:
-            logger.debug(str(json.dumps(itm)))
-            logger.debug(str(itm["rect"]))
-            if itm["rect"] != False:
-                self.draw.rectangle(itm["rect"], outline=0, fill=255)
-            if itm["txt"] != False:
-                tp = 24
-                if len(itm["txt"]) == 4:
-                    tp = itm["txt"][3] # taille police = dernier élément du tableau
-                font = ImageFont.truetype(self.ttf,tp)
-    
-                x = itm["txt"][0]
-                y  = itm["txt"][1]
-                lib  = itm["txt"][2]
-                #print(str(x))
-                #print(str(y))
-                #print(str(lib))
-                self.draw.text((y, x), lib,  font=font, fill=0)
-            
-            if itm["img"] != False:
-                x = itm["img"][0]
-                y = itm["img"][1]
-                picture = itm["img"][2]
-                #print(str(picture))
+
+        logger.debug("map Level "+str(self.tMaps[Level]))
+        # Affichage de la navigation
+        for icon in self.tMaps[Level]["nav"]:
+            if icon["img"] != False:
+                x = icon["x"]
+                y = icon["y"]
+                xp = icon["img"][0]
+                yp = icon["img"][1]
+                picture = icon["img"][2]
+                logger.debug("pic:"+str(picture))
                 img = Image.open(picture)
                 img = img.resize((40, 40),Image.NEAREST)
-                self.image.paste(img, (x,y))
+                logger.debug("x:"+str(x)+",y:"+str(y))
+                self.image.paste(img, (xp,yp))
+        
+        # Affichage des fenêtres
+        i = self.mapL
+        maxi = len(self.tMaps[Level]["witem"]) - 1
+        #self.showDebug("maxi:"+str(maxi))
+        offset = 0
+        h = self.tMaps[Level]["hwin"]
+        nbW = self.width / h
+        iw = 0
+        running = True
+        logger.debug("i:"+str(i)+",maxi:"+str(maxi)+",h:"+str(h)+",nbW:"+str(nbW))
+        logger.debug("witem:"+str(self.tMaps[Level]["witem"]))
+        if len(self.tMaps[Level]["witem"]) == 0:
+            # pas de fenêtres à afficher !
+            running = False
+        while running == True:
+            offset = h*iw
+            logger.debug("offset:"+str(offset))
+            win = self.tMaps[Level]["witem"][i]
+            logger.debug(str(win))
+            rect = []
+            rect.append(self.tMaps[Level]["window"][0])
+            rect.append(self.tMaps[Level]["window"][1])
+            rect.append(self.tMaps[Level]["window"][2])
+            rect.append(self.tMaps[Level]["window"][3])
+            rect[1] = rect[1]+offset
+            rect[3] = rect[3]+offset
+            self.draw.rectangle(rect, outline=0, fill=255)
+            logger.debug("i:"+str(i)+",witem:"+str(self.tMaps[Level]["witem"]))
+            for itm in self.tMaps[Level]["witem"][i]["item"]:
+                if itm["rect"] != False:
+                    self.draw.rectangle(itm["rect"], outline=0, fill=255)
+                if itm["txt"] != False:
+                    tp = 24
+                    if len(itm["txt"]) == 4:
+                        tp = itm["txt"][3] # taille police = dernier élément du tableau
+                    font = ImageFont.truetype(self.ttf,tp)
+                    x = itm["txt"][0]
+                    y  = itm["txt"][1]+offset
+                    lib  = itm["txt"][2]
+                    
+                    if "vars" in itm:
+                        logger.debug("vars:"+str(itm["vars"]))
+                        if itm["vars"] != False:
+                            for variable in itm["vars"]:
+                                logger.debug("variable:"+str(variable))
+                                lib = lib.format(var = variable)
+                    
+                    logger.debug("itm:"+str(itm["txt"]))
+                    logger.debug("i:"+str(i)+",x:"+str(x)+",y:"+str(y)+",lib:"+str(lib)+",offset:"+str(offset))
+                    self.draw.text((x, y), lib,  font=font, fill=0)
+                if itm["img"] != False:
+                    x = itm["img"][0]
+                    y = itm["img"][1]+offset
+                    picture = itm["img"][2]
+                    #print(str(picture))
+                    img = Image.open(picture)
+                    img = img.resize((40, 40),Image.NEAREST)
+                    self.image.paste(img, (x,y))
+            iw += 1
+            i += 1
+            if iw > nbW:
+                running = False
+            if i > maxi:
+                running = False
+        
         return self.image
 #######################################################################
 
@@ -309,10 +395,10 @@ class Screen():
             #return False
             return True
         with open(self.cache, 'r') as cache:
-            logger.debug("read cache")
+            #logger.debug("read cache")
             message = cache.read()
-            logger.debug(message)
-        logger.debug("["+str(message)+"]/["+str(self.message)+"]")
+            #logger.debug(message)
+        #logger.debug("["+str(message)+"]/["+str(self.message)+"]")
         if message == self.message:
             time.sleep(0.2)
             return True
@@ -459,7 +545,7 @@ class Screen():
             self.draw.text((self.x, self.top+60), line3,  font=self.fontsmall, fill=0)
             self.draw.text((self.x, self.top+90), line4,  font=self.fontsmall, fill=0)
 
-            logger.debug("Small...")
+            #logger.debug("Small...")
 
         elif commande == DISPLAY_MENU:
             # the character following the command is the number of the line (from 0 to 3) to be highlighted
@@ -530,21 +616,21 @@ class Screen():
                 fill[brightline] = 1
 
             self.draw.rectangle((0,0,self.top+16,self.width), outline=0, fill=fill[0])
-            self.draw.text((self.top, self.x), line1,  font=self.fontsmall, fill=bright[0])
+            self.draw.text((self.x, self.top), line1,  font=self.fontsmall, fill=bright[0])
 
             self.draw.rectangle((0,self.top+16,self.width,self.top+32), outline=0, fill=fill[1])
-            self.draw.text((self.top+16, self.x), line2,  font=self.fontsmall, fill=bright[1])
+            self.draw.text((self.x, self.top+16), line2,  font=self.fontsmall, fill=bright[1])
 
             self.draw.rectangle((0,self.top+32,self.width,self.top+48), outline=0, fill=fill[2])
-            self.draw.text((self.top+32, self.x), line3,  font=self.fontsmall, fill=bright[2])
+            self.draw.text((self.x, self.top+32), line3,  font=self.fontsmall, fill=bright[2])
 
             self.draw.rectangle((0,self.top+48,self.width,self.top+64), outline=0, fill=fill[3])
-            self.draw.text((self.top+48, self.x), line4,  font=self.fontsmall, fill=bright[3])
+            self.draw.text((self.x, self.top+48), line4,  font=self.fontsmall, fill=bright[3])
             
         elif commande == CLEAR: 
             # Draw a white filled box to clear the image.
             self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.top, self.x), " ",  font=self.font, fill=0)
+            self.draw.text((self.x, self.top), " ",  font=self.font, fill=0)
             logger.debug("Clear...")
             #self.epd.init()
             #self.epd.Clear(0xFF)
@@ -555,7 +641,7 @@ class Screen():
             self.buff3 = ""
             self.buff4 = ""
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=0)
-            self.draw.text((self.top, self.x), "",  font=self.font, fill=0)
+            self.draw.text((self.x, self.top), "",  font=self.font, fill=0)
             logger.debug("Goto Sleep...")
             #return False
             
@@ -563,7 +649,7 @@ class Screen():
             logger.debug("commande invalide:"+commande)
             line1 = "invalid command:"+commande
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=0)
-            self.draw.text((self.top, self.x), line1,  font=self.font, fill=0)
+            self.draw.text((self.x, self.top), line1,  font=self.font, fill=0)
 
         # partial update
         self.epd.displayPartial(self.epd.getbuffer(self.image))
@@ -587,15 +673,15 @@ class Screen():
         while running == True:
             # Read the touch input
             gt.GT_Scan(GT_Dev, GT_Old)
-            logger.debug("State "+str(self.stateDisplay)+"/"+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
+            #logger.debug("State "+str(self.stateDisplay)+"/"+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
             if(self.stateDisplay == 0 and self.touch() == False):
-                logger.debug("lire cache")
+                #logger.debug("lire cache")
                 running = self.lire_cache()
-                logger.debug("lire_cache:"+str(running))
+                #logger.debug("lire_cache:"+str(running))
             else:
                 logger.debug("dialog")
                 self.dialog()
-            logger.debug("running loop:"+str(running)+" State "+str(self.stateDisplay))
+            #logger.debug("running loop:"+str(running)+" State "+str(self.stateDisplay))
         logger.debug("end of loop")
 
     def touch(self):
@@ -633,6 +719,8 @@ class Screen():
                 else:
                     ct = 0
                     self.laststate = self.stateDisplay
+            else:
+                ct = 0
             logger.debug("GT_Dev.Touch: "+str(GT_Dev.Touch))
 
             logger.debug("before call performState:"+str(running))
@@ -640,7 +728,7 @@ class Screen():
                 running = self.performState()
                 logger.debug("after call performState:"+str(running))
             
-            #logger.info(str(running))
+            logger.debug(str(running))
 
             time.sleep(0.1)
             logger.debug("running after sleep:"+str(running))
@@ -648,39 +736,30 @@ class Screen():
             gt.GT_Scan(GT_Dev, GT_Old)
             
 
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        line = "end of dialog"
-        self.draw.text((self.x, self.top), line,  font=self.font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        self.mapLevel = 0
+        self.mapL = 0
+        self.showDebug("end of dialog")
+        
         self.message = ""
         logger.debug('end of dialog')
-        #logger.info('state:'+str(self.stateDisplay))
-        #logger.info('level:'+str(self.level))
-        #logger.info(str(self.tMenus))
+        logger.debug('level:'+str(self.mapLevel))
+        logger.debug('line:'+str(self.mapL))
 
     def performState(self):
-        logger.info("def performState level:"+str(self.level))
+        logger.debug("def performState level:"+str(self.level))
         running = True
-        logger.info("state:"+str(self.stateDisplay))
+        logger.debug("state:"+str(self.stateDisplay))
         if self.stateDisplay == 0: # on vient du chronomètre
-            #if self.touch() == True:
-            #    self.displayMenuG()
-            #self.displayDialog()
             self.displayMenuG()
-            #self.stateDisplay = 1
             logger.debug("running:"+str(running))
             logger.debug("state:"+str(self.stateDisplay))
         elif self.stateDisplay == 1: # on vient du dialogue
             if self.touch() == True:
                 running = self.performMenuG()
-            logger.info("running:"+str(running))
+            logger.debug("running:"+str(running))
             logger.debug("state:"+str(self.stateDisplay))
         else:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), str(self.stateDisplay)+" inconnu",  font=self.font, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
+            self.showDebug(str(self.stateDisplay)+" inconnu")
             logger.debug("Etat inconnu")
             self.stateDisplay = 0
             running = False
@@ -689,42 +768,42 @@ class Screen():
         return running
         
     def get_touch(self):
-        #logger.info("def get_touch:")
+        #logger.debug("def get_touch:")
         zone = 0
         x = 250 - GT_Dev.Y[0]
         y = GT_Dev.X[0]
 
-        for touch in self.tMenus[self.level]["touch"]:
-            #print(str(json.dumps(touch)))
-            #logger.info("search touch in:"+str(touch))
+        for touch in self.tMaps[self.mapLevel]["nav"]:
             tx = touch["x"]
             ty = touch["y"]
             lib = touch["lib"]
             func = touch["func"]
-            #print(str(lib))
-            #print(str(tx)+" "+str(x))
-            #print(str(ty)+" "+str(y))
             txt = "hors zone"
-            #print(str(x)+" > "+str(tx[0]-1)+" and "+str(x)+" < "+str(tx[1]+1)+" and "+str(y)+" > "+str(ty[0]-1)+" and "+str(y)+" < "+str(ty[1]+1))
+            logger.debug("tx:"+str(tx)+",ty:"+str(ty)+",lib:"+str(lib))
             if x > tx[0]-1 and x < tx[1]+1 and y > ty[0]-1 and y < ty[1]+1:
                 zone = touch
-                #logger.info("zone found")
                 break
-        #logger.info("touch:"+str(zone))
+        if zone == 0: # on recherche une touche dans une fenêtre
+            tx = (self.tMaps[self.mapLevel]["window"][0],self.tMaps[self.mapLevel]["window"][2])
+            ty = (self.tMaps[self.mapLevel]["window"][1],self.tMaps[self.mapLevel]["window"][3])
+            zy = 0
+            line = self.mapL # numéro de la première fenêtre affichée
+            logger.debug("tx:"+str(tx)+",ty:"+str(ty)+",line:"+str(line)+",width:"+str(self.width))
+            logger.debug("witem:"+str(self.tMaps[self.mapLevel]["witem"]))
+            while zy < self.width:
+                if x > tx[0]-1 and x < tx[1]+1 and y > zy+ty[0]-1 and y < zy+ty[1]+1:
+                    zone = {}
+                    #zone["func"] = self.tMaps[self.mapLevel]["witem"][line]["func"]
+                    zone = self.tMaps[self.mapLevel]["witem"][line]
+                    break                
+                zy = zy + self.tMaps[self.mapLevel]["hwin"]
+                line += 1
+        #        
         return zone
     
-    #   def displayDialog(self):
-    #       logger.info("def displayDialog:"+str(self.level))
-    #       self.display(self.level)
-    #   
-    #       self.epd.displayPartial(self.epd.getbuffer(self.image))
-    #       self.epd.ReadBusy()
-    #       self.stateDisplay = 1
-    #       return True        
-    
     def displayMenuG(self):
-        logger.info("def displayMenuG:"+str(self.level))
-        self.display(self.level)
+        logger.debug("def displayMenuG:"+str(self.mapLevel))
+        self.display(self.mapLevel)
 
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
@@ -732,249 +811,214 @@ class Screen():
         return True        
     
     def performMenuG(self):
-        logger.info("def performMenuG:"+str(self.level))
+        #logger.info("def performMenuG:"+str(self.mapLevel))
         running = True
-        zone = self.get_touch()
-        #logger.info("zone:"+str(zone))
-        if zone == 0:
+        self.ztouch = self.get_touch()
+        logger.debug("zone:"+str(self.ztouch))
+        if self.ztouch == 0:
             self.errorZone()
             return False
-        retfunc = zone.get("func", print(str(zone)))()
-        #logger.info("retfunc:"+str(retfunc))
-        #logger.info("stateDisplay:"+str(self.stateDisplay))
+        namefunc = self.ztouch.get("func", print(str(self.ztouch)))
+        logger.debug(namefunc)
+        if namefunc == False:
+            self.showDebug("Procédure non trouvée")
+            self.stateDisplay = 0
+            self.mapLevel = 0
+            return False
+        
+        retfunc = namefunc()
+
         self.stateDisplay = 0
         return retfunc
-        
-        
-        if logger.level == logging.DEBUG:
-            logger.debug("Sortir d'Arrêt "+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
-            logger.debug("Flag T TF TC "+str(GT_Dev.Touch)+"/"+str(GT_Dev.TouchpointFlag)+"/"+str(GT_Dev.TouchCount))
-            self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=255)
-            line = "Sortie Zone "+str(zone)
-            self.draw.text((self.x, self.top), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Dev.X[0])+",Y="+str(GT_Dev.Y[0])+",S="+str(GT_Dev.S[0])
-            self.draw.text((self.x, self.top+30), line,  font=self.fontsmall, fill=0)
-            line = "X="+str(GT_Old.X[0])+",Y="+str(GT_Old.Y[0])+",S="+str(GT_Old.S[0])
-            self.draw.text((self.x, self.top+60), line,  font=self.fontsmall, fill=0)
-    
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            time.sleep(3)
-        
-        # test de la position pour savoir si on arrête vraiment ou si on sort d'arrêt
-        if zone == HOME or zone == RET:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Home",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 0
-            running = False
-        elif zone == 1:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "CMDs",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 2
-            #running = False
-        elif zone == 2:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "GPS",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 3
-            #running = False
-        elif zone == 3:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Status",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 4
-            #running = False
-        elif zone == 4:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Datas",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-
-            self.stateDisplay = 5
-            #running = False
-        else:
-            self.draw.rectangle((0,0,self.height,self.width), fill=255)
-            self.draw.text((self.x, self.top), "Zone non traitée",  font=self.fontsmall, fill=0)
-            self.epd.displayPartial(self.epd.getbuffer(self.image))
-            self.epd.ReadBusy()
-            #time.sleep(3)
-            #self.stateDisplay = 0
-            #running = False
-        #logger.info("running:"+str(running))
-        #time.sleep(5)
-        return running
-
-    def displayIcons(self):
-        #logger.info("def displayIcons:")
-        # read png file on window
-        logger.debug("3.read png file on window...")
-        # epd.Clear(0xFF)
-        img = Image.open(picret)
-        img = img.resize((40, 40),Image.NEAREST)
-        self.image.paste(img, (0,10))    
-        img = Image.open(pichome)
-        img = img.resize((40, 40),Image.NEAREST)
-        self.image.paste(img, (0,80))    
-        img = Image.open(picup)
-        img = img.resize((40, 40),Image.NEAREST)
-        self.image.paste(img, (210,10))    
-        img = Image.open(picdown)
-        img = img.resize((40, 40),Image.NEAREST)
-        self.image.paste(img, (210,80))    
             
     def errorZone(self):
-        #logger.info("def errorZone:")        
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Zone non traitée",  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-
+        self.showDebug("Zone non traitée")
+        
         self.stateDisplay = 0
-        self.level = 0
+        self.mapLevel = 0
         return False
+
+    def showDebug(self,lib="?",fontsize=False):
+        if logger.level != logging.DEBUG:
+            return False
+        logger.debug(lib)    
+        if fontsize ==False:
+            fontsize = self.fontsmallsize
+        self.showMessage(lib,fontsize)
+        time.sleep(1)
+
+    def showMessage(self,lib="?",fontsize=False):
+        if fontsize ==False:
+            fontsize = self.fontsmallsize
+        font = ImageFont.truetype(self.ttf,fontsize)
+        self.draw.rectangle((0,0,self.height,self.width), fill=255)
+        self.draw.text((self.x, self.top), lib,  font=font, fill=0)
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()        
+        time.sleep(0.5)
         
     def home(self):
         #logger.setLevel(logging.DEBUG)
         logger.debug("def home:")
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Home",  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-        
-        time.sleep(0.5)
+        self.showDebug("Home")
 
-        self.level = 0
+        self.mapLevel = 0
+        self.mapL = 0
+
+        running = self.displayMenuG()
+        return running
+        
+    def end(self):
+        #logger.setLevel(logging.DEBUG)
+        logger.debug("def end:")
+        self.showDebug("END")
+
+        self.mapLevel = 0
+        self.mapL = 0
         self.stateDisplay = 0
         return False
         
     def returnParent(self):
-        backscreen = self.tMenus[self.level]["parent"]
+        # les données du parent sont dans la pile
+        backscreen = self.depile()
         logger.info("retour parent:"+str(backscreen))
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "retour vers "+str(backscreen),  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
-        
-        time.sleep(0.5)
+        self.showDebug("retour parent:"+str(backscreen))
         if backscreen == 0:
-            self.level = 0
+            self.mapLevel = 0
             self.stateDisplay = 0
             return False
-        
-        logger.info("recherche parent:"+str(backscreen))
-        backmenu = self.searchMenu(backscreen)
-        logger.info("retour search parent:"+str(backmenu))
-        running = False
-        if backmenu != False:
-            func = backmenu["function"]
-            logger.info("fonction:"+str(func))
-            if func != False:
-                logger.info("appel fonction:"+str(func))
-                self.stateDisplay = 0
-                running = backmenu["function"]()
-                logger.info("retour fonction:"+str(running))
-            else:
-                self.level = 0
-                return False
-            #self.level = backfunc
-        else:
-            self.level = 0
-            return False
-        logger.info("running:"+str(running))
-        if running != True:
-            self.level = 0
-            return False
         self.stateDisplay = 0
-        self.level = backmenu["level"]
-        logger.info("level:"+str(self.level))
-        logger.info("state:"+str(self.stateDisplay))
         return True
         
     def downMenu(self):
-        #logger.info("def downMenu:")
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Down",  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        #logger.debug("def downMenu:")
+        #self.showDebug("Down")
 
         self.stateDisplay = 0
-        level = self.level
-        level += 1
-        print("d2:"+str(level)+" vs "+str(len(self.tMenus)-1))
-        if level > len(self.tMenus)-1:
-            return False
-        print("d3:"+str(level))
-        self.level = level
+        level = self.mapLevel
+        line = self.mapL
+        logger.debug(str(self.tMaps[level]["witem"][line]))
+        maxl = len(self.tMaps[level]["witem"])-1
+        logger.debug("line:"+str(line)+",maxl:"+str(maxl))
+        #self.showDebug("line:"+str(line)+",maxl:"+str(maxl))
+        if line < maxl:
+            line += 1
+        self.mapL = line
         return True
         
     def upMenu(self):
-        #logger.info("def upMenu:")
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Up",  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        #logger.debug("def upMenu:")
+        self.showDebug("Up")
 
         self.stateDisplay = 0
-        level = self.level
-        print("u1:"+str(level))
-        if level > 0:
-            level -= 1
-        print("u2:"+str(level))
-        if level == 0:
-            return False
-        print("u3:"+str(level))
-        if level > len(self.tMenus)-1:
-            return False
-        print("u4:"+str(level))
-        self.level = level
+        level = self.mapLevel
+        line = self.mapL
+        logger.debug(str(self.tMaps[level]["witem"][line]))
+        maxl = len(self.tMaps[level]["witem"])-1
+        logger.debug("line:"+str(line)+",maxl:"+str(maxl))
+        self.showDebug("line:"+str(line)+",maxl:"+str(maxl))
+        if line > 0:
+            line -= 1
+        self.mapL = line
+        return True
+        
+    def next(self):
+        #logger.setLevel(logging.DEBUG)
+        
+        logger.debug("def next:")
+        self.showDebug("Next")
+
+        self.stateDisplay = 0
+        level = self.mapLevel
+        line = self.mapL
+        logger.debug(str(self.tMaps[level]["witem"][line]))
+        if "func" in self.tMaps[level]["witem"][line]:
+            self.showDebug("appel fonction Window")
+            logger.debug(str(self.tMaps[level]["witem"][line]))
+            window = self.tMaps[level]["witem"][line]
+            namefunc = window.get("func", print(str(window)))
+            logger.debug(namefunc)
+            if namefunc == False:
+                self.showDebug("Procédure non trouvée")
+                self.stateDisplay = 0
+                self.mapLevel = 0
+                return False
+            
+            retfunc = namefunc()
+
+            self.stateDisplay = 0
+            return retfunc
+
+        self.mapLevel = 0
+        self.mapL = 0
+
+        #running = self.displayMenuG()
+        #return running
         return True
         
     def menuCMDs(self):
-        #logger.info("def menuCMDs:")
-        menu = self.searchMenu("Menu Commandes")
-        logger.debug("résultat search menu:"+str(menu))
-        if menu != False:
-            #self.image = self.display(menu)
-            self.display(menu["level"])
-            #self.image = self.get_image()
-            self.level = menu["level"]
+        #logger.debug("def menuCMDs:")
+        map = self.searchMap("Menu Commandes")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.display(map["level"])
+            logger.debug("level menuCMDs:"+str(self.mapLevel))
+            self.empile()
+            logger.debug("map menuCMDs:"+str(map))
+            self.mapLevel = map["level"]
+            self.mapL = 0
         else:
-            #logger.info("Menu Commandes non trouvé "+str(len(self.tMenus)))
-            #print(str(self.tMenus))
-            self.level = 0
+            self.mapLevel = 0
             return False
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
         return True
         
+    def nettoiePile(self):
+        self.pileW = []
+        
+    def empile(self):
+        dict = {}
+        dict["level"] = self.mapLevel
+        dict["line"] = self.mapL
+        logger.debug("pile avant empile:"+str(self.pileW))
+        self.pileW.append(dict)
+        logger.debug("pile après empile:"+str(self.pileW))
+        
+    def depile(self):
+        logger.debug("pile:"+str(self.pileW))
+        if len(self.pileW) == 0:
+            return True        
+
+        i = len(self.pileW) - 1
+        self.mapLevel = self.pileW[i]["level"]
+        logger.debug("élément pile:"+str(self.pileW[i]))
+        self.mapL = self.pileW[i]["line"]
+        logger.debug("pile avant depile:"+str(self.pileW))
+        logger.debug("line:"+str(self.mapL))
+
+        a = self.pileW.pop()
+        logger.debug("pile après pop:"+str(self.pileW))
+        logger.debug("a:"+str(a))
+
+        logger.debug("map level:"+str(self.tMaps[self.mapLevel]))
+        logger.debug("witem:"+str(self.tMaps[self.mapLevel]["witem"][self.mapL]))
+
+        logger.debug("pile après depile:"+str(self.pileW))
+        return True
+        
     def request_MyChronoGPS(self):
-        #logger.info("def request_MyChronoGPS:")
-        menu = self.searchMenu("MyChronoGPS")
-        logger.debug("résultat search menu:"+str(menu))
-        if menu != False:
-            #self.image = self.display(menu)
-            self.display(menu["level"])
-            self.level = menu["level"]
+        map = self.searchMap("MyChronoGPS")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.empile()
+            self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
         else:
-            #logger.info("Menu MyChronoGPS non trouvé "+str(len(self.tMenus)))
-            #print(str(self.tMenus))
-            self.level = 0
+            self.mapLevel = 0
+            self.mapL = 0
             return False
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
@@ -982,15 +1026,12 @@ class Screen():
         return True
         
     def startGPS(self):
-        #logger.info("def startGPS:")
+        #logger.debug("def startGPS:")
         font = ImageFont.truetype(self.ttf,18)
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Démarrage MyChronoGPS en cours",  font=self.fontsmall, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        self.showDebug("Démarrage MyChronoGPS en cours",font)
         #
         isModule = get_module(main_module)
-        #logger.info("main_module:"+str(main_module))
+        #logger.debug("main_module:"+str(main_module))
         if isModule == False:
             try:
                 os.system(cmd_start)
@@ -998,21 +1039,15 @@ class Screen():
             except:
                 msg = "Unexpected error:"+str(sys.exc_info()[0])+str(sys.exc_info()[1])
                 logger.info(str(msg))
-                self.draw.rectangle((0,0,self.height,self.width), fill=255)
-                self.draw.text((self.x, self.top), msg,  font=font, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
+                self.showDebug(msg,font)
                 time.sleep(3)
                 self.stateDisplay = 0
                 self.level = 0
                 return False
         else:
             msg = "MyChronoGPS is already running"
-            
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), msg,  font=font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+
+        self.showDebug(msg,font)
         time.sleep(3)
 
         self.stateDisplay = 0
@@ -1020,15 +1055,12 @@ class Screen():
         return False        
         
     def stopGPS(self):
-        #logger.info("def stopGPS:")
+        #logger.debug("def stopGPS:")
         font = ImageFont.truetype(self.ttf,18)
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), "Arrêt MyChronoGPS en cours",  font=font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        self.showDebug("Arrêt MyChronoGPS en cours",font)
         #
         isModule = get_module(main_module)
-        #logger.info("main_module:"+str(main_module))
+        #logger.debug("main_module:"+str(main_module))
         if isModule != False:
             try:
                 pipelcd = os.open(pipe_name, os.O_WRONLY, os.O_NONBLOCK)
@@ -1038,21 +1070,15 @@ class Screen():
             except:
                 msg = "Unexpected error:"+str(sys.exc_info()[0])+str(sys.exc_info()[1])
                 logger.info(str(msg))
-                self.draw.rectangle((0,0,self.height,self.width), fill=255)
-                self.draw.text((self.x, self.top), msg,  font=font, fill=0)
-                self.epd.displayPartial(self.epd.getbuffer(self.image))
-                self.epd.ReadBusy()
+                self.showDebug(msg,font)
                 time.sleep(3)
                 self.stateDisplay = 0
                 self.level = 0
                 return False
         else:
             msg = "MyChronoGPS is not running"
-            
-        self.draw.rectangle((0,0,self.height,self.width), fill=255)
-        self.draw.text((self.x, self.top), msg,  font=font, fill=0)
-        self.epd.displayPartial(self.epd.getbuffer(self.image))
-        self.epd.ReadBusy()
+        
+        self.showDebug(msg,font)
         time.sleep(3)
 
         self.stateDisplay = 0
@@ -1060,23 +1086,163 @@ class Screen():
         return False        
         
     def request_stopRPi(self):
-        #logger.info("def request_stopRPi:")
-        menu = self.searchMenu("Demande Arrêt RPi")
-        logger.debug("résultat search menu:"+str(menu))
-        if menu != False:
-            #self.image = self.display(menu)
-            self.display(menu["level"])
-            self.level = menu["level"]
+        logger.debug("def request_stopRPi:")
+        map = self.searchMap("Demande Arrêt RPi")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.empile()
+            self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
+            self.mapL = 0
         else:
-            #logger.info("Menu Demande Arrêt RPi non trouvé "+str(len(self.tMenus)))
-            #print(str(self.tMenus))
-            self.level = 0
+            self.mapLevel = 0
+            self.mapL = 0
             return False
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
+        logger.debug("end request_stopRPi:")
         return True
         
+    def request_clearAutoTrack(self):
+        logger.debug("def request_clearAutoTrack:")
+        map = self.searchMap("Demande Effacement Auto Track")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.empile()
+            self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
+            self.mapL = 0
+        else:
+            self.mapLevel = 0
+            self.mapL = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        logger.debug("end request_clearAutoTrack:")
+        return True
+
+    def getUseDBTrack(self):
+        logger.debug("def getUseDBTrack:")
+        map = self.searchMap("Utilisation DB Track")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            # affichage de la zone touchée
+            logger.debug("zone:"+str(self.ztouch))
+        
+            # recherche du paramètre UseDBTrack actuel
+            self.dbtracks = 0
+            el_parms = parms.get_parms("UseDBTrack")
+            if "UseDBTrack" in parms.params:
+                self.dbtracks = int(el_parms)
+            # affichage de UseDBTrack dans la fenêtre état
+            values = []
+            if self.dbtracks == 1:
+                values.append("actif")
+                values.append("DB Tracks OFF")
+            else:
+                values.append("inactif")
+                values.append("DB Tracks ON")
+            #logger.debug("values:"+str(values))
+
+            i = 0
+            for item in map["witem"][0]["item"]:
+                #logger.debug("item:"+str(item))
+                if "vars" in item:
+                    #logger.debug("vars:"+str(item["vars"]))
+                    #i = 0
+                    if item["vars"] != False:
+                        for variable in item["vars"]:
+                            #logger.debug("variable:"+str(variable))
+                            #logger.debug("values:"+str(values[i]))
+                            variable = values[i]
+                            item["vars"][0] = variable
+                            #logger.debug("variable:"+str(variable))
+                            #logger.debug("vars:"+str(item["vars"]))
+                            i += 1
+            #if i > 0:
+            #    logger.debug(str(map["witem"][0]["item"]))
+                
+            self.empile()
+            self.mapL = 0
+
+
+            self.display(map["level"])
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+        else:
+            self.mapLevel = 0
+            self.mapL = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        logger.debug("end getUseDBTrack:")
+        return True
+
+    def getTracker(self):
+        logger.debug("def getTracker:")
+        map = self.searchMap("Utilisation Tracker")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            # affichage de la zone touchée
+            logger.debug("zone:"+str(self.ztouch))
+        
+            # recherche du paramètre GpsTrackerMode actuel
+            self.tracker = 0
+            el_parms = parms.get_parms("GpsTrackerMode")
+            if "GpsTrackerMode" in parms.params:
+                self.tracker = int(el_parms)
+            # affichage de GpsTrackerMode dans la fenêtre état
+            values = []
+            if self.tracker == 1:
+                values.append("actif")
+                values.append("Tracker OFF")
+            else:
+                values.append("inactif")
+                values.append("Tracker ON")
+            #logger.debug("values:"+str(values))
+
+            i = 0
+            for item in map["witem"][0]["item"]:
+                #logger.debug("item:"+str(item))
+                if "vars" in item:
+                    #logger.debug("vars:"+str(item["vars"]))
+                    #i = 0
+                    if item["vars"] != False:
+                        for variable in item["vars"]:
+                            #logger.debug("variable:"+str(variable))
+                            #logger.debug("values:"+str(values[i]))
+                            variable = values[i]
+                            item["vars"][0] = variable
+                            #logger.debug("variable:"+str(variable))
+                            #logger.debug("vars:"+str(item["vars"]))
+                            i += 1
+            #if i > 0:
+            #    logger.debug(str(map["witem"][0]["item"]))
+                
+            self.empile()
+            self.mapL = 0
+
+
+            self.display(map["level"])
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+        else:
+            self.mapLevel = 0
+            self.mapL = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        logger.debug("end getTracker:")
+        return True
+
     def stopRPi(self):
         #logger.info("def stopRPi:")
         font = ImageFont.truetype(self.ttf,18)
@@ -1109,21 +1275,25 @@ class Screen():
         return False
         
     def request_restartRPi(self):
-        #logger.info("def request_restartRPi:")
-        menu = self.searchMenu("Demande Redémarrage RPi")
-        logger.debug("résultat search menu:"+str(menu))
-        if menu != False:
-            #self.image = self.display(menu)
-            self.display(menu["level"])
-            self.level = menu["level"]
+        logger.debug("def request_restartRPi:")
+        map = self.searchMap("Demande Redémarrage RPi")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            #self.nettoiePile()
+            #self.mapL = 0
+            self.empile()
+            self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
+            self.mapL = 0
         else:
-            #logger.info("Menu Demande Redémarrage RPi non trouvé "+str(len(self.tMenus)))
-            #print(str(self.tMenus))
-            self.level = 0
+            self.mapLevel = 0
+            self.mapL = 0
             return False
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
+        logger.debug("end request_restartRPi:")
         return True
         
     def restartRPi(self):
@@ -1151,223 +1321,609 @@ class Screen():
             return False
 
         self.stateDisplay = 0
-        self.level = 0
+        self.mapLevel = 0
         return False
         
-    def createMenus(self):
-        self.level = -1
-        if self.addMenu("Menu Principal",self.displayMenuG) == False:
-            #logger.info("erreur création menu principal")
+    def clearAutoTrack(self):
+        logLevel = logger.level
+        #logger.level = logging.DEBUG
+        self.showDebug("clearAutoTrack en cours")
+        
+        mydict = dict()
+
+        if os.path.isfile(autotrack):
+            try:
+                os.remove(autotrack)
+                mydict["msg"] = "autodef track successfully removed"
+                mydict["return"] = 0
+            except OSError as err:
+                print("OS error: {0}".format(err))
+                mydict["msg"] = "OS error: {0}".format(err)
+                mydict["return"] = 8
+            except:
+                print("Unexpected error:", sys.exc_info()[0], sys.exc_info()[1])
+                mydict["msg"] = "Unexpected error:", sys.exc_info()[0], sys.exc_info()[1]
+                raise
+        else:
+                mydict["msg"] = "no autodef track to remove"
+                mydict["return"] = 0
+
+        self.showDebug(str(mydict["return"]))
+        self.showMessage(str(mydict["msg"]))
+        
+        logger.level = logLevel
+        
+        self.stateDisplay = 0
+        self.mapLevel = 0
+        return True
+        
+    def switchUseDBTrack(self):
+        logLevel = logger.level
+        #logger.level = logging.DEBUG
+                
+        # recherche du paramètre UseDBTrack actuel
+        self.dbtracks = 0
+        el_parms = parms.get_parms("UseDBTrack")
+        if "UseDBTrack" in parms.params:
+            self.dbtracks = int(el_parms)
+            self.showDebug("UseDBTrack:"+str(self.dbtracks))
+        if self.dbtracks == 1:
+            self.dbtracks = 0
+            status_dbtracks = "OFF"
+        else:
+            self.dbtracks = 1
+            status_dbtracks = "ON"
+            
+        #self.showDebug("UseDBTrack:"+str(status_dbtracks))
+        parms.set_parms("UseDBTrack",self.dbtracks)
+        #self.showDebug("UseDBTrack:"+str(self.dbtracks))
+        self.showDebug("dbtracks "+str(status_dbtracks))
+
+        logger.level = logLevel
+        self.stateDisplay = 0
+        self.mapLevel = 0
+        return True
+        
+    def switchTracker(self):
+        logLevel = logger.level
+        #logger.level = logging.DEBUG
+                
+        # recherche du paramètre GpsTrackerMode actuel
+        self.tracker = 0
+        el_parms = parms.get_parms("GpsTrackerMode")
+        if "GpsTrackerMode" in parms.params:
+            self.tracker = int(el_parms)
+            self.showDebug("GpsTrackerMode:"+str(self.tracker))
+        if self.tracker == 1:
+            self.tracker = 0
+            status_tracker = "OFF"
+        else:
+            self.tracker = 1
+            status_tracker = "ON"
+            
+        #self.showDebug("GpsTrackerMode:"+str(status_tracker))
+        parms.set_parms("GpsTrackerMode",self.tracker)
+        #self.showDebug("GpsTrackerMode:"+str(self.tracker))
+        self.showDebug("tracker "+str(status_tracker))
+
+        logger.level = logLevel
+        self.stateDisplay = 0
+        self.mapLevel = 0
+        return True
+        
+    def menuSessions(self):
+        logger.debug("def menuSessions:")
+        map = self.searchMap("Menu Sessions")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.display(map["level"])
+            logger.debug("level menuSessions:"+str(self.mapLevel))
+            self.empile()
+            logger.debug("map menuSessions:"+str(map))
+            self.mapLevel = map["level"]
+            self.mapL = 0
+
+            # creation window liste des sessions
+            map["witem"] = [] # effacement des fenêtres précédemment crées
+            
+            p = "Sessions"
+            
+            # ligne titre
+            l = "Liste Sessions"
+            self.addWindow(l,False,p)
+            t = [46,2,l,20] # position du texte, libellé & taille police (défaut = 24 si absent)
+            self.addItem(t)
+            
+            # recherche des sessions et création d'un tableau
+            listeSessions = self.getSessions()
+            logger.debug("liste sessions:"+str(listeSessions))
+            for line in listeSessions:
+                #self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+                self.mapL += 1
+
+                # ligne détail
+                l = "Session"
+                f = self.detailSession
+                x = line["fichier"]
+                self.addWindow(l,f,p,x)
+                
+                t = [40,2,line["date_session"],14]
+                self.addItem(t)
+                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
+                t = [94,2,line["heure_session"],14]
+                self.addItem(t)
+                t = [130,2,line["circuit_session"],14]
+                self.addItem(t)
+                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
+
+            # touches de navigation pour la map Menu Sessions
+            self.addTL3(picret,"RET",self.returnParent)
+            self.addML3(pichome,"HOME",self.home)
+            self.addBL3(picend,"END",self.end)
+            self.addTR3(picup,"UP",self.upMenu)
+            self.addMR3(picnext,"NEXT",self.next)
+            self.addBR3(picdown,"DOWN",self.downMenu)
+
+            map = self.searchMap("Menu Sessions")
+            #logger.debug("map menuSessions après création fenêtres:"+str(map))
+            #logger.debug("tMaps:"+str(self.tMaps))
+            self.mapLevel = map["level"]
+            self.mapL = 0
+            #
+
+        else:
+            self.mapLevel = 0
             return False
-        #self.level = len(self.tMenus)-1
-        #self.level = 0
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        return True
         
-        # item des icônes
-        self.addItem(False, False, [0,10,picret])
-        self.addItem(False, False, [0,80,pichome])
-        self.addItem(False, False, [210,10,picup])
-        self.addItem(False, False, [210,80,picdown])
+    def listdirectory(self,path): 
+        fichier=[] 
+        l = glob.glob(path+'/*') 
+        for i in l: 
+            if os.path.isdir(i): fichier.extend(listdirectory(i)) 
+            else: fichier.append(i) 
+        return fichier
         
-        # item des menus
-        r = [40,0,119,60] # position du rectangle
-        t = [16,46,"CMDs"] # position du texte, libellé & taille police (défaut = 24 si absent)
-        f = self.menuCMDs
-        self.addItem(r, t, False,f)
-        r = [120,0,209,60]
-        t = [16,125,"GPS"]
-        self.addItem(r, t, False)
-        r = [40,61,119,121]
-        t = [81,46,"Status"]
-        self.addItem(r, t, False)
-        r = [120,61,210,121]
-        t = [81,125,"Datas"]
-        self.addItem(r, t, False)
+    def getSessions(self):
+        result = []
+        listfic = self.listdirectory(dirsess)
+        for fic in listfic:
+            statinfo = os.stat(fic)
+            if statinfo.st_size > 0:
+                # on recherche les extensions .txt
+                extension = os.path.splitext(fic)
+                if extension[1] == '.txt':
+                    session = dict()
+                    session["fichier"] = fic
+                    FD = open(fic, 'r')
+                    info = FD.read()
+                    T = info.split(";") # c'est au format csv avec le séparateur ";" 
+                    session["date_session"] = T[0][0:2]+T[0][3:5]+T[0][8:10]
+                    session["heure_session"] = T[1][0:2]+T[0][3:5]
+                    session["circuit_session"] = T[2]
+                    session["sort"] = T[0][6:4]+T[0][3:2]+T[0][0:2]+T[1]
+                    FD.close()
+                    result.append(session)
+        #logger.debug("résultat brut:"+str(result))
+        result = sorted(result, key=lambda d: d["sort"], reverse=True)
+        #logger.debug("résultat trié:"+str(result))
+        return result
         
-        # zones touch des icônes
-        self.touchIcons()
-        
-        # zones touch des sous-menus
-        # # Menu principal affiché
-        # x = [41,119]
-        # y = [0,61]
-        # l = "CMDs"
-        # f = self.menuCMDs
-        # self.addTouch(x, y, l, f)
+    def detailSession(self):
+        logger.setLevel(logging.DEBUG)
+        self.showDebug("detailSession en travaux")
 
-        # Menu Commandes
-        #logger.info("ret addMenu:"+str(ret))
-        if self.addMenu("Menu Commandes",self.menuCMDs,"Menu Principal") == False:
-            #logger.info("erreur création menu commandes")
-            return False
+        logger.debug("def detailSession:")
+        map = self.searchMap("Menu Sessions")
+        logger.debug("résultat search map:"+str(map))
+        if map != False:
+            self.display(map["level"])
+            logger.debug("level menuSessions:"+str(self.mapLevel))
+            logger.debug("line menuSessions:"+str(self.mapL))
+            logger.debug("map à détailler:"+str(self.tMaps[self.mapLevel]["witem"][self.mapL]))
         
-        # item des icônes
-        self.addItem(False, False, [0,10,picret])
-        self.addItem(False, False, [0,80,pichome])
-        self.addItem(False, False, [210,10,picup])
-        self.addItem(False, False, [210,80,picdown])
-        
-        r = [40,0,209,40]
-        t = [6,46,"MyChronoGPS",20]
-        self.addItem(r, t, False)
-        r = [40,41,209,81]
-        t = [46,46,"Arrêt RPi",20]
-        self.addItem(r, t, False)
-        r = [40,81,209,122]
-        t = [91,46,"Redémarrage RPi",20]
-        self.addItem(r, t, False)
-        
-        # zones touch des icônes
-        self.touchIcons()
-        
-        # Menu commandes affiché
-        # zone rectangles du menu
-        x = [41,209]
-        y = [0,40]
-        l = "MyChronoGPS"
-        f = self.request_MyChronoGPS
-        self.addTouch(x, y, l, f)
-
-        x = [41,209]
-        y = [41,80]
-        l = "Demande Arrêt RPi"
-        f = self.request_stopRPi
-        self.addTouch(x, y, l, f)
-        
-        x = [41,209]
-        y = [81,122]
-        l = "Demande Redémarrage RPi"
-        f = self.request_restartRPi
-        self.addTouch(x, y, l, f)
-
-        # Menu MyChronoGPS (arrêt/démarrage)
-        #logger.info("ret addMenu:"+str(ret))
-        if self.addMenu("MyChronoGPS",self.request_MyChronoGPS,"Menu Commandes") == False:
-            #logger.info("erreur création MyChronoGPS")
-            return False
-        # item des icônes
-        self.addItem(False, False, [0,10,picret])
-        self.addItem(False, False, [0,80,pichome])
-        #self.addItem(False, False, [210,10,picup])
-        #self.addItem(False, False, [210,80,picdown])
-
-        r = [40,0,209,61]
-        t = [0,46,"Démarrage",24]
-        self.addItem(r, t, False)
-        t = [30,46,"MyChronoGPS",24]
-        self.addItem(False, t, False)
-        r = [40,62,209,122]
-        t = [65,46,"Arrêt",24]
-        self.addItem(r, t, False)
-        t = [90,46,"MyChronoGPS",24]
-        self.addItem(False, t, False)
-
-        # démarrage MyChronoGPS
-        x = [41,209]
-        y = [0,61]
-        l = "Démarrage MyChronoGPS"
-        f = self.startGPS
-        self.addTouch(x, y, l, f)
-        # abandon arrêt
-        x = [41,209]
-        y = [62,122]
-        l = "Arrêt MyChronoGPS"
-        f = self.stopGPS
-        self.addTouch(x, y, l, f)
-
-        # zones touch des icônes
-        self.touchIcons()
+        self.stateDisplay = 0
+        self.mapLevel = 0
+        return False
+    #def detailSession(self):
+            
+#            # recherche des chronos de la session à détailler et création d'un tableau
+#            listeChronos = self.getChronos()
+#            logger.debug("liste chronos:"+str(listeChronos))
 #
-        # Menu Choix (confirmation)
-        #logger.info("ret addMenu:"+str(ret))
-        if self.addMenu("Demande Arrêt RPi",self.request_stopRPi,"Menu Commandes") == False:
-            #logger.info("erreur création Demande Arrêt RPi")
+#            self.empile()
+#            logger.debug("map detailSession:"+str(map))
+#            self.mapLevel = map["level"]
+#            self.mapL = 0
+#
+#            # creation window détail de la session
+#            map["witem"] = [] # effacement des fenêtres précédemment crées
+#            
+#            p = "Sessions"
+#            
+#            # ligne titre
+#            l = "Detail Session"
+#            self.addWindow(l,False,p)
+#            t = [46,2,l,20] # position du texte, libellé & taille police (défaut = 24 si absent)
+#            self.addItem(t)
+#            for line in listeSessions:
+#                #self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+#                self.mapL += 1
+#
+#                # ligne détail
+#                l = "Session"
+#                f = self.detailSession
+#                self.addWindow(l,f,p)
+#                
+#                t = [40,2,line["date_session"],14]
+#                self.addItem(t)
+#                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
+#                t = [94,2,line["heure_session"],14]
+#                self.addItem(t)
+#                t = [130,2,line["circuit_session"],14]
+#                self.addItem(t)
+#                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
+#
+#            # touches de navigation pour la map Menu Sessions
+#            self.addTL3(picret,"RET",self.returnParent)
+#            self.addML3(pichome,"HOME",self.home)
+#            self.addBL3(picend,"END",self.end)
+#            self.addTR3(picup,"UP",self.upMenu)
+#            self.addMR3(picnext,"NEXT",self.next)
+#            self.addBR3(picdown,"DOWN",self.downMenu)
+#
+#            map = self.searchMap("Menu Sessions")
+#            #logger.debug("map detailSession après création fenêtres:"+str(map))
+#            #logger.debug("tMaps:"+str(self.tMaps))
+#            self.mapLevel = map["level"]
+#            self.mapL = 0
+#            #
+#
+#        else:
+#            self.mapLevel = 0
+#            return False
+#        self.epd.displayPartial(self.epd.getbuffer(self.image))
+#        self.epd.ReadBusy()
+#        self.stateDisplay = 1
+#        return True
+        
+    def createMaps(self):
+        self.mapLevel = -1
+        if self.addMap("Menu Principal",[40,0,209,60],61) == False:
             return False
 
-        r = [0,0,250,20]
-        t = [0,0,"Vous avez demandé 'Arrêt RPi', voulez-vous continuer ? ",16]
-        self.addItem(r, t, False)
-        t = [40,6,"OUI",24]
-        self.addItem(False, t, False)
-        t = [40,131,"NON",24]
-        self.addItem(False, t, False)
+        # fenêtres de la map Menu Principal
+        # fenêtre 1 = CMDs
+        f = self.menuCMDs
+        l = "CMDs"
+        self.addWindow(l,f)
+        t = [46,16,l] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 2 = Sessions
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.menuSessions
+        l = "Sessions"
+        self.addWindow(l,f)
+        t = [46,16,l] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
 
-        # arrêt (shutdown)
-        x = [0,125]
-        y = [41,122]
-        l = "Arrêt RPi"
-        f = self.stopRPi
-        self.addTouch(x, y, l, f)
-        # abandon arrêt
-        x = [125,250]
-        y = [41,122]
-        l = "HOME"
-        f = self.home
-        self.addTouch(x, y, l, f)
+        # touches de navigation pour la map Menu Principal
+        self.addML1(picend,"END",self.end)
 
-        if self.addMenu("Demande Redémarrage RPi",self.request_restartRPi,"Menu Commandes") == False:
-            #logger.info("erreur création Demande Redémarrage RPi")
+#        # Menu Commandes
+        if self.addMap("Menu Commandes",[40,0,209,60],61) == False:
             return False
+        
+        p = "CMDs" # fenêtre parente
 
-        r = [0,0,250,20]
-        t = [0,0,"Vous avez demandé 'Redémarrage RPi', voulez-vous continuer ? ",16]
-        self.addItem(r, t, False)
-        t = [40,6,"OUI",24]
-        self.addItem(False, t, False)
-        t = [40,131,"NON",24]
-        self.addItem(False, t, False)
-
-        # Menu confirmation affiché
-        # redémarrage (restart)
-        x = [0,125]
-        y = [41,122]
+        # fenêtre 1 = MyChronoGPS
+        f = self.request_MyChronoGPS
+        #f = self.request_("MyChronoGPS")
+        l = "MyChronoGPS"
+        self.addWindow(l,f,p)
+        t = [46,16,l] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 2 = Redémarrage RPi
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.request_restartRPi
         l = "Redémarrage RPi"
-        f = self.restartRPi
-        self.addTouch(x, y, l, f)
-        # abandon redémarrage
-        x = [125,250]
-        y = [41,122]
-        l = "HOME"
-        f = self.home
-        self.addTouch(x, y, l, f)
-        
-        
+        self.addWindow(l,f,p)
+        t = [46,16,l,20] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 3 = Arrêt RPi
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.request_stopRPi
+        l = "Arrêt RPi"
+        self.addWindow(l,f,p)
+        t = [46,16,l] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 4 = Effacement Auto Track
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.request_clearAutoTrack
+        l = "Effacement Auto Track"
+        self.addWindow(l,f,p)
+        t = [46,16,l,16] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 5 = Utilisation DB Track
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        #f = self.request_useDBTrack
+        f = self.getUseDBTrack
+        l = "Utilisation DB Track"
+        self.addWindow(l,f,p)
+        t = [46,16,l,16] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 6 = Utilisation Tracker
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.getTracker
+        l = "Tracker"
+        self.addWindow(l,f,p)
+        t = [46,16,l,16] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+
+        # touches de navigation pour la map Menu Commandes
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+        self.addTR3(picup,"UP",self.upMenu)
+        self.addBR3(picdown,"DOWN",self.downMenu)
+
+#        # Menu MyChronoGPS
+        if self.addMap("MyChronoGPS",[40,0,209,60],61) == False:
+            return False
+       
+        p = "MyChronoGPS" # fenêtre parente
+
+        # fenêtre 1 = démarrage MyChronoGPS
+        f = self.startGPS
+        l = "Démarrage MyChronoGPS"
+        self.addWindow(l,f,p)
+        t = [54,4,"Démarrer",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        t = [54,34,"MyChronoGPS",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
         #
-        # fin de la création des menus
+        # fenêtre 2 = arrêt MyChronoGPS
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.stopGPS
+        l = "Arrêt MyChronoGPS"
+        self.addWindow(l,f,p)
+        t = [54,4,"Arrêter",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t, False)
+        t = [54,34,"MyChronoGPS",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t, False)
         #
 
-        # affichage du premier menu
-        self.level = 0
-        #print(str(json.dumps(self.tMenus)))
+        # touches de navigation pour la map Menu MyChronoGPS
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+        self.addTR3(picup,"UP",self.upMenu)
+        self.addBR3(picdown,"DOWN",self.downMenu)
+
+#        # Menu Demande Arrêt RPi
+        if self.addMap("Demande Arrêt RPi",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Arrêt RPi"
+        self.addWindow(l)
+        r = [40,0,250,20]
+        t = [40,0,"Vous demandez 'Arrêt RPi'",16]
+        self.addItem(t, False, r)
+        t = [40,20,"voulez-vous continuer ? ",16]
+        self.addItem(t, False)
+        t = [60,60,"OUI",32]
+        self.addItem(t)
+        t = [160,60,"NON",32]
+        self.addItem(t)
+        self.addNav([40,124],[41,122],False,"OUI",self.stopRPi)
+        self.addNav([146,250],[41,122],False,"NON",self.end)
+
+        # touches de navigation pour la map Menu Demande Arrêt RPi
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Demande Redémarrage RPi
+        if self.addMap("Demande Redémarrage RPi",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Redémarrage RPi"
+        self.addWindow(l)
+        r = [40,0,250,40]
+        t = [40,0,"Vous demandez 'Redémarrage RPi',",16]
+        self.addItem(t, False, r)
+        t = [40,20,"voulez-vous continuer ? ",16]
+        self.addItem(t, False)
+        t = [60,60,"OUI",32]
+        self.addItem(t)
+        t = [160,60,"NON",32]
+        self.addItem(t)
+        self.addNav([40,124],[41,122],False,"OUI",self.restartRPi)
+        self.addNav([146,250],[41,122],False,"NON",self.end)
+
+        # touches de navigation pour la map Menu Demande Arrêt RPi
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Demande Effacement Auto Track
+        if self.addMap("Demande Effacement Auto Track",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Effacement Auto Track"
+        self.addWindow(l)
+        r = [40,0,250,40]
+        t = [40,0,"Vous demandez 'Effacement Auto Track',",16]
+        self.addItem(t, False, r)
+        t = [40,20,"voulez-vous continuer ? ",16]
+        self.addItem(t, False)
+        t = [60,60,"OUI",32]
+        self.addItem(t)
+        t = [160,60,"NON",32]
+        self.addItem(t)
+        self.addNav([40,124],[41,122],False,"OUI",self.clearAutoTrack)
+        self.addNav([146,250],[41,122],False,"NON",self.end)
+
+        # touches de navigation pour la map Menu Effacement Auto Track
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Utilisation DB Track
+        if self.addMap("Utilisation DB Track",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Utilisation DB Track"
+        self.addWindow(l)
+        
+        r = [40,0,250,40]
+        t = [40,0,"DB Tracks actuellement",16]
+        self.addItem(t, False, r)
+        t = [40,20,"{var}",16] # à remplacer par l'état actuel de l'utilisation de la DataBase (Actif / Inactif)
+        v = ["status"]
+        self.addItem(t, False, False, v)
+        
+        t = [60,70,"{var}",28] # à remplacer par l'action sur l'utilisation de la DataBase (ON / OFF)
+        v = ["action"]
+        self.addItem(t, False, False, v)
+        
+        self.addNav([40,250],[61,122],False,"?",self.switchUseDBTrack)
+
+        # touches de navigation pour la map Menu Demande Utilisation DB Track
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Utilisation Tracker
+        if self.addMap("Utilisation Tracker",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Utilisation Tracker"
+        self.addWindow(l)
+        r = [40,0,250,40]
+        t = [40,0,"Le Tracker est actuellement",16]
+        self.addItem(t, False, r)
+        t = [40,20,"{var}",16] # à remplacer par l'état actuel du Tracker (Actif / Inactif)
+        v = ["status"]
+        self.addItem(t, False, False, v)
+        
+        t = [60,70,"{var}",32] # à remplacer par l'action sur le Tracker (ON / OFF)
+        v = ["action"]
+        self.addItem(t, False, False, v)
+        
+        self.addNav([40,250],[61,122],False,"?",self.switchTracker)
+
+        # touches de navigation pour la map Utilisation Tracker
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Sessions
+        if self.addMap("Menu Sessions",[40,0,209,122],20) == False:
+            return False
+
+#        # Detail Session
+        if self.addMap("Detail Session",[40,0,209,122],20) == False:
+            return False
+
+        
+        logger.debug(str(self.tMaps))
+
+        self.mapLevel = 0
+        self.mapL = 0
         return True
 
-    def touchIcons(self):
-        #logger.info("def touchIcons:")
-        # zones touch des icônes
-        x = [0,40] # valeur x et x+1 de la zone touch
-        y = [0,61] # valeur y et y+1 de la zone touch
-        l = "RET"  # libellé zone touch
-        f = self.returnParent   # fonction appelée
-        self.addTouch(x, y, l, f)
-        x = [0,40]
-        y = [62,122]
-        l = "HOME"
-        f = self.home
-        self.addTouch(x, y, l, f)
-        x = [210,250]
-        y = [0,61]
-        l = "UP"
-        f = self.upMenu
-        self.addTouch(x, y, l, f)
-        x = [210,250]
-        y = [62,122]
-        l = "DOWN"
-        f = self.downMenu
-        self.addTouch(x, y, l, f)
-       
+# ajout des images de navigation
+###################
+# TL3         TR3 # Top Left / Top Right (3 Lignes)
+###################
+# ML3         MR3 # Middle Left / Middle Right
+###################
+# BL3         BR3 # Bottom Left / Bottom Right
+###################
+#
+###################
+#                 #
+# TL2         TR2 # Top Left / Top Right (2 Lignes)
+#                 #
+###################
+#                 #
+# BL2         BR2 # Bottom Left / Bottom Right (2 Lignes)
+#                 #
+###################
+#
+###################
+#                 #
+# ML1         MR1 # Middle Left / Middle Right (1 Ligne)
+#                 #
+###################
+#
+    def addML1(self,pic,lib,func):
+        x = [0,39] # valeur x et x+1 de la zone navigation
+        y = [0,121] # valeur y et y+1 de la zone navigation
+        img = [0,41,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addTL3(self,pic,lib,func):
+        x = [0,39] # valeur x et x+1 de la zone navigation
+        y = [0,40] # valeur y et y+1 de la zone navigation
+        img = [0,4,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addML3(self,pic,lib,func):
+        x = [0,39] # valeur x et x+1 de la zone navigation
+        y = [41,81] # valeur y et y+1 de la zone navigation
+        img = [0,45,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addBL3(self,pic,lib,func):
+        x = [0,39] # valeur x et x+1 de la zone navigation
+        y = [82,121] # valeur y et y+1 de la zone navigation
+        img = [0,86,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addTR3(self,pic,lib,func):
+        x = [210,249] # valeur x et x+1 de la zone navigation
+        y = [0,40] # valeur y et y+1 de la zone navigation
+        img = [210,4,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addMR3(self,pic,lib,func):
+        x = [210,249] # valeur x et x+1 de la zone navigation
+        y = [41,81] # valeur y et y+1 de la zone navigation
+        img = [210,45,pic]
+        self.addNav(x,y,img,lib,func)
+
+    def addBR3(self,pic,lib,func):
+        x = [210,249] # valeur x et x+1 de la zone navigation
+        y = [82,121] # valeur y et y+1 de la zone navigation
+        img = [210,86,pic]
+        self.addNav(x,y,img,lib,func)       
 
 if __name__ == '__main__':
     try:
         logger.info("MyChronoGPS_TE2in13V3")
+
+        # we start by reading the parameters ...
+        parms = Parms(Path)
         
         epd = epd2in13_V3.EPD()
         gt = gt1151.GT1151()
