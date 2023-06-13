@@ -2655,7 +2655,7 @@ def formatTimeDelta(t,format="mmsscc"):
     else:
         hh = floor(t.seconds / 3600)
         mm = floor(t.seconds / 60) - (hh * 60)
-        ss = round(t.seconds - ((hh * 3600) + (mm * 60)))
+        ss = floor(t.seconds - ((hh * 3600) + (mm * 60)))
         if format.find("hh") > -1:
             if hh < 10:
                 retour = "0"
@@ -2668,7 +2668,7 @@ def formatTimeDelta(t,format="mmsscc"):
             retour += "0"
         retour += str(int(ss))
         if format.find("cc") > -1:
-            cs = round(t.microseconds/10000)
+            cs = floor(t.microseconds/10000)
             retour += "."
             if cs < 10:
                 retour += "0"
