@@ -2835,8 +2835,9 @@ if __name__ == "__main__":
         if "TrackAcqTime" in parms.params:
             TrackAcqTime = el_parms
 
-        UseDBTrack = 0 # 0: by default, a search is made in the database of circuits if a start-finish line is cut
-                    # 1: no search, an "Autotrack" track will be created automatically in the database of circuits.
+        UseDBTrack = 1 # 1: by default, a search is made in the database of circuits if a start-finish line is cut
+                       # 0: no search, an "Autotrack" track will be created automatically in the database of circuits.
+                       
         el_parms = parms.get_parms("UseDBTrack")
         if "UseDBTrack" in parms.params:
             UseDBTrack = el_parms
