@@ -704,7 +704,8 @@ class DisplayControl(threading.Thread):
             i = 0
             temps_secteurs = []
             while i < len(self.chrono.temps_secteurs):
-                temps_secteurs[i] = formatTimeDelta(self.chrono.temps_secteurs[i])
+                ts = formatTimeDelta(self.chrono.temps_secteurs[i])
+                temps_secteurs.append(ts)
                 i = i+1
             
             self.infos["sect"] = temps_secteurs
