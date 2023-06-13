@@ -1948,7 +1948,7 @@ class ChronoControl():
                             if self.nblap > 0:
                                 fsession.write()
                                 fsession.commit() # the file is closed and reopened so as not to lose information in the event of a power cut
-                                fanalysis.commit() # the file is closed and reopened so as not to lose information in the event of a power cut
+                                fanalys.commit() # the file is closed and reopened so as not to lose information in the event of a power cut
     
                             if (len(self.intline)) > 0:
                                self.temps_secteurs = [] # the times of the sectors are erased
