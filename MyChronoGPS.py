@@ -1466,30 +1466,35 @@ class AnalysisControl():
         self.__current_state = self.CLOSED
         self.Line1 = False
         self.Line = False
+        self.started = False
         logger.info("AnalysisControl init complete")
 
     def start_analysis(self):
+        #logger.info("start_analysis")
         if self.__current_state != self.OPEN:
             self.filename = pathdata+'/analysis/analysis-'+self.chrono.fileTime+'.json'
             self.fileDescriptor = open(self.filename, 'w')
             self.__current_state = self.OPEN
             logger.info("analysis file open")
+        self.started = True
         
     def stop(self):
         if self.__current_state != self.CLOSED:
             self.fileDescriptor.close()
             self.__current_state = self.CLOSED
             self.Line = False
-            self.Line1 = False # to force the writing of line 1 when the file is opened again
+            #self.Line1 = False # to force the writing of line 1 when the file is opened again
             logger.info("analysis file closed")
         
     def commit(self):
+        #logger.info("commit")
         if self.__current_state != self.CLOSED:
             name = self.fileDescriptor.close
             self.fileDescriptor.close()
             self.fileDescriptor = open(pathdata+'/analysis/analysis-'+self.chrono.fileTime+'.json', 'a')
         
     def writePoint(self):
+        #logger.info("writePoint")
         if self.Line1 == False:
             self.writeLine1()
         self.Line = '[{"timestamp":"'+str(self.chrono.time0)+'"'
@@ -1518,8 +1523,12 @@ class AnalysisControl():
         self.Line1 = True
         
     def write(self,line=""):
-        if self.__current_state != self.OPEN:
+        if self.started == False:
             self.start_analysis()
+        if self.__current_state != self.OPEN:
+            self.fileDescriptor = open(pathdata+'/analysis/analysis-'+self.chrono.fileTime+'.json', 'a')
+            self.__current_state = self.OPEN
+        #logger.info(str(line))
         if self.__current_state == self.OPEN:
             line += "\r\n"
             self.fileDescriptor.write(line)
@@ -2101,6 +2110,7 @@ class ChronoControl():
             if GpsChronoMode > 0:
                 self.neardist = 999999
                 self.neartrack = ""
+                #logger.info(str(circuits))
                 for track in circuits:
                     LatFL = 0
                     LonFL = 0
@@ -2129,9 +2139,19 @@ class ChronoControl():
                     distcir = distanceGPS(gps.latitude, gps.longitude, LatFL, LonFL)
 
                     if distcir < self.neardist: # we found an even closer circuit
-                        self.neartrack = circuits[track]["NomCircuit"]
+                        #self.neartrack = circuits[track]["NomCircuit"]
+                        #logger.info(str(self.neartrack))
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
+                            self.neartrack = circuits[track]["NomCircuit"]
+                            if UseDBTrack == 1:
+                                # if the automatic definition of the line is in progress, it is stopped
+                                if acq != False:
+                                    if acq.active == True:
+                                        logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
+                                        logger.info('track='+str(self.neartrack)+' UseDBTrack='+str(UseDBTrack)+' TrackProximity='+str(TrackProximity))
+                                        acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
+
                             # we'll look to see if we've cut the starting line of the circuit nearby
                             # was the start/finish line cut ?
                             if self.gps.prevlat != 0:

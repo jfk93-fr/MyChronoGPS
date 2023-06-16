@@ -32,9 +32,11 @@ for fic in listfic:
             session = dict()
             session["fichier"] = fic
             session["stats"] = statinfo.st_size
-            T = fic.split(".")
+            
+            T = fic.split(extension[1])
             session["filename"] = T[0]
-            session["filetype"] = T[1]
+            session["filetype"] = extension[1]
+            
             # on recherche un "-" dans le nom du fichier
             R = session["filename"].split("/")
             #print(str(R))
