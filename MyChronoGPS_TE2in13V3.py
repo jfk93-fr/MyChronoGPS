@@ -21,6 +21,10 @@ import json
 import subprocess
 import shlex
 
+import time
+from datetime import timedelta, datetime, tzinfo
+from math import *
+
 main_module =  "MyChronoGPS"
 cmdgps =  "MyChronoGPS_TE2in13V3"
 pathcmd = Path.pathcmd
@@ -142,14 +146,9 @@ def get_module(moduleName):
     ps = str(proc_retval.strip().decode())
     Tps = ps.split('\n')
     for chaine in Tps:
-        #logger.info(str(chaine))
         fnd = chaine.find(str(moduleName+".py"))
-        #logger.info(str(fnd))
         if fnd > -1:
             return chaine
-        #if moduleName in chaine:
-        #    if ".py" in chaine:
-        #        return chaine
     return False
 
 class Screen():
@@ -172,8 +171,7 @@ class Screen():
         # Make sure to create image with mode '1' for 1-bit color.
         self.width = self.epd.width
         self.height = self.epd.height
-        #print('width='+str(self.width))
-        #print('height='+str(self.height))
+
         self.image = Image.new('1', (self.height, self.width), 255)
         
         # Get drawing object to draw on image.
@@ -218,12 +216,14 @@ class Screen():
         self.createMaps()
         
         self.ztouch = [] # zone touchée
+        
+        self.session = False
 
 
 #######################################################################
 # fonctions de gestion des maps    
 #######################################################################
-    def addMap(self,id,window=False,hwin=122):
+    def addMap(self,id,window=[0,0,254,121],hwin=122,header=False):
         #self.level += 1
         if self.searchMap(id) != False: #est-ce que la map existe déjà ?
             logger.info("la map "+str(id)+" existe déjà")
@@ -235,7 +235,7 @@ class Screen():
         dict["witem"] = [] # élément fenêtre
         dict["hwin"] = hwin # hauteur fenêtre
         dict["window"] = window # rect = [x0,y0,x1,y1] "[[coin supérieur gauche[x0,y0], [coin inférieur droit[x1,y1]]"
-        #dict["parent"] = pid
+        dict["header"] = header # si True: la 1ère fenêtre est toujours affichées.
         dict["nav"] = [] # éléments de navigation
         self.tMaps.append(dict)
         logger.debug(str(self.tMaps))
@@ -252,7 +252,6 @@ class Screen():
             if "id" in map:
                 if map["id"] == id:
                     logger.debug("map trouvée:"+str(map["id"])+", level:"+str(i))
-                    #return i
                     return map
             i += 1
         return False
@@ -282,10 +281,7 @@ class Screen():
                 tp = dict["txt"][3] # taille police = dernier élément du tableau
             font = ImageFont.truetype(self.ttf,tp)
             lib  = dict["txt"][2]
-            #txtsize = 
             dict["lngt"] = font.getlength(lib)
-            #logger.debug(str(font.getbbox(lib)))
-            #logger.debug(str(font.getlength(lib)))
         
         self.tMaps[self.mapLevel]["witem"][self.mapL]["item"].append(dict)
         logger.debug(str(self.tMaps))
@@ -306,24 +302,11 @@ class Screen():
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
 
         logger.debug("map Level "+str(self.tMaps[Level]))
-        # Affichage de la navigation
-        for icon in self.tMaps[Level]["nav"]:
-            if icon["img"] != False:
-                x = icon["x"]
-                y = icon["y"]
-                xp = icon["img"][0]
-                yp = icon["img"][1]
-                picture = icon["img"][2]
-                logger.debug("pic:"+str(picture))
-                img = Image.open(picture)
-                img = img.resize((40, 40),Image.NEAREST)
-                logger.debug("x:"+str(x)+",y:"+str(y))
-                self.image.paste(img, (xp,yp))
         
         # Affichage des fenêtres
         i = self.mapL
         maxi = len(self.tMaps[Level]["witem"]) - 1
-        #self.showDebug("maxi:"+str(maxi))
+
         offset = 0
         h = self.tMaps[Level]["hwin"]
         nbW = self.width / h
@@ -334,10 +317,25 @@ class Screen():
         if len(self.tMaps[Level]["witem"]) == 0:
             # pas de fenêtres à afficher !
             running = False
+        header = self.tMaps[Level]["header"]
+        if header == True:
+            i = 0
         while running == True:
             offset = h*iw
             logger.debug("offset:"+str(offset))
-            win = self.tMaps[Level]["witem"][i]
+            try:
+                win = self.tMaps[Level]["witem"][i]
+            except:
+                logger.setLevel(logging.DEBUG)
+                logger.debug("tMaps:"+str(self.tMaps))
+                logger.debug("mapLevel:"+str(self.mapLevel))
+                logger.debug("Level:"+str(Level))
+                logger.debug("mapL:"+str(self.mapL))
+                logger.debug("i:"+str(i))
+                logger.debug("witem:"+str(self.tMaps[Level]["witem"]))
+                self.showDebug("display error")
+                running = False
+                break
             logger.debug(str(win))
             rect = []
             rect.append(self.tMaps[Level]["window"][0])
@@ -379,11 +377,28 @@ class Screen():
                     img = img.resize((40, 40),Image.NEAREST)
                     self.image.paste(img, (x,y))
             iw += 1
+            if header == True:
+                i = self.mapL
+                header = False
             i += 1
             if iw > nbW:
                 running = False
             if i > maxi:
                 running = False
+
+        # Affichage de la navigation
+        for icon in self.tMaps[Level]["nav"]:
+            if icon["img"] != False:
+                x = icon["x"]
+                y = icon["y"]
+                xp = icon["img"][0]
+                yp = icon["img"][1]
+                picture = icon["img"][2]
+                logger.debug("pic:"+str(picture))
+                img = Image.open(picture)
+                img = img.resize((40, 40),Image.NEAREST)
+                logger.debug("x:"+str(x)+",y:"+str(y))
+                self.image.paste(img, (xp,yp))
         
         return self.image
 #######################################################################
@@ -392,13 +407,9 @@ class Screen():
     def lire_cache(self):
         if os.path.exists(self.cache) == False:
             time.sleep(0.2)
-            #return False
             return True
         with open(self.cache, 'r') as cache:
-            #logger.debug("read cache")
             message = cache.read()
-            #logger.debug(message)
-        #logger.debug("["+str(message)+"]/["+str(self.message)+"]")
         if message == self.message:
             time.sleep(0.2)
             return True
@@ -632,8 +643,6 @@ class Screen():
             self.draw.rectangle((0,0,self.height,self.width), fill=255)
             self.draw.text((self.x, self.top), " ",  font=self.font, fill=0)
             logger.debug("Clear...")
-            #self.epd.init()
-            #self.epd.Clear(0xFF)
             
         elif commande == POWER_OFF: # a stop to the programm is requested
             self.buff1 = ""
@@ -643,7 +652,6 @@ class Screen():
             self.draw.rectangle((0,0,self.height,self.width), outline=0, fill=0)
             self.draw.text((self.x, self.top), "",  font=self.font, fill=0)
             logger.debug("Goto Sleep...")
-            #return False
             
         else:
             logger.debug("commande invalide:"+commande)
@@ -659,7 +667,6 @@ class Screen():
         return True
 
     def boucle(self):
-        #logger.info("def boucle:")
         running = True
 
         self.image = Image.new('1', (self.epd.height, self.epd.width), 255)
@@ -673,16 +680,10 @@ class Screen():
         while running == True:
             # Read the touch input
             gt.GT_Scan(GT_Dev, GT_Old)
-            #logger.debug("State "+str(self.stateDisplay)+"/"+str(GT_Dev.X[0])+"/"+str(GT_Old.X[0])+"/"+str(GT_Dev.Y[0])+"/"+str(GT_Old.Y[0])+"/"+str(GT_Dev.S[0])+"/"+str(GT_Old.S[0]))
             if(self.stateDisplay == 0 and self.touch() == False):
-                #logger.debug("lire cache")
                 running = self.lire_cache()
-                #logger.debug("lire_cache:"+str(running))
             else:
-                logger.debug("dialog")
                 self.dialog()
-            #logger.debug("running loop:"+str(running)+" State "+str(self.stateDisplay))
-        logger.debug("end of loop")
 
     def touch(self):
         if GT_Dev.TouchCount == 0:
@@ -694,11 +695,9 @@ class Screen():
         if dev == old:
             return False
 
-        #logger.info("touch true"+str(self.level))
         self.draw.rectangle((self.height-8,0,self.height,8), outline=0, fill=0)
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
-        #time.sleep(3)
         return True
 
     def dialog(self):
@@ -708,67 +707,48 @@ class Screen():
         while running == True:
             if self.stateDisplay > 0:
                 if self.stateDisplay == self.laststate:
-                    if ct > 120: # 300 cycles de 0.1" = 30 secondes
+                    if ct > 1200: # 300 cycles de 0.1" = 30 secondes
                         # au bout d'un certain temps d'inactivité, on sort du dialogue
                         self.stateDisplay = 0
                         logger.info("trop de temps")
                         running = False
                         ct = 0
-                    logger.debug("ct:"+str(ct))
                     ct += 1
                 else:
                     ct = 0
                     self.laststate = self.stateDisplay
             else:
                 ct = 0
-            logger.debug("GT_Dev.Touch: "+str(GT_Dev.Touch))
 
-            logger.debug("before call performState:"+str(running))
             if running == True:
                 running = self.performState()
-                logger.debug("after call performState:"+str(running))
-            
-            logger.debug(str(running))
 
             time.sleep(0.1)
-            logger.debug("running after sleep:"+str(running))
+
             # Read the touch input
             gt.GT_Scan(GT_Dev, GT_Old)
             
 
         self.mapLevel = 0
         self.mapL = 0
-        self.showDebug("end of dialog")
         
         self.message = ""
-        logger.debug('end of dialog')
-        logger.debug('level:'+str(self.mapLevel))
-        logger.debug('line:'+str(self.mapL))
 
     def performState(self):
-        logger.debug("def performState level:"+str(self.level))
         running = True
-        logger.debug("state:"+str(self.stateDisplay))
         if self.stateDisplay == 0: # on vient du chronomètre
             self.displayMenuG()
-            logger.debug("running:"+str(running))
-            logger.debug("state:"+str(self.stateDisplay))
         elif self.stateDisplay == 1: # on vient du dialogue
             if self.touch() == True:
                 running = self.performMenuG()
-            logger.debug("running:"+str(running))
-            logger.debug("state:"+str(self.stateDisplay))
         else:
             self.showDebug(str(self.stateDisplay)+" inconnu")
-            logger.debug("Etat inconnu")
             self.stateDisplay = 0
             running = False
 
-        logger.debug("running:"+str(running))
         return running
         
     def get_touch(self):
-        #logger.debug("def get_touch:")
         zone = 0
         x = 250 - GT_Dev.Y[0]
         y = GT_Dev.X[0]
@@ -779,7 +759,6 @@ class Screen():
             lib = touch["lib"]
             func = touch["func"]
             txt = "hors zone"
-            logger.debug("tx:"+str(tx)+",ty:"+str(ty)+",lib:"+str(lib))
             if x > tx[0]-1 and x < tx[1]+1 and y > ty[0]-1 and y < ty[1]+1:
                 zone = touch
                 break
@@ -788,12 +767,9 @@ class Screen():
             ty = (self.tMaps[self.mapLevel]["window"][1],self.tMaps[self.mapLevel]["window"][3])
             zy = 0
             line = self.mapL # numéro de la première fenêtre affichée
-            logger.debug("tx:"+str(tx)+",ty:"+str(ty)+",line:"+str(line)+",width:"+str(self.width))
-            logger.debug("witem:"+str(self.tMaps[self.mapLevel]["witem"]))
             while zy < self.width:
                 if x > tx[0]-1 and x < tx[1]+1 and y > zy+ty[0]-1 and y < zy+ty[1]+1:
                     zone = {}
-                    #zone["func"] = self.tMaps[self.mapLevel]["witem"][line]["func"]
                     zone = self.tMaps[self.mapLevel]["witem"][line]
                     break                
                 zy = zy + self.tMaps[self.mapLevel]["hwin"]
@@ -802,7 +778,6 @@ class Screen():
         return zone
     
     def displayMenuG(self):
-        logger.debug("def displayMenuG:"+str(self.mapLevel))
         self.display(self.mapLevel)
 
         self.epd.displayPartial(self.epd.getbuffer(self.image))
@@ -811,15 +786,12 @@ class Screen():
         return True        
     
     def performMenuG(self):
-        #logger.info("def performMenuG:"+str(self.mapLevel))
         running = True
         self.ztouch = self.get_touch()
-        logger.debug("zone:"+str(self.ztouch))
         if self.ztouch == 0:
             self.errorZone()
             return False
         namefunc = self.ztouch.get("func", print(str(self.ztouch)))
-        logger.debug(namefunc)
         if namefunc == False:
             self.showDebug("Procédure non trouvée")
             self.stateDisplay = 0
@@ -841,7 +813,6 @@ class Screen():
     def showDebug(self,lib="?",fontsize=False):
         if logger.level != logging.DEBUG:
             return False
-        logger.debug(lib)    
         if fontsize ==False:
             fontsize = self.fontsmallsize
         self.showMessage(lib,fontsize)
@@ -858,8 +829,6 @@ class Screen():
         time.sleep(0.5)
         
     def home(self):
-        #logger.setLevel(logging.DEBUG)
-        logger.debug("def home:")
         self.showDebug("Home")
 
         self.mapLevel = 0
@@ -869,8 +838,6 @@ class Screen():
         return running
         
     def end(self):
-        #logger.setLevel(logging.DEBUG)
-        logger.debug("def end:")
         self.showDebug("END")
 
         self.mapLevel = 0
@@ -881,7 +848,6 @@ class Screen():
     def returnParent(self):
         # les données du parent sont dans la pile
         backscreen = self.depile()
-        logger.info("retour parent:"+str(backscreen))
         self.showDebug("retour parent:"+str(backscreen))
         if backscreen == 0:
             self.mapLevel = 0
@@ -891,31 +857,22 @@ class Screen():
         return True
         
     def downMenu(self):
-        #logger.debug("def downMenu:")
-        #self.showDebug("Down")
-
         self.stateDisplay = 0
         level = self.mapLevel
         line = self.mapL
-        logger.debug(str(self.tMaps[level]["witem"][line]))
         maxl = len(self.tMaps[level]["witem"])-1
-        logger.debug("line:"+str(line)+",maxl:"+str(maxl))
-        #self.showDebug("line:"+str(line)+",maxl:"+str(maxl))
         if line < maxl:
             line += 1
         self.mapL = line
         return True
         
     def upMenu(self):
-        #logger.debug("def upMenu:")
         self.showDebug("Up")
 
         self.stateDisplay = 0
         level = self.mapLevel
         line = self.mapL
-        logger.debug(str(self.tMaps[level]["witem"][line]))
         maxl = len(self.tMaps[level]["witem"])-1
-        logger.debug("line:"+str(line)+",maxl:"+str(maxl))
         self.showDebug("line:"+str(line)+",maxl:"+str(maxl))
         if line > 0:
             line -= 1
@@ -923,21 +880,18 @@ class Screen():
         return True
         
     def next(self):
-        #logger.setLevel(logging.DEBUG)
-        
-        logger.debug("def next:")
         self.showDebug("Next")
 
         self.stateDisplay = 0
         level = self.mapLevel
         line = self.mapL
-        logger.debug(str(self.tMaps[level]["witem"][line]))
+        if self.tMaps[level]["header"] == True:
+            line += 1
+
         if "func" in self.tMaps[level]["witem"][line]:
             self.showDebug("appel fonction Window")
-            logger.debug(str(self.tMaps[level]["witem"][line]))
             window = self.tMaps[level]["witem"][line]
             namefunc = window.get("func", print(str(window)))
-            logger.debug(namefunc)
             if namefunc == False:
                 self.showDebug("Procédure non trouvée")
                 self.stateDisplay = 0
@@ -951,20 +905,13 @@ class Screen():
 
         self.mapLevel = 0
         self.mapL = 0
-
-        #running = self.displayMenuG()
-        #return running
         return True
         
     def menuCMDs(self):
-        #logger.debug("def menuCMDs:")
         map = self.searchMap("Menu Commandes")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             self.display(map["level"])
-            logger.debug("level menuCMDs:"+str(self.mapLevel))
             self.empile()
-            logger.debug("map menuCMDs:"+str(map))
             self.mapLevel = map["level"]
             self.mapL = 0
         else:
@@ -982,35 +929,20 @@ class Screen():
         dict = {}
         dict["level"] = self.mapLevel
         dict["line"] = self.mapL
-        logger.debug("pile avant empile:"+str(self.pileW))
         self.pileW.append(dict)
-        logger.debug("pile après empile:"+str(self.pileW))
         
     def depile(self):
-        logger.debug("pile:"+str(self.pileW))
         if len(self.pileW) == 0:
             return True        
 
         i = len(self.pileW) - 1
         self.mapLevel = self.pileW[i]["level"]
-        logger.debug("élément pile:"+str(self.pileW[i]))
         self.mapL = self.pileW[i]["line"]
-        logger.debug("pile avant depile:"+str(self.pileW))
-        logger.debug("line:"+str(self.mapL))
 
-        a = self.pileW.pop()
-        logger.debug("pile après pop:"+str(self.pileW))
-        logger.debug("a:"+str(a))
-
-        logger.debug("map level:"+str(self.tMaps[self.mapLevel]))
-        logger.debug("witem:"+str(self.tMaps[self.mapLevel]["witem"][self.mapL]))
-
-        logger.debug("pile après depile:"+str(self.pileW))
         return True
         
     def request_MyChronoGPS(self):
         map = self.searchMap("MyChronoGPS")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             self.empile()
             self.mapL = 0
@@ -1026,12 +958,10 @@ class Screen():
         return True
         
     def startGPS(self):
-        #logger.debug("def startGPS:")
         font = ImageFont.truetype(self.ttf,18)
         self.showDebug("Démarrage MyChronoGPS en cours",font)
         #
         isModule = get_module(main_module)
-        #logger.debug("main_module:"+str(main_module))
         if isModule == False:
             try:
                 os.system(cmd_start)
@@ -1055,12 +985,10 @@ class Screen():
         return False        
         
     def stopGPS(self):
-        #logger.debug("def stopGPS:")
         font = ImageFont.truetype(self.ttf,18)
         self.showDebug("Arrêt MyChronoGPS en cours",font)
         #
         isModule = get_module(main_module)
-        #logger.debug("main_module:"+str(main_module))
         if isModule != False:
             try:
                 pipelcd = os.open(pipe_name, os.O_WRONLY, os.O_NONBLOCK)
@@ -1086,9 +1014,7 @@ class Screen():
         return False        
         
     def request_stopRPi(self):
-        logger.debug("def request_stopRPi:")
         map = self.searchMap("Demande Arrêt RPi")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             self.empile()
             self.mapL = 0
@@ -1102,13 +1028,10 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
-        logger.debug("end request_stopRPi:")
         return True
         
     def request_clearAutoTrack(self):
-        logger.debug("def request_clearAutoTrack:")
         map = self.searchMap("Demande Effacement Auto Track")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             self.empile()
             self.mapL = 0
@@ -1122,17 +1045,13 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
-        logger.debug("end request_clearAutoTrack:")
         return True
 
     def getUseDBTrack(self):
-        logger.debug("def getUseDBTrack:")
         map = self.searchMap("Utilisation DB Track")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             # affichage de la zone touchée
-            logger.debug("zone:"+str(self.ztouch))
-        
+
             # recherche du paramètre UseDBTrack actuel
             self.dbtracks = 0
             el_parms = parms.get_parms("UseDBTrack")
@@ -1146,29 +1065,18 @@ class Screen():
             else:
                 values.append("inactif")
                 values.append("DB Tracks ON")
-            #logger.debug("values:"+str(values))
 
             i = 0
             for item in map["witem"][0]["item"]:
-                #logger.debug("item:"+str(item))
                 if "vars" in item:
-                    #logger.debug("vars:"+str(item["vars"]))
-                    #i = 0
                     if item["vars"] != False:
                         for variable in item["vars"]:
-                            #logger.debug("variable:"+str(variable))
-                            #logger.debug("values:"+str(values[i]))
                             variable = values[i]
                             item["vars"][0] = variable
-                            #logger.debug("variable:"+str(variable))
-                            #logger.debug("vars:"+str(item["vars"]))
                             i += 1
-            #if i > 0:
-            #    logger.debug(str(map["witem"][0]["item"]))
-                
+
             self.empile()
             self.mapL = 0
-
 
             self.display(map["level"])
 
@@ -1181,16 +1089,12 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
-        logger.debug("end getUseDBTrack:")
         return True
 
     def getTracker(self):
-        logger.debug("def getTracker:")
         map = self.searchMap("Utilisation Tracker")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             # affichage de la zone touchée
-            logger.debug("zone:"+str(self.ztouch))
         
             # recherche du paramètre GpsTrackerMode actuel
             self.tracker = 0
@@ -1205,29 +1109,18 @@ class Screen():
             else:
                 values.append("inactif")
                 values.append("Tracker ON")
-            #logger.debug("values:"+str(values))
 
             i = 0
             for item in map["witem"][0]["item"]:
-                #logger.debug("item:"+str(item))
                 if "vars" in item:
-                    #logger.debug("vars:"+str(item["vars"]))
-                    #i = 0
                     if item["vars"] != False:
                         for variable in item["vars"]:
-                            #logger.debug("variable:"+str(variable))
-                            #logger.debug("values:"+str(values[i]))
                             variable = values[i]
                             item["vars"][0] = variable
-                            #logger.debug("variable:"+str(variable))
-                            #logger.debug("vars:"+str(item["vars"]))
                             i += 1
-            #if i > 0:
-            #    logger.debug(str(map["witem"][0]["item"]))
-                
+
             self.empile()
             self.mapL = 0
-
 
             self.display(map["level"])
 
@@ -1240,11 +1133,9 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
-        logger.debug("end getTracker:")
         return True
 
     def stopRPi(self):
-        #logger.info("def stopRPi:")
         font = ImageFont.truetype(self.ttf,18)
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
         self.draw.text((self.x, self.top), "Arrêt RPi en cours",  font=font, fill=0)
@@ -1275,9 +1166,7 @@ class Screen():
         return False
         
     def request_restartRPi(self):
-        logger.debug("def request_restartRPi:")
         map = self.searchMap("Demande Redémarrage RPi")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
             #self.nettoiePile()
             #self.mapL = 0
@@ -1293,11 +1182,9 @@ class Screen():
         self.epd.displayPartial(self.epd.getbuffer(self.image))
         self.epd.ReadBusy()
         self.stateDisplay = 1
-        logger.debug("end request_restartRPi:")
         return True
         
     def restartRPi(self):
-        #logger.info("def restartRPi:")
         font = ImageFont.truetype(self.ttf,18)
         self.draw.rectangle((0,0,self.height,self.width), fill=255)
         self.draw.text((self.x, self.top), "Redémarrage RPi en cours",  font=font, fill=0)
@@ -1326,7 +1213,6 @@ class Screen():
         
     def clearAutoTrack(self):
         logLevel = logger.level
-        #logger.level = logging.DEBUG
         self.showDebug("clearAutoTrack en cours")
         
         mydict = dict()
@@ -1359,7 +1245,6 @@ class Screen():
         
     def switchUseDBTrack(self):
         logLevel = logger.level
-        #logger.level = logging.DEBUG
                 
         # recherche du paramètre UseDBTrack actuel
         self.dbtracks = 0
@@ -1374,9 +1259,7 @@ class Screen():
             self.dbtracks = 1
             status_dbtracks = "ON"
             
-        #self.showDebug("UseDBTrack:"+str(status_dbtracks))
         parms.set_parms("UseDBTrack",self.dbtracks)
-        #self.showDebug("UseDBTrack:"+str(self.dbtracks))
         self.showDebug("dbtracks "+str(status_dbtracks))
 
         logger.level = logLevel
@@ -1386,7 +1269,6 @@ class Screen():
         
     def switchTracker(self):
         logLevel = logger.level
-        #logger.level = logging.DEBUG
                 
         # recherche du paramètre GpsTrackerMode actuel
         self.tracker = 0
@@ -1401,9 +1283,7 @@ class Screen():
             self.tracker = 1
             status_tracker = "ON"
             
-        #self.showDebug("GpsTrackerMode:"+str(status_tracker))
         parms.set_parms("GpsTrackerMode",self.tracker)
-        #self.showDebug("GpsTrackerMode:"+str(self.tracker))
         self.showDebug("tracker "+str(status_tracker))
 
         logger.level = logLevel
@@ -1412,23 +1292,19 @@ class Screen():
         return True
         
     def menuSessions(self):
-        logger.debug("def menuSessions:")
         map = self.searchMap("Menu Sessions")
-        logger.debug("résultat search map:"+str(map))
         if map != False:
-            self.display(map["level"])
-            logger.debug("level menuSessions:"+str(self.mapLevel))
             self.empile()
-            logger.debug("map menuSessions:"+str(map))
-            self.mapLevel = map["level"]
             self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
 
             # creation window liste des sessions
             map["witem"] = [] # effacement des fenêtres précédemment crées
             
             p = "Sessions"
             
-            # ligne titre
+            # # ligne titre
             l = "Liste Sessions"
             self.addWindow(l,False,p)
             t = [46,2,l,20] # position du texte, libellé & taille police (défaut = 24 si absent)
@@ -1438,7 +1314,6 @@ class Screen():
             listeSessions = self.getSessions()
             logger.debug("liste sessions:"+str(listeSessions))
             for line in listeSessions:
-                #self.mapL = len(self.tMaps[self.mapLevel]["witem"])
                 self.mapL += 1
 
                 # ligne détail
@@ -1449,12 +1324,10 @@ class Screen():
                 
                 t = [40,2,line["date_session"],14]
                 self.addItem(t)
-                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
-                t = [94,2,line["heure_session"],14]
+                t = [89,2,line["heure_session"],14]
                 self.addItem(t)
-                t = [130,2,line["circuit_session"],14]
+                t = [124,2,line["circuit_session"],14]
                 self.addItem(t)
-                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
 
             # touches de navigation pour la map Menu Sessions
             self.addTL3(picret,"RET",self.returnParent)
@@ -1465,11 +1338,8 @@ class Screen():
             self.addBR3(picdown,"DOWN",self.downMenu)
 
             map = self.searchMap("Menu Sessions")
-            #logger.debug("map menuSessions après création fenêtres:"+str(map))
-            #logger.debug("tMaps:"+str(self.tMaps))
             self.mapLevel = map["level"]
             self.mapL = 0
-            #
 
         else:
             self.mapLevel = 0
@@ -1504,91 +1374,308 @@ class Screen():
                     session["date_session"] = T[0][0:2]+T[0][3:5]+T[0][8:10]
                     session["heure_session"] = T[1][0:2]+T[0][3:5]
                     session["circuit_session"] = T[2]
-                    session["sort"] = T[0][6:4]+T[0][3:2]+T[0][0:2]+T[1]
+                    session["sort"] = str(T[0][6:10])+str(T[0][3:5])+str(T[0][0:2])+str(session["heure_session"])
                     FD.close()
                     result.append(session)
-        #logger.debug("résultat brut:"+str(result))
         result = sorted(result, key=lambda d: d["sort"], reverse=True)
-        #logger.debug("résultat trié:"+str(result))
         return result
         
+    def getChronos(self,fic):
+        result = []
+        session = dict()
+        FD = open(fic, 'r')
+        info = FD.read()
+        Tinfo = info.split('\n')
+        logger.debug(str(len(Tinfo)))
+        logger.debug("info:"+str(Tinfo))
+        line = Tinfo[0].split(";")
+        session["date"] = line[0]
+        session["heure"] = line[1]
+        session["circuit"] = line[2]
+
+        i = 1
+        chrono = []
+        best = False
+        blap = False
+        bin1 = False
+        bin2 = False
+        bin3 = False
+        bin4 = False
+        session["best"] = ""
+        session["bin1"] = ""
+        session["bin2"] = ""
+        session["bin3"] = ""
+        while i < len(Tinfo):
+            lap = dict()
+            line = Tinfo[i].split(";")
+            logger.debug("line:"+str(line))
+            if len(line) < 4:
+                break
+            lap["date"] = line[0]
+            lap["heure"] = line[1]
+            lap["lap"] = line[2]
+            lap["time"] = line[3]
+            if best == False or best > lap["time"]:
+                best = lap["time"]
+                blap = lap["lap"]
+            if len(line) > 4:
+                lap["int1"] = line[4]
+                if bin1 == False or bin1 > lap["int1"]:
+                    bin1 = lap["int1"]
+            if len(line) > 5:
+                lap["int2"] = line[5]
+                if bin2 == False or bin2 > lap["int2"]:
+                    bin2 = lap["int2"]
+            if len(line) > 6:
+                lap["int3"] = line[6]
+                if bin3 == False or bin3 > lap["int3"]:
+                    bin3 = lap["int3"]
+            if len(line) > 7:
+                lap["int4"] = line[7]
+                if bin4 == False or bin4 > lap["int4"]:
+                    bin4 = lap["int4"]
+            chrono.append(lap)
+            i += 1
+            
+        session["chrono"] = chrono
+        session["best"] = best
+        session["blap"] = blap
+        session["bin1"] = bin1
+        session["bin2"] = bin2
+        session["bin3"] = bin3
+        session["bin4"] = bin4
+        
+        idealTime = timedelta(seconds=0)
+        if bin1 != False:
+            dt = getTime(bin1)
+            idealTime += dt
+        if bin2 != False:
+            dt = getTime(bin2)
+            idealTime += dt
+        if bin3 != False:
+            dt = getTime(bin3)
+            idealTime += dt
+        if bin4 != False:
+            dt = getTime(bin4)
+            idealTime += dt
+        idt = formatTimeDelta(idealTime)
+        session["idt"] = idt
+        
+        result.append(session)
+        
+        return session
+        
     def detailSession(self):
-        logger.setLevel(logging.DEBUG)
         self.showDebug("detailSession en travaux")
 
-        logger.debug("def detailSession:")
-        map = self.searchMap("Menu Sessions")
-        logger.debug("résultat search map:"+str(map))
+        map = self.searchMap("Detail Session")
         if map != False:
+            self.empile()
+
+            if self.tMaps[self.mapLevel]["header"] == True:
+                self.mapL += 1
+            file_session = self.tMaps[self.mapLevel]["witem"][self.mapL]["xtra"]
+
+            self.mapL = 0
+            self.mapLevel = map["level"]
+
             self.display(map["level"])
-            logger.debug("level menuSessions:"+str(self.mapLevel))
-            logger.debug("line menuSessions:"+str(self.mapL))
-            logger.debug("map à détailler:"+str(self.tMaps[self.mapLevel]["witem"][self.mapL]))
-        
-        self.stateDisplay = 0
-        self.mapLevel = 0
-        return False
-    #def detailSession(self):
+
+            # creation window 
+            map["witem"] = [] # effacement des fenêtres précédemment crées
             
-#            # recherche des chronos de la session à détailler et création d'un tableau
-#            listeChronos = self.getChronos()
-#            logger.debug("liste chronos:"+str(listeChronos))
-#
-#            self.empile()
-#            logger.debug("map detailSession:"+str(map))
-#            self.mapLevel = map["level"]
-#            self.mapL = 0
-#
-#            # creation window détail de la session
-#            map["witem"] = [] # effacement des fenêtres précédemment crées
-#            
-#            p = "Sessions"
-#            
-#            # ligne titre
-#            l = "Detail Session"
-#            self.addWindow(l,False,p)
-#            t = [46,2,l,20] # position du texte, libellé & taille police (défaut = 24 si absent)
-#            self.addItem(t)
-#            for line in listeSessions:
-#                #self.mapL = len(self.tMaps[self.mapLevel]["witem"])
-#                self.mapL += 1
-#
-#                # ligne détail
-#                l = "Session"
-#                f = self.detailSession
-#                self.addWindow(l,f,p)
-#                
-#                t = [40,2,line["date_session"],14]
-#                self.addItem(t)
-#                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
-#                t = [94,2,line["heure_session"],14]
-#                self.addItem(t)
-#                t = [130,2,line["circuit_session"],14]
-#                self.addItem(t)
-#                #logger.debug(str(self.tMaps[self.mapLevel]["witem"][self.mapL]["item"]))                
-#
-#            # touches de navigation pour la map Menu Sessions
-#            self.addTL3(picret,"RET",self.returnParent)
-#            self.addML3(pichome,"HOME",self.home)
-#            self.addBL3(picend,"END",self.end)
-#            self.addTR3(picup,"UP",self.upMenu)
-#            self.addMR3(picnext,"NEXT",self.next)
-#            self.addBR3(picdown,"DOWN",self.downMenu)
-#
-#            map = self.searchMap("Menu Sessions")
-#            #logger.debug("map detailSession après création fenêtres:"+str(map))
-#            #logger.debug("tMaps:"+str(self.tMaps))
-#            self.mapLevel = map["level"]
-#            self.mapL = 0
-#            #
-#
-#        else:
-#            self.mapLevel = 0
-#            return False
-#        self.epd.displayPartial(self.epd.getbuffer(self.image))
-#        self.epd.ReadBusy()
-#        self.stateDisplay = 1
-#        return True
+            p = "Menu Sessions"
+
+            l = "Detail Session"
+            f = self.listeChronos
+            self.addWindow(l,f,p)            
+            
+            # recherche de la session et création d'un tableau des chronos
+            session = self.getChronos(file_session)
+            self.session = session
+
+            l = str(session["circuit"])
+            t = [40,2,l,18]
+            self.addItem(t)
+            l = str(session["date"])
+            t = [40,22,l,18]
+            self.addItem(t)
+            l = str(session["heure"])
+            t = [140,22,l,18]
+            self.addItem(t)
+            l = str(len(session["chrono"]))+" tours"
+            t = [40,42,l,18]
+            self.addItem(t)
+            l = "best L"+str(session["blap"])
+            t = [40,62,l,18]
+            self.addItem(t)
+            l = str(session["best"])
+            t = [140,62,l,18]
+            self.addItem(t)
+            if session["idt"] != "00:00.00":
+                l = "ideal Time"
+                t = [40,82,l,18]
+                self.addItem(t)
+                l = str(session["idt"])
+                t = [140,82,l,18]
+                self.addItem(t)
+            
+            # touches de navigation pour la map Detail Session
+            self.addTL3(picret,"RET",self.returnParent)
+            self.addML3(pichome,"HOME",self.home)
+            self.addBL3(picend,"END",self.end)
+            self.addMR3(picnext,"NEXT",self.next)
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+
+        else:
+            self.mapLevel = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        return True
+
+    def listeChronos(self):
+        self.showDebug("listeChronos en travaux")
+    
+        map = self.searchMap("Liste Chronos")
+        if map != False:
+            self.empile()
+            self.mapL = 0
+            self.display(map["level"])
+            self.mapLevel = map["level"]
+
+            # creation window liste des chronos
+            map["witem"] = [] # effacement des fenêtres précédemment crées
+            
+            p = "Sessions" # à affiner
+            
+            # # ligne titre
+            l = "Liste Chronos"
+            self.addWindow(l,False,p)
+            t = [46,2,"Tour",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+            self.addItem(t)
+            t = [100,2,"Temps",20] # position du texte, libellé & taille police (défaut = 24 si absent)
+            self.addItem(t)
+            
+            # examen des chronos
+            listeChronos = self.session["chrono"]
+            logger.debug("liste chronos:"+str(listeChronos))
+            for line in listeChronos:
+                self.mapL += 1
+
+                # ligne détail
+                l = "Chrono"
+                f = self.detailChrono
+                x = line
+                self.addWindow(l,f,p,x)
+                
+                t = [46,2,line["lap"],14]
+                self.addItem(t)
+                l = line["time"]
+                if line["time"] == self.session["best"]:
+                    l += " **"
+                t = [100,2,l,14]
+                self.addItem(t)
+
+            # touches de navigation pour la map Menu Sessions
+            self.addTL3(picret,"RET",self.returnParent)
+            self.addML3(pichome,"HOME",self.home)
+            self.addBL3(picend,"END",self.end)
+            self.addTR3(picup,"UP",self.upMenu)
+            self.addMR3(picnext,"NEXT",self.next)
+            self.addBR3(picdown,"DOWN",self.downMenu)
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+
+        else:
+            self.mapLevel = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        return True
+    
+        
+    def detailChrono(self):
+        self.showDebug("detailChrono en travaux")
+
+        map = self.searchMap("Detail Chrono")
+        if map != False:
+            self.empile()
+
+            if self.tMaps[self.mapLevel]["header"] == True:
+                self.mapL += 1                
+            
+            chrono = self.tMaps[self.mapLevel]["witem"][self.mapL]["xtra"]
+
+            self.mapL = 0
+            self.mapLevel = map["level"]
+
+            self.display(map["level"])
+
+            # creation window 
+            map["witem"] = [] # effacement des fenêtres précédemment crées
+            
+            p = "Menu Sessions"
+
+            l = "Detail Chrono"
+            self.addWindow(l,False,p)
+            
+            l = str(self.session["circuit"])
+            t = [40,2,l,18]
+            self.addItem(t)
+            l = str(chrono["date"])
+            t = [40,22,l,18]
+            self.addItem(t)
+            l = str(chrono["heure"])
+            t = [140,22,l,18]
+            self.addItem(t)
+            l = "Tour: "+str(chrono["lap"])
+            t = [40,42,l,18]
+            self.addItem(t)
+            l = str(chrono["time"])
+            t = [140,42,l,18]
+            self.addItem(t)
+            l = ""
+            if "int1" in chrono:
+                l += str(chrono["int1"])
+            t = [40,62,l,18]
+            self.addItem(t)
+            l = ""
+            if "int2" in chrono:
+                l += str(chrono["int2"])
+            t = [140,62,l,18]
+            self.addItem(t)
+            l = ""
+            if "int3" in chrono:
+                l += str(chrono["int3"])
+            t = [40,82,l,18]
+            self.addItem(t)
+            l = ""
+            if "int4" in chrono:
+                l += str(chrono["int4"])
+            t = [140,82,l,18]
+            self.addItem(t)
+            
+            # touches de navigation pour la map Detail Session
+            self.addTL3(picret,"RET",self.returnParent)
+            self.addML3(pichome,"HOME",self.home)
+            self.addBL3(picend,"END",self.end)
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+
+        else:
+            self.mapLevel = 0
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        return True
         
     def createMaps(self):
         self.mapLevel = -1
@@ -1837,15 +1924,20 @@ class Screen():
         self.addBL3(picend,"END",self.end)
 
 #        # Menu Sessions
-        if self.addMap("Menu Sessions",[40,0,209,122],20) == False:
+        if self.addMap("Menu Sessions",[40,0,209,122],20,True) == False:
             return False
 
 #        # Detail Session
-        if self.addMap("Detail Session",[40,0,209,122],20) == False:
+        if self.addMap("Detail Session",[40,0,209,122]) == False:
             return False
 
-        
-        logger.debug(str(self.tMaps))
+#        # Liste Chronos
+        if self.addMap("Liste Chronos",[40,0,209,122],20,True) == False:
+            return False
+
+#        # Detail Chrono
+        if self.addMap("Detail Chrono",[40,0,209,122]) == False:
+            return False
 
         self.mapLevel = 0
         self.mapL = 0
@@ -1917,6 +2009,48 @@ class Screen():
         y = [82,121] # valeur y et y+1 de la zone navigation
         img = [210,86,pic]
         self.addNav(x,y,img,lib,func)       
+        
+def getTime(time2delta):
+    timestr = str(time2delta)
+    logger.debug(str(timestr))
+    mm = timestr[0:2]
+    ss = timestr[3:5]
+    ms = timestr[6:8]
+    logger.debug(str(mm))
+    logger.debug(str(ss))
+    logger.debug(str(ms))
+    try:
+        return timedelta(hours=0,minutes=int(mm),seconds=int(ss),milliseconds=int(ms)*10)
+    except:
+        return timedelta(hours=0,minutes=0,seconds=0,milliseconds=0)
+def formatTimeDelta(t,format="mmsscc"):
+    # receives a timedelta object = returns a time in the form MM:SS.CC (in hundredths of a second)
+    retour = ""
+    if t == 0:
+        retour = "no valid time   "
+    else:
+        hh = floor(t.seconds / 3600)
+        mm = floor(t.seconds / 60) - (hh * 60)
+        ss = floor(t.seconds - ((hh * 3600) + (mm * 60)))
+        if format.find("hh") > -1:
+            if hh < 10:
+                retour = "0"
+            retour += str(int(hh))+":"           
+        if format.find("mm") > -1:
+            if mm < 10:
+                retour = "0"
+            retour += str(int(mm))+":"
+        if ss < 10:
+            retour += "0"
+        retour += str(int(ss))
+        if format.find("cc") > -1:
+            cs = floor(t.microseconds/10000)
+            retour += "."
+            if cs < 10:
+                retour += "0"
+            retour += str(int(cs))
+    
+    return retour
 
 if __name__ == '__main__':
     try:
@@ -1935,10 +2069,6 @@ if __name__ == '__main__':
         epd.init(epd.FULL_UPDATE)
         gt.GT_Init()
         epd.Clear(0xFF)
-        
-        #logger.info("wait 15 sec")
-        #time.sleep(15)
-        #logger.info("end wait")
     
         t = threading.Thread(target = pthread_irq)
         t.setDaemon(True)
@@ -1953,11 +2083,8 @@ if __name__ == '__main__':
         Screen().boucle()
         
         epd.init(epd.FULL_UPDATE)
-        #gt.GT_Init()   
         epd.Clear(0xFF)
-        #epd.Clear(0x00)
         flag_t = 0
-        #epd.sleep()
         time.sleep(2)
         t.join()
         epd.Dev_exit()
