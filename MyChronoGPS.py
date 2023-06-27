@@ -2322,6 +2322,7 @@ class AcqControl(threading.Thread):
         self.pulse = 90 # to calculate the break time
         self.dist2points = 120 # distance below which we look if we cut a line
         self.md2m = 15 # minimum distance between 2 measurements
+        self.vmin = 3 # the minimum speed for acquisition must be 3 km/h
         self.timestamp = 0.
         logger.info("AcqControl init complete")
 
@@ -2482,6 +2483,8 @@ class AcqControl(threading.Thread):
         self.seglat1 = self.acqlines[j]["lat"]
         self.seglon1 = self.acqlines[j]["lon"]
         self.getline()
+        if self.vit < self.vmin: # the minimum speed for acquisition must be 3 km/h
+            return False
         dist = distanceGPS(self.seglat1, self.seglon1, self.acqline["lat"], self.acqline["lon"])
         if dist < self.md2m: # at least 15m between 2 measurements
             return False

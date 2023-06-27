@@ -80,7 +80,7 @@ function showLines() {
 			Tabint[1].title = "Intermédiaire 2";
 		}
 		Tabint[1].color = "yellow";
-		Tabint[1].idelem = "Int1";
+		Tabint[1].idelem = "Int2";
 
 		drawLine(Tabint[1]);
 	}
