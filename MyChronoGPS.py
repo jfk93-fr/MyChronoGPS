@@ -397,10 +397,10 @@ class GpsControl(threading.Thread):
         logger.debug("is_pipe:"+str(is_pipe))
         if is_pipe == True:
             try:
-                logger.info("try to open fifo GPSCMD")
+                #logger.info("try to open fifo GPSCMD")
                 pipe = os.open(self.gpscmd, os.O_WRONLY, os.O_NONBLOCK)
                 if True:
-                    logger.info("write command E to fifo GPSCMD")
+                    #logger.info("write command E to fifo GPSCMD")
                     os.write(pipe, "EEEEE\r\n".encode())
             except OSError as err:
                 logger.error("cannot use named pipe GPS OS error: {0}".format(err))
@@ -464,12 +464,12 @@ class MenuControl(threading.Thread):
 
         while self.__running:
             fifo_data = self.lire_fifo()
-            logger.info("fifo_data:"+str(fifo_data))
+            #logger.info("fifo_data:"+str(fifo_data))
             self.current_button = int(fifo_data[0:1])
             self.__current_state = int(fifo_data[1:2])
             if self.__current_state != self.prev_state:
                 self.prev_state = self.__current_state
-                logger.info("previous state:"+str(self.prev_state))
+                #logger.info("previous state:"+str(self.prev_state))
             # choice of actions according to the buttons
             if self.current_button == 1:
                 # button 1 = main button
@@ -482,7 +482,7 @@ class MenuControl(threading.Thread):
                     self.running_state = POWER_OFF
                     logger.info("POWER_OFF")
                 else:
-                    logger.info("self.__current_state:"+str(self.__current_state))
+                    #logger.info("self.__current_state:"+str(self.__current_state))
                     if self.buttonNumber > 1:
                         # there are several buttons => menu management
                         if self.menu_state == MENU_OFF:
@@ -495,7 +495,7 @@ class MenuControl(threading.Thread):
                         self.running_state = self.running_state + 1
                         if (self.running_state > self.max_wheel):
                             self.running_state = 0
-                logger.info("running state:"+str(self.running_state))
+                #logger.info("running state:"+str(self.running_state))
 
             elif self.current_button == 2:
                 # button 2 = scroll down the menu
@@ -1226,11 +1226,11 @@ class IlsControl(threading.Thread):
             if self.ilstime != False:
                 self.ilstime = False
                 if self.chrono.nblap == 1:
-                    logger.info("tTimer start request")
+                    #logger.info("tTimer start request")
                     delai = 3.0
                     tTimer = Timer(delai, self.tick_delayed())
                     tTimer.start()  # after 3 seconds, the tick is triggered
-                    logger.info("tTimer started after:"+str(delai)+" secs")
+                    #logger.info("tTimer started after:"+str(delai)+" secs")
                 else:
                     self.ilsticktime += self.chrono.temps_tour / timedelta(seconds=1)
                     delai = self.ilsticktime - time.time()
@@ -1449,10 +1449,10 @@ class LiveSession(threading.Thread):
             line += ',"PitIn":['+str(self.chrono.pitin.lat1)+","+str(self.chrono.pitin.lon1)+","+str(self.chrono.pitin.lat2)+","+str(self.chrono.pitin.lon2)+"]"
             line += ',"PitOut":['+str(self.chrono.pitout.lat1)+","+str(self.chrono.pitout.lon1)+","+str(self.chrono.pitout.lat2)+","+str(self.chrono.pitout.lon2)+"]"
         i = 0
+        #logger.info(str(self.chrono.intline))
         while i < len(self.chrono.intline):
             line += ',"Int'+str(i+1)+'":['+str(self.chrono.intline[i].lat1)+","+str(self.chrono.intline[i].lon1)+","+str(self.chrono.intline[i].lat2)+","+str(self.chrono.intline[i].lon2)+"]"
             i = i+1            
-
         line += '}]'
         self.Line1 = line
         
@@ -1763,6 +1763,12 @@ class ChronoControl():
         line = '{"date":"'+str(formatGpsDate(self.gps))+'"'
         line += ',"NomCircuit":"Autotrack"'
         line += ',"FL":['+str(self.startlat1)+","+str(self.startlon1)+","+str(self.startlat2)+","+str(self.startlon2)+"]"
+
+        i = 0
+        while i < len(self.intline):
+            line += ',"Int'+str(i+1)+'":['+str(self.intline[i].lat1)+","+str(self.intline[i].lon1)+","+str(self.intline[i].lat2)+","+str(self.intline[i].lon2)+"]"
+            i = i+1            
+
         line += '}'
         self.track = pathdata+'/tracks/Autotrack.trk' # location of the Autotrack track file
         try:
@@ -2364,11 +2370,79 @@ class AcqControl(threading.Thread):
                                 lon2 = self.acqlines[i]["lon2"]
                                 self.cut = self.chrono.is_lineCut(lat1,lon1,lat2,lon2,self.seglat1,self.seglon1,self.seglat2,self.seglon2)
                                 if self.cut == True:
+                                    #logger.info("acqlines:"+str(self.acqlines))
                                     k = j - 1
                                     self.chrono.getGpsData();
                                     # we cut a line, we will draw the line from the calculated coordinates
                                     # instead of drawing the line, we could indicate that we are ready to draw it
                                     self.chrono.define_start_wcap(self.acqlines[i]["lat"], self.acqlines[i]["lon"], self.acqlines[i]["cap"])
+
+                                    #
+                                    # creation of 3 intermediate lines
+                                    ii = i
+                                    li = len(self.acqlines)-1
+                                    hh=int(self.acqlines[i]["time"][0:2])
+                                    mm=int(self.acqlines[i]["time"][2:4])
+                                    ss=int(self.acqlines[i]["time"][4:6])
+                                    td = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    hh=int(self.acqlines[li]["time"][0:2])
+                                    mm=int(self.acqlines[li]["time"][2:4])
+                                    ss=int(self.acqlines[li]["time"][4:6])
+                                    tf = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    tl = tf - td
+                                    ts = floor(tl.total_seconds()/4)
+                                    
+                                    # creation of intermediate line 1
+                                    ti1 = td+timedelta(seconds=ts)
+                                    tr = td
+                                    while ti1 > tr:
+                                        ii0 = ii
+                                        ii += 1
+                                        hh=int(self.acqlines[ii]["time"][0:2])
+                                        mm=int(self.acqlines[ii]["time"][2:4])
+                                        ss=int(self.acqlines[ii]["time"][4:6])
+                                        tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    self.chrono.intline.append("")
+                                    self.chrono.intline[0] = self.chrono.ChronoData()
+                                    self.chrono.intline[0].lat1 =  self.acqlines[ii0]["lat1"]
+                                    self.chrono.intline[0].lon1 =  self.acqlines[ii0]["lon1"]
+                                    self.chrono.intline[0].lat2 =  self.acqlines[ii0]["lat2"]
+                                    self.chrono.intline[0].lon2 =  self.acqlines[ii0]["lon2"]
+                                    
+                                    # creation of intermediate line 2
+                                    ti2 = ti1+timedelta(seconds=ts)
+                                    tr = ti1
+                                    while ti2 > tr:
+                                        ii0 = ii
+                                        ii += 1
+                                        hh=int(self.acqlines[ii]["time"][0:2])
+                                        mm=int(self.acqlines[ii]["time"][2:4])
+                                        ss=int(self.acqlines[ii]["time"][4:6])
+                                        tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    self.chrono.intline.append("")
+                                    self.chrono.intline[1] = self.chrono.ChronoData()
+                                    self.chrono.intline[1].lat1 =  self.acqlines[ii0]["lat1"]
+                                    self.chrono.intline[1].lon1 =  self.acqlines[ii0]["lon1"]
+                                    self.chrono.intline[1].lat2 =  self.acqlines[ii0]["lat2"]
+                                    self.chrono.intline[1].lon2 =  self.acqlines[ii0]["lon2"]
+                                    
+                                    # creation of intermediate line 3
+                                    ti3 = ti2+timedelta(seconds=ts)
+                                    tr = ti2
+                                    while ti3 > tr:
+                                        ii0 = ii
+                                        ii += 1
+                                        hh=int(self.acqlines[ii]["time"][0:2])
+                                        mm=int(self.acqlines[ii]["time"][2:4])
+                                        ss=int(self.acqlines[ii]["time"][4:6])
+                                        tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    self.chrono.intline.append("")
+                                    self.chrono.intline[2] = self.chrono.ChronoData()
+                                    self.chrono.intline[2].lat1 =  self.acqlines[ii0]["lat1"]
+                                    self.chrono.intline[2].lon1 =  self.acqlines[ii0]["lon1"]
+                                    self.chrono.intline[2].lat2 =  self.acqlines[ii0]["lat2"]
+                                    self.chrono.intline[2].lon2 =  self.acqlines[ii0]["lon2"]
+
                                     # creation of the self-defined track
                                     self.chrono.create_sfTrack()
                                     
@@ -2859,12 +2933,22 @@ if __name__ == "__main__":
         if "TrackAcqTime" in parms.params:
             TrackAcqTime = el_parms
 
+        AutoTrackMode = 1 # 1: by default an autotrack can be created
+                          # 0: no autotrack is created in this mode.
+        el_parms = parms.get_parms("AutoTrackMode")
+        if "AutoTrackMode" in parms.params:
+            AutoTrackMode = el_parms
+
         UseDBTrack = 1 # 1: by default, a search is made in the database of circuits if a start-finish line is cut
                        # 0: no search, an "Autotrack" track will be created automatically in the database of circuits.
-                       
         el_parms = parms.get_parms("UseDBTrack")
         if "UseDBTrack" in parms.params:
             UseDBTrack = el_parms
+            
+        if AutoTrackMode == 0 and UseDBTrack == 0:
+            #if autotrackmode = 0 (no autotrack creation) and no use of the track base,
+            #then autotrackmode is forced to 1 (automatic autotrack creation).
+            AutoTrackMode == 1;
             
         el_parms = parms.get_parms("PredictiveTimeMode")
         if "PredictiveTimeMode" in parms.params:
@@ -2889,7 +2973,7 @@ if __name__ == "__main__":
             circuits = {}
                 
             if UseDBTrack == 0:
-                logger.info("dirlist:"+str(dirlist))
+                #logger.info("dirlist:"+str(dirlist))
                 if "Autotrack.trk" in dirlist:
                     TFD = open(dirtracks+"/Autotrack.trk", 'r')
                     circuits["Autotrack"] = json.loads(TFD.read())
@@ -3042,7 +3126,7 @@ if __name__ == "__main__":
                                             menu.running_state = READY
                                             chrono.begin()
                                         else:
-                                            if acq == False:
+                                            if acq == False and AutoTrackMode == 1:
                                                 # if the GPS point acquisition thread is not started, it is started
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
