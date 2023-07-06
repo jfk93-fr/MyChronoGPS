@@ -414,6 +414,7 @@ function mouseMove(mousePt) {
 	if (oStatusDiv) {
 		oStatusDiv.value  = mouseLat + ',' + mouseLon;
 	}
+	document.getElementById("zone-info").innerHTML = '';
 }
 	
 function copyClipboard(mousePt) {
@@ -507,22 +508,25 @@ function showData() {
 
 	/* FL en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("FLLat1");
-	//console.log("FL:"+thisCircuit.FL)
+	el.value = undefined;
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("FLLon1");
+	el.value = undefined;
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("FLLat2");
+	el.value = undefined;
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("FLLon2");
+	el.value = undefined;
 	if (thisCircuit.FL) {
 		el.value = thisCircuit.FL[3];
 	}
@@ -530,18 +534,21 @@ function showData() {
 
 	/* FL en lat,lon,cap */
 	el = document.getElementById("LatFL");
+	el.value = undefined;
 	if (thisCircuit.LatFL) {
 		el.value = thisCircuit.LatFL;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonFL");
+	el.value = undefined;
 	if (thisCircuit.LonFL) {
 		el.value = thisCircuit.LonFL;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapFL");
+	el.value = undefined;
 	if (thisCircuit.CapFL) {
 		el.value = thisCircuit.CapFL;
 	}
@@ -549,21 +556,25 @@ function showData() {
 
 	/* Int1 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int1Lat1");
+	el.value = undefined;
 	if (thisCircuit.Int1) {
 		el.value = thisCircuit.Int1[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int1Lon1");
+	el.value = undefined;
 	if (thisCircuit.Int1) {
 		el.value = thisCircuit.Int1[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int1Lat2");
+	el.value = undefined;
 	if (thisCircuit.Int1) {
 		el.value = thisCircuit.Int1[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int1Lon2");
+	el.value = undefined;
 	if (thisCircuit.Int1) {
 		el.value = thisCircuit.Int1[3];
 	}
@@ -571,18 +582,21 @@ function showData() {
 
 	/* Int1 en lat,lon,cap */
 	el = document.getElementById("LatInt1");
+	el.value = undefined;
 	if (thisCircuit.LatInt1) {
 		el.value = thisCircuit.LatInt1;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonInt1");
+	el.value = undefined;
 	if (thisCircuit.LonInt1) {
 		el.value = thisCircuit.LonInt1;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapInt1");
+	el.value = undefined;
 	if (thisCircuit.CapInt1) {
 		el.value = thisCircuit.CapInt1;
 	}
@@ -590,21 +604,25 @@ function showData() {
 
 	/* Int2 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int2Lat1");
+	el.value = undefined;
 	if (thisCircuit.Int2) {
 		el.value = thisCircuit.Int2[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int2Lon1");
+	el.value = undefined;
 	if (thisCircuit.Int2) {
 		el.value = thisCircuit.Int2[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int2Lat2");
+	el.value = undefined;
 	if (thisCircuit.Int2) {
 		el.value = thisCircuit.Int2[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int2Lon2");
+	el.value = undefined;
 	if (thisCircuit.Int2) {
 		el.value = thisCircuit.Int2[3];
 	}
@@ -612,18 +630,21 @@ function showData() {
 
 	/* Int2 en lat,lon,cap */
 	el = document.getElementById("LatInt2");
+	el.value = undefined;
 	if (thisCircuit.LatInt2) {
 		el.value = thisCircuit.LatInt2;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonInt2");
+	el.value = undefined;
 	if (thisCircuit.LonInt2) {
 		el.value = thisCircuit.LonInt2;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapInt2");
+	el.value = undefined;
 	if (thisCircuit.CapInt2) {
 		el.value = thisCircuit.CapInt2;
 	}
@@ -631,21 +652,25 @@ function showData() {
 
 	/* Int3 en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("Int3Lat1");
+	el.value = undefined;
 	if (thisCircuit.Int3) {
 		el.value = thisCircuit.Int3[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int3Lon1");
+	el.value = undefined;
 	if (thisCircuit.Int3) {
 		el.value = thisCircuit.Int3[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int3Lat2");
+	el.value = undefined;
 	if (thisCircuit.Int3) {
 		el.value = thisCircuit.Int3[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("Int3Lon2");
+	el.value = undefined;
 	if (thisCircuit.Int3) {
 		el.value = thisCircuit.Int3[3];
 	}
@@ -653,18 +678,21 @@ function showData() {
 
 	/* Int3 en lat,lon,cap */
 	el = document.getElementById("LatInt3");
+	el.value = undefined;
 	if (thisCircuit.LatInt3) {
 		el.value = thisCircuit.LatInt3;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonInt3");
+	el.value = undefined;
 	if (thisCircuit.LonInt3) {
 		el.value = thisCircuit.LonInt3;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapInt3");
+	el.value = undefined;
 	if (thisCircuit.CapInt3) {
 		el.value = thisCircuit.CapInt3;
 	}
@@ -672,21 +700,25 @@ function showData() {
 
 	/* PitIn en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("PitInLat1");
+	el.value = undefined;
 	if (thisCircuit.PitIn) {
 		el.value = thisCircuit.PitIn[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitInLon1");
+	el.value = undefined;
 	if (thisCircuit.PitIn) {
 		el.value = thisCircuit.PitIn[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitInLat2");
+	el.value = undefined;
 	if (thisCircuit.PitIn) {
 		el.value = thisCircuit.PitIn[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitInLon2");
+	el.value = undefined;
 	if (thisCircuit.PitIn) {
 		el.value = thisCircuit.PitIn[3];
 	}
@@ -694,18 +726,21 @@ function showData() {
 
 	/* PitIn en lat,lon,cap */
 	el = document.getElementById("LatPitIn");
+	el.value = undefined;
 	if (thisCircuit.LatPitIn) {
 		el.value = thisCircuit.LatPitIn;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonPitIn");
+	el.value = undefined;
 	if (thisCircuit.LonPitIn) {
 		el.value = thisCircuit.LonPitIn;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapPitIn");
+	el.value = undefined;
 	if (thisCircuit.CapPitIn) {
 		el.value = thisCircuit.CapPitIn;
 	}
@@ -713,21 +748,25 @@ function showData() {
 
 	/* PitOut en lat1,lon1 / lat2,lon2 */
 	el = document.getElementById("PitOutLat1");
+	el.value = undefined;
 	if (thisCircuit.PitOut) {
 		el.value = thisCircuit.PitOut[0];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitOutLon1");
+	el.value = undefined;
 	if (thisCircuit.PitOut) {
 		el.value = thisCircuit.PitOut[1];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitOutLat2");
+	el.value = undefined;
 	if (thisCircuit.PitOut) {
 		el.value = thisCircuit.PitOut[2];
 	}
 	else el.style.display = 'none';
 	el = document.getElementById("PitOutLon2");
+	el.value = undefined;
 	if (thisCircuit.PitOut) {
 		el.value = thisCircuit.PitOut[3];
 	}
@@ -735,18 +774,21 @@ function showData() {
 
 	/* PitOut en lat,lon,cap */
 	el = document.getElementById("LatPitOut");
+	el.value = undefined;
 	if (thisCircuit.LatPitOut) {
 		el.value = thisCircuit.LatPitOut;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("LonPitOut");
+	el.value = undefined;
 	if (thisCircuit.LonPitOut) {
 		el.value = thisCircuit.LonPitOut;
 	}
 	else el.style.display = 'none';
 
 	el = document.getElementById("CapPitOut");
+	el.value = undefined;
 	if (thisCircuit.CapPitOut) {
 		el.value = thisCircuit.CapPitOut;
 	}
@@ -754,6 +796,7 @@ function showData() {
 
 	var el;
 	el = document.getElementById("NameFL");
+	el.value = undefined;
 	if (thisCircuit.NameFL) {
 		el.value = thisCircuit.NameFL;
 	}
@@ -761,6 +804,7 @@ function showData() {
 
 	var el;
 	el = document.getElementById("NameInt1");
+	el.value = undefined;
 	if (thisCircuit.NameInt1) {
 		el.value = thisCircuit.NameInt1;
 	}
@@ -768,6 +812,7 @@ function showData() {
 
 	var el;
 	el = document.getElementById("NameInt2");
+	el.value = undefined;
 	if (thisCircuit.NameInt2) {
 		el.value = thisCircuit.NameInt2;
 	}
@@ -775,12 +820,88 @@ function showData() {
 
 	var el;
 	el = document.getElementById("NameInt3");
+	el.value = undefined;
 	if (thisCircuit.NameInt3) {
 		el.value = thisCircuit.NameInt3;
 	}
 	else el.style.display = 'none';
+}
 
+function deleteLine(line) {
+	document.getElementById("zone-info").innerHTML = '';
+	var center = map.getCenter(); // on met de côté le centrage actuel
+	// On recentre la map avec le zoom d'origine
+	resetScreen();
+	
+	var obj = getObjLine(line)
+	if (!obj)
+		return;
+	if (!confirm("vous êtes sur le point de supprimer la ligne "+obj.idelem+", voulez-vous continuer ?"))
+		return;
 
+	// on efface tous les marqueurs
+	if (typeof(obj.marker1) != 'undefined') {
+		if (obj.marker1 != '') {
+			//obj.marker1.setMap(null);
+			map.removeLayer(obj.marker1);
+			obj.marker1 = '';
+		}
+	}
+		
+	if (typeof(obj.marker2) != 'undefined') {
+		if (obj.marker2 != '') {
+			//obj.marker2.setMap(null);
+			map.removeLayer(obj.marker2);
+			obj.marker2 = '';
+		}
+	}
+
+	if (typeof(obj.line) != 'undefined') {
+		if (obj.line != '') {
+			//obj.line.setMap(null);
+			map.removeLayer(obj.line);
+			obj.line = '';
+		}
+	}
+	// On récrée les objets
+	if (line > 0) {
+		if (Tabint[line-1])
+			Tabint[line-1] = new Object();
+		if (Tabint[0]) {
+			if (typeof(thisCircuit.Int1) != 'undefined') {
+				delete thisCircuit.Int1;
+				delete thisCircuit.LatInt1;
+				delete thisCircuit.LonInt1;
+				delete thisCircuit.CapInt1;
+			}
+		}
+		if (Tabint[1]) {
+			if (typeof(thisCircuit.Int2) != 'undefined') {
+				delete thisCircuit.Int2;
+				delete thisCircuit.LatInt2;
+				delete thisCircuit.LonInt2;
+				delete thisCircuit.CapInt2;
+			}
+		}
+		if (Tabint[2]) {
+			if (typeof(thisCircuit.Int3) != 'undefined') {
+				delete thisCircuit.Int3;
+				delete thisCircuit.LatInt3;
+				delete thisCircuit.LonInt3;
+				delete thisCircuit.CapInt3;
+			}
+		}
+	}
+
+	if (line == 0) {
+		objStart = new Object();
+		delete thisCircuit.FL;
+	}
+	if (line == -1)
+		objPitIn = new Object();
+	if (line == -2)
+		objPitOut = new Object();
+	showData(); // remplissage des données lues dans les input
 }
 
 function copyTrack(parm=0) {
@@ -1079,6 +1200,7 @@ function saveTrack(parm) {
 	createNewTrack();
 
 	dataPost = new FormData();
+	
 	for (property in Track) {		
 		var valuePost = Track[property];
 		if (Array.isArray(Track[property])) {
@@ -1186,6 +1308,82 @@ function manageLine(line) {
 	drawLine(obj);
 	setMaxZoom(obj.lat,obj.lon,2);
 	
+}
+	
+function designLine(line) {
+	var center = map.getCenter(); // on met de côté le centrage actuel
+	// On recentre la map avec le zoom d'origine
+	resetScreen();
+	
+	var obj = getObjLine(line)
+
+	if (obj.coord) {
+		var newobj = drawLine(obj);
+		return;
+	}
+
+	if (obj.marker) {
+		setMaxZoom(obj.lat,obj.lon);
+		return;
+	}
+	if (obj.marker1) {
+		setMaxZoom(obj.coord[0],obj.coord[1]);
+		return;
+	}
+
+	obj = new Object();
+	// Si la ligne n'existe pas on va la placer là où on était centré
+	obj.lat = center.lat;
+	obj.lon = center.lng;
+	obj.cap = 0;
+	if (line == 0) {
+		obj.title = "Ligne de départ/arrivée";
+		obj.color = "yellow";
+		obj.idelem = "FL";
+	}
+	if (line > 0) {
+		obj.title = "Intermédiaire "+line;
+		obj.color = "blue";
+		obj.idelem = "Int"+line;
+	}
+	if (line == -1) {
+		obj.title = "Pit In";
+		obj.color = "orange";
+		obj.idelem = "PitIn";
+	}
+	if (line == -2) {
+		obj.title = "Pit Out";
+		obj.color = "green";
+		obj.idelem = "PitOut";
+	}
+
+	var newobj = drawLine(obj);
+	if (line > 0) {
+		Tabint[line-1] = obj;
+	}
+	if (line == 0)
+		objStart = obj;
+	if (line == -1)
+		objPitIn = obj;
+	if (line == -2)
+		objPitOut = obj;
+
+	setMaxZoom(obj.lat,obj.lon,2);
+}
+
+function getObjLine(line) {
+	var obj = false;
+	if (line > 0) {
+		if (Tabint[line-1])
+			obj = Tabint[line-1];
+	}
+	if (line == 0)
+		obj = objStart;
+	if (line == -1)
+		obj = objPitIn;
+	if (line == -2)
+		obj = objPitOut;
+	return obj;
 }
 
 function resetScreen() {

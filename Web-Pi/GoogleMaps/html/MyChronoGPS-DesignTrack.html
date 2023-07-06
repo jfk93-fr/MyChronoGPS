@@ -18,20 +18,99 @@
 <body>
 <div class="w3-main">
 	<div class="w3-container w3-row">
-		<div class="w3-col l1 m1 s2"><a class="w3-button w3-border w3-round" href="MyChronoGPS.html" >Menu</a></div>
-		<div class="w3-col l1 m1 s2"><a class="w3-button w3-border w3-round" href="MyChronoGPS-Tracks.html" >Circuits</a></div>
-		<span id="zone-info"></span>&nbsp;
-		<textarea id="clipboard" cols=50></textarea>
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(0);" >FL</a>
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(1);" >Int1</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(2);" >Int2</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(3);" >Int3</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(-1);" >PitIn</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="manageLine(-2);" >PitOut</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="constructLine();" >Marks</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="resetScreen();" >Reset</a>		
-		<a class="w3-button w3-border w3-round" href="#"  onClick="copyTrack();" >Save</a>
-		<a class="w3-button w3-border w3-round" href="#"  onClick="copyTrack(1);" >Copy</a>		
+		<div class="w3-bar" id="menu-onglets" style="display:block">
+			<div class="LCD35-hide">
+				<a href="MyChronoGPS.html" >
+				<div class="w3-bar-item w3-button">Menu</div>
+				</a>
+			</div>
+			<div class="w3-col s3">
+				<span class="LCD35-show">
+				<a href="MyChronoGPS.html" class="w3-bar-item w3-button w3-border w3-round">
+				<span class="btnmainmenu"></span>
+				</a>
+				</span>
+			</div>
+			<div class="LCD35-hide">
+				<a href="MyChronoGPS-Tracks.html" >
+				<div class="w3-bar-item w3-button">Circuits</div>
+				</a>
+			</div>
+			<div class="w3-col s3">
+				<span class="LCD35-show">
+				<a href="MyChronoGPS-Tracks.html" class="w3-bar-item w3-button w3-border w3-round">
+				<span class="btntracks"></span>
+				</a>
+				</span>
+			</div>
+		<!--	
+		</div>
+		<div class="w3-bar" id="sousmenu-map">
+		-->
+			<span id="zone-info"></span>&nbsp;
+			<textarea id="clipboard" cols=50></textarea>
+			<span class="LCD35-hide">
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center" >FL</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(0);" ></a>
+						<!--<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(0);" ></a>-->
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center">Int1</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(1);" ></a>
+						<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(1);" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center">Int2</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(2);" ></a>
+						<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(2);" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center">Int3</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(3);" ></a>
+						<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(3);" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center">PitIn</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(-1);" ></a>
+						<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(-1);" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<div class="w3-row w3-center">PitOut</div>
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btnpencil minibtn" href="#"  onClick="designLine(-2);" ></a>
+						<a class="w3-bar-item w3-button btndelete minibtn" href="#"  onClick="deleteLine(-2);" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<!--<div class="w3-row w3-center">Save</div>-->
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btncopy" href="#" onClick="copyTrack();" title="Save" ></a>
+					</div>
+				</span>
+				<span class="w3-bar-item">
+					<!--<div class="w3-row w3-center">Save</div>-->
+					<div class="w3-row">
+						<a class="w3-bar-item w3-button btndraw" href="#" onClick="redraw();" title="Recalcul Session" ></a>
+					</div>
+				</span>
+			</span>
+			<!--
+			<span class="LCD35-hide"><input id="LatLng" cols="50" value="" onchange="showInputPoint(this.id);"></input></span>
+			<span class="LCD35-hide"><input type="hidden" id="HiddenLatLng" value=""></input></span>
+			<span class="LCD35-hide"><a class="w3-bar-item w3-button" href="#"  onClick="showInputPoint('HiddenLatLng');" >Point</a></span>	
+			-->
+		</div>
 	</div>
 	<div class="w3-row">
 		<div class="w3-col s4 m4 l2">
