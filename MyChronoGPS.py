@@ -1154,6 +1154,7 @@ class IpControl(threading.Thread):
         except OSError as err:
             logger.error("cannot use cache file OS error: {0}".format(err))
             pass
+        self.getparms()
         logger.info("IpControl init complete")
     
     def run(self):
@@ -1165,6 +1166,8 @@ class IpControl(threading.Thread):
                 proc_retval = subprocess.check_output(shlex.split(command))
                 self.ipadr = str(proc_retval.strip().decode())
                 loop = 0
+                parms.read_parms() # on recharge le fichier paramètre
+                self.getparms()
                 self.writeInfos() # Infos
             loop = loop+1
             time.sleep(2) # every minute (30 loops * 2 seconds), we check if we have not changed the network
@@ -1173,11 +1176,30 @@ class IpControl(threading.Thread):
     def getip(self):
         return self.ipadr
         
+    def getparms(self):
+        global UseDBTrack
+        global AutoTrackMode
+        #logger.info("before get UseDBTrack:"+str(UseDBTrack))
+        #logger.info("before get AutoTrackMode:"+str(AutoTrackMode))
+        el_parms = parms.get_parms("AutoTrackMode")
+        #logger.info("get AutoTrackMode:"+str(el_parms))
+        if "AutoTrackMode" in parms.params:
+            AutoTrackMode = el_parms
+        el_parms = parms.get_parms("UseDBTrack")
+        #logger.info("get UseDBTrack:"+str(el_parms))
+        #logger.info("parms.params:"+str(parms.params["UseDBTrack"]))
+        if "UseDBTrack" in parms.params:
+            UseDBTrack = el_parms
+        #logger.info("after get UseDBTrack:"+str(UseDBTrack))
+        #logger.info("after get AutoTrackMode:"+str(AutoTrackMode))
+        return
+        
     def stop(self):
         self.__running = False
             
     def writeInfos(self):
         global UseDBTrack
+        global AutoTrackMode
         NomCircuit = "inconnu"
         if self.chrono.circuit != False:
             if "NomCircuit" in self.chrono.circuit:
@@ -1186,9 +1208,11 @@ class IpControl(threading.Thread):
         self.Infos += ',"tempcpu":"'+str(round(get_thermal()))+'"'
         self.Infos += ',"volts":"'+str(get_volts())+'"'
         self.Infos += ',"dbtracks":'+str(UseDBTrack)
+        self.Infos += ',"autotrack":'+str(AutoTrackMode)
         self.Infos += ',"circuit":"'+NomCircuit+'"'
         self.Infos += ',"distcircuit":"'+str(round(self.chrono.neardist))+'"'
         self.Infos += '}]'
+        #logger.info("self.Infos:"+str(self.Infos))
         try:
             with open(self.cache_name, 'w') as cache: # the file is initialized
                 cache.write(self.Infos+'\r\n')

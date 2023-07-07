@@ -125,7 +125,7 @@
 					</span>
 				</div>
 				<div class="w3-row w3-padding linebtn"></div>
-				<div id="cleartrack" class="w3-col s6 linebtn">
+				<div id="cleartrack" class="w3-row w3-col s6 linebtn">
 					<span>
 					<button type="button" class="w3-button btnmenu btnclearlayer" onclick="clear_autodef()"></button>
 					</span>
@@ -142,13 +142,12 @@
 					</span>
 				</div>
 				<div class="w3-row w3-padding linebtn"></div>
-				<div id="gpsmenu" class="w3-col s6 linebtn">
+				<div id="switchautotrack" class="w3-row w3-col s6 linebtn">
 					<span>
-					<a href="MyChronoGPS.html" ><button type="button" class="w3-button btnmenu btnmainmenu"></button>
-					</a>
+					<button id="btn-switchautotrack" type="button" class="w3-button btnmenu btnautotrack" onclick="switch_autotrack()"></button>
 					</span>
-					<span>
-					Menu G&eacute;n&eacute;ral
+					<span id="lib-switchautotrack">
+					Auto Piste
 					</span>
 				</div>
 				<div id="gpsquest" class="w3-col s6 linebtn">
@@ -157,6 +156,16 @@
 					</span>
 					<span>
 						Etat
+					</span>
+				</div>
+				<div class="w3-row w3-padding linebtn"></div>
+				<div id="gpsmenu" class="w3-row w3-col s6 linebtn">
+					<span>
+					<a href="MyChronoGPS.html" ><button type="button" class="w3-button btnmenu btnmainmenu"></button>
+					</a>
+					</span>
+					<span>
+					Menu G&eacute;n&eacute;ral
 					</span>
 				</div>
 				<div id="info-cmd">

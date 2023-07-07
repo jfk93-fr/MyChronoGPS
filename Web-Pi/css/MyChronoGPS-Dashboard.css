@@ -369,6 +369,16 @@
 	background-size: 36px 36px;
 	background-repeat: no-repeat;
 }
+.btnautotrack {
+	background-image: url(../img/white/go-kart-track.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
+.btnautotrackoff {
+	background-image: url(../img/white/go-kart-track-off.png) ; 
+	background-size: 36px 36px;
+	background-repeat: no-repeat;
+}
 
 
 #changescreen {

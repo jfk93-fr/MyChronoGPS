@@ -70,21 +70,21 @@ mydict = dict()
 # we start by reading the parameters ...
 parms = Parms(Path)
 
-AutoTrackMode = 1 # 1: par défaut, on tente de créer automatiquement une piste "Autotrack" dans la base des circuits.
-            # 0: on ne va pas créer automatiquement une piste "Autotrack" dans la base des circuits.
-el_parms = parms.get_parms("AutoTrackMode")
-if "AutoTrackMode" in parms.params:
-    AutoTrackMode = el_parms
-# switch AutoTrackMode
-#print(str(AutoTrackMode))
-if AutoTrackMode == 0:
-    AutoTrackMode = 1
-    msg = "Create Autotrack successfully forced"
+UseDBTrack = 0 # 0: par défaut, on recherche dans la base des circuits si on coupe une ligne départ-arrivée
+            # 1: on ne recherche pas, on va créer automatiquement une piste "Autotrack" dans la base des circuits.
+el_parms = parms.get_parms("UseDBTrack")
+if "UseDBTrack" in parms.params:
+    UseDBTrack = el_parms
+# switch UseDBTrack
+print(str(UseDBTrack))
+if UseDBTrack == 0:
+    UseDBTrack = 1
+    msg = "DB Tracks use, all tracks successfully forced"
 else:
-    AutoTrackMode = 0
-    msg = "no Autotrack will be created"
-parms.set_parms("AutoTrackMode",AutoTrackMode)
-#print(str(AutoTrackMode))
+    UseDBTrack = 0
+    msg = "no DB Tracks use, autodef track successfully forced"
+parms.set_parms("UseDBTrack",UseDBTrack)
+print(str(UseDBTrack))
 
 mydict["msg"] = msg
 mydict["return"] = 0
@@ -96,8 +96,8 @@ if os.path.isfile(finfos):
         FD = open(finfos, 'r')
         infos = json.loads(FD.read())
         FD.close()
-        infos[0]["autotrack"] = AutoTrackMode
-        #print(str(infos))
+        infos[0]["dbtracks"] = UseDBTrack
+        print(str(infos))
         # rewrite INFOS
         try:
             FO = open(finfos, "w+")
@@ -120,10 +120,10 @@ if os.path.isfile(finfos):
 else:        
     try:
         FO = open(finfos, "w+")
-        dautodef = dict()
-        dautodef["AutoTrackMode"] = AutoTrackMode
+        dbuse = dict()
+        dbuse["dbtracks"] = UseDBTrack
         infos = []
-        infos.append(dautodef)
+        infos.append(dbuse)
         FO.write(json.dumps(infos))
         FO.close()
         os.chmod(finfos, 0o777)

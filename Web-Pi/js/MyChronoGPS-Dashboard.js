@@ -14,7 +14,7 @@ led_timer['blue'] = '';
 led_timer['yellow'] = '';
 
 var inactiv_timeout = false;
-var delai_inactiv = 10000; // 10 secondes d'inactivité au max
+var delai_inactiv = 30000; // 10 secondes d'inactivité au max
 
 var Infos = false;
 var timerInfos = '';
@@ -401,6 +401,28 @@ function switch_track() {
 		var lib = "don't use DB tracks";
 	}
 	if (confirm(lib+", do you want to continue ?")) {
+	    ajax_cmd('switch_dbuse.py');
+		setInactiv(5000); // on temporise 5 secondes, le temps de voir la réponse ajax
+	}
+	else {
+		setInactiv(8000); // on refuse la confirmation, on recalibre le délai d'inaction à 8 secondes
+	}
+}
+
+function switch_autotrack() {
+	if (Dashboard) {
+		clearTimeout(dashboard_timer);
+	}
+	if (timer) {
+		clearTimeout(timer);
+	}
+	if (autotrack == 0) {
+		var lib = "define auto track";
+	}
+	else {
+		var lib = "don't define auto track";
+	}
+	if (confirm(lib+", do you want to continue ?")) {
 	    ajax_cmd('switch_autodef.py');
 		setInactiv(5000); // on temporise 5 secondes, le temps de voir la réponse ajax
 	}
@@ -509,6 +531,18 @@ function isInfosReady()
 	else {
 		el.className = "w3-button btnmenu btnzerotrack";
 		el2.innerHTML = "Zéro piste";
+	}
+	
+	autotrack = retour.autotrack;
+	var el = document.getElementById("btn-switchautotrack");
+	var el2 = document.getElementById("lib-switchautotrack");
+	if (autotrack == 0) {
+		el.className = "w3-button btnmenu btnautotrack";
+		el2.innerHTML = "auto track on";
+	}
+	else {
+		el.className = "w3-button btnmenu btnautotrackoff";
+		el2.innerHTML = "auto track off";
 	}
 
 	var el = document.getElementById("nb-sats");
