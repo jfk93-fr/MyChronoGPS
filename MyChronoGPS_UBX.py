@@ -185,7 +185,7 @@ class GpsControl(threading.Thread):
             self.serialGps.timeout=1
             #
             self.serialGps.open()
-            logger.info("communication with "+str("/dev/"+PORT)+" established at "+str(BAUDRATE)+" bauds")
+            logger.info("communication with "+str(self.serialGps.port)+" established at "+str(BAUDRATE)+" bauds")
             self.enable()
 
     def closeSerialGPS(self):

@@ -3139,9 +3139,10 @@ if __name__ == "__main__":
                                         distcir = distanceGPS(gps.latitude, gps.longitude, chrono.startlat1,chrono.startlon1)
                                         if distcir < TrackProximity: # we are near the circuit
                                             # if the GPS point acquisition thread is running, it is stopped to force the use of the nearby circuit
-                                            if acq.active != False:
-                                                logger.info("we are near a circuit ("+str(distcir)+"m), GPS point acquisition thread is stopped. ")
-                                                acq.stop()
+                                            if acq != False:
+                                                if acq.active != False:
+                                                    logger.info("we are near a circuit ("+str(distcir)+"m), GPS point acquisition thread is stopped. ")
+                                                    acq.stop()
                                             if gps.gpsvitesse > speedometer:
                                                 menu.running_state = READY
                                                 chrono.begin()
