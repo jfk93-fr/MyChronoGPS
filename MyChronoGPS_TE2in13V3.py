@@ -1091,6 +1091,56 @@ class Screen():
         self.stateDisplay = 1
         return True
 
+    def getUseAutoTrack(self):
+        logLevel = logger.level
+        #logger.setLevel(logging.DEBUG)
+        map = self.searchMap("Utilisation AutoTrack")
+        self.showDebug("getUseAutoTrack en cours")
+        logger.debug(str(map))
+        if map != False:
+            # affichage de la zone touchée
+
+            # recherche du paramètre AutoTrackMode actuel
+            self.autotrack = 0
+            el_parms = parms.get_parms("AutoTrackMode")
+            if "AutoTrackMode" in parms.params:
+                self.autotrack = int(el_parms)
+            # affichage de AutoTrackMode dans la fenêtre état
+            values = []
+            if self.autotrack == 1:
+                values.append("actif")
+                values.append("AutoTrack OFF")
+            else:
+                values.append("inactif")
+                values.append("AutoTrack ON")
+
+            i = 0
+            for item in map["witem"][0]["item"]:
+                if "vars" in item:
+                    if item["vars"] != False:
+                        for variable in item["vars"]:
+                            variable = values[i]
+                            item["vars"][0] = variable
+                            i += 1
+
+            self.empile()
+            self.mapL = 0
+
+            self.display(map["level"])
+
+            self.mapLevel = map["level"]
+            self.mapL = 0
+        else:
+            self.mapLevel = 0
+            self.mapL = 0
+            logger.setLevel(logLevel)
+            return False
+        self.epd.displayPartial(self.epd.getbuffer(self.image))
+        self.epd.ReadBusy()
+        self.stateDisplay = 1
+        logger.setLevel(logLevel)
+        return True
+
     def getTracker(self):
         map = self.searchMap("Utilisation Tracker")
         if map != False:
@@ -1261,6 +1311,30 @@ class Screen():
             
         parms.set_parms("UseDBTrack",self.dbtracks)
         self.showDebug("dbtracks "+str(status_dbtracks))
+
+        logger.level = logLevel
+        self.stateDisplay = 0
+        self.mapLevel = 0
+        return True
+        
+    def switchUseAutoTrack(self):
+        logLevel = logger.level
+                
+        # recherche du paramètre AutoTrackMode actuel
+        self.autotrack = 0
+        el_parms = parms.get_parms("AutoTrackMode")
+        if "AutoTrackMode" in parms.params:
+            self.autotrack = int(el_parms)
+            self.showDebug("AutoTrackMode:"+str(self.autotrack))
+        if self.autotrack == 1:
+            self.autotrack = 0
+            status_autotrack = "OFF"
+        else:
+            self.autotrack = 1
+            status_autotrack = "ON"
+            
+        parms.set_parms("AutoTrackMode",self.autotrack)
+        self.showDebug("autotrack "+str(status_autotrack))
 
         logger.level = logLevel
         self.stateDisplay = 0
@@ -1736,13 +1810,19 @@ class Screen():
         self.addItem(t)
         # fenêtre 5 = Utilisation DB Track
         self.mapL = len(self.tMaps[self.mapLevel]["witem"])
-        #f = self.request_useDBTrack
         f = self.getUseDBTrack
         l = "Utilisation DB Track"
         self.addWindow(l,f,p)
         t = [46,16,l,16] # position du texte, libellé & taille police (défaut = 24 si absent)
         self.addItem(t)
-        # fenêtre 6 = Utilisation Tracker
+        # fenêtre 6 = AutoTrack ON/OFF
+        self.mapL = len(self.tMaps[self.mapLevel]["witem"])
+        f = self.getUseAutoTrack
+        l = "Utilisation AutoTrack"
+        self.addWindow(l,f,p)
+        t = [46,16,l,16] # position du texte, libellé & taille police (défaut = 24 si absent)
+        self.addItem(t)
+        # fenêtre 7 = Utilisation Tracker
         self.mapL = len(self.tMaps[self.mapLevel]["witem"])
         f = self.getTracker
         l = "Tracker"
@@ -1892,6 +1972,34 @@ class Screen():
         self.addNav([40,250],[61,122],False,"?",self.switchUseDBTrack)
 
         # touches de navigation pour la map Menu Demande Utilisation DB Track
+        self.addTL3(picret,"RET",self.returnParent)
+        self.addML3(pichome,"HOME",self.home)
+        self.addBL3(picend,"END",self.end)
+
+#        # Menu Utilisation AutoTrack
+        if self.addMap("Utilisation AutoTrack",[40,0,254,122]) == False:
+            return False
+       
+        p = "CMDs" # fenêtre parente
+
+        # fenêtre 1 = libellé 
+        l = "Utilisation AutoTrack"
+        self.addWindow(l)
+        
+        r = [40,0,250,40]
+        t = [40,0,"AutoTracks actuellement",16]
+        self.addItem(t, False, r)
+        t = [40,20,"{var}",16] # à remplacer par l'état actuel de l'utilisation de AutoTrackMode (Actif / Inactif)
+        v = ["status"]
+        self.addItem(t, False, False, v)
+        
+        t = [60,70,"{var}",28] # à remplacer par l'action sur l'utilisation de AutoTrackMode (ON / OFF)
+        v = ["action"]
+        self.addItem(t, False, False, v)
+        
+        self.addNav([40,250],[61,122],False,"?",self.switchUseAutoTrack)
+
+        # touches de navigation pour la map Menu Demande Utilisation AutoTrack
         self.addTL3(picret,"RET",self.returnParent)
         self.addML3(pichome,"HOME",self.home)
         self.addBL3(picend,"END",self.end)
