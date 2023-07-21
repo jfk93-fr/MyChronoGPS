@@ -689,17 +689,25 @@ class DisplayControl(threading.Thread):
 
         def write_chrono(self):
             self.infos = dict()
-            self.point = self.chrono.ChronoData()
+            #self.point = self.chrono.ChronoData()
+            #self.chrono.getGpsData()
             NomCircuit = "inconnu"
             if self.chrono.circuit != False:
                 if "NomCircuit" in self.chrono.circuit:
                     NomCircuit = self.chrono.circuit["NomCircuit"]
             self.infos["ip"] = get_ipadr()
+            self.infos["d"] = self.gps.gpsdate
+            self.infos["t"] = self.gps.gpstime
+            self.infos["l"] = self.gps.latitude
+            self.infos["L"] = self.gps.longitude
+            self.infos["v"] = self.gps.gpsvitesse
+            self.infos["a"] = self.gps.gpsaltitude
+            self.infos["c"] = self.gps.gpscap
+            
             self.infos["gpsfix"] = self.gps.gpsfix
             self.infos["nbsats"] = self.gps.gpsnbsat
             self.infos["circuit"] = NomCircuit
             self.infos["dict"] = self.gps.gpsdict
-            #self.infos["line"] = self.gps.gpsline
             self.infos["tt"] = formatTimeDelta(self.chrono.temps_tour)
             i = 0
             temps_secteurs = []
@@ -2396,7 +2404,7 @@ class AcqControl(threading.Thread):
                                 if self.cut == True:
                                     #logger.info("acqlines:"+str(self.acqlines))
                                     k = j - 1
-                                    self.chrono.getGpsData();
+                                    self.chrono.getGpsData()
                                     # we cut a line, we will draw the line from the calculated coordinates
                                     # instead of drawing the line, we could indicate that we are ready to draw it
                                     self.chrono.define_start_wcap(self.acqlines[i]["lat"], self.acqlines[i]["lon"], self.acqlines[i]["cap"])
