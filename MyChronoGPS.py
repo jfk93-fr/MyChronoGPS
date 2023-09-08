@@ -698,6 +698,7 @@ class DisplayControl(threading.Thread):
             self.infos["ip"] = get_ipadr()
             self.infos["d"] = self.gps.gpsdate
             self.infos["t"] = self.gps.gpstime
+            self.infos["lt"] = formatLocalTime(self.gps)
             self.infos["l"] = self.gps.latitude
             self.infos["L"] = self.gps.longitude
             self.infos["v"] = self.gps.gpsvitesse
@@ -707,7 +708,7 @@ class DisplayControl(threading.Thread):
             self.infos["gpsfix"] = self.gps.gpsfix
             self.infos["nbsats"] = self.gps.gpsnbsat
             self.infos["circuit"] = NomCircuit
-            self.infos["dict"] = self.gps.gpsdict
+            #self.infos["dict"] = self.gps.gpsdict
             self.infos["tt"] = formatTimeDelta(self.chrono.temps_tour)
             i = 0
             temps_secteurs = []
@@ -720,7 +721,7 @@ class DisplayControl(threading.Thread):
             self.infos["best"] = formatTimeDelta(self.chrono.best_lap)
             self.infos["lap"] = self.chrono.lap
             self.infos["nblap"] = self.chrono.nblap
-            self.infos["line"] = self.gps.gpsline
+            #self.infos["line"] = self.gps.gpsline
             self.record = json.dumps(self.infos)
             try:
                 with open(self.cache_name, 'w') as cache: # the file is initialized
