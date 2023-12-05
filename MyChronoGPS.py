@@ -854,6 +854,7 @@ class DisplayControl(threading.Thread):
                             self.buff2 = self.buff2+formatVitesse(gps.gpsvitesse)
     
                         if (self.display_mode == self.DISPLAY_CHRONO):
+                            #logger.info("before display:"+str(self.buff1)+str(self.buff2))
                             self.waiting_time = 0.1; # delay 0.1 second
                             t = chrono.temps_en_cours - timedelta(microseconds=chrono.temps_en_cours.microseconds)
                             self.set_contrast(255)
@@ -901,9 +902,11 @@ class DisplayControl(threading.Thread):
                                         # ligne 2 : the speed is displayed
                                         self.buff2 = self.buff2+" "+formatVitesse(gps.gpsvitesse)
     
+                            #logger.info("after display:"+str(self.buff1)+str(self.buff2))
                             self.loop += 1
                             # we will let 5 cycles pass before changing the display
-                            if (self.loop > 5): # 5 times 0.1 the display changes every 0.5 seconds
+                            #if (self.loop > 5): # 5 times 0.1 the display changes every 0.5 seconds
+                            if (self.loop > 0): # 5 times 0.1 the display changes every 0.5 seconds
                                 self.loop = 0
                 else:
                     self.buff1 = "GPS not connected"
@@ -1473,6 +1476,8 @@ class LiveSession(threading.Thread):
     def createLine1(self):
         line = '[{"date":"'+str(formatGpsDate(self.gps))+'"'
         NomCircuit = "inconnu"
+        if AutoTrackMode == 1:
+            NomCircuit = "Autotrack"
         if self.chrono.circuit != False:
             if "NomCircuit" in self.chrono.circuit:
                 NomCircuit = self.chrono.circuit["NomCircuit"]
@@ -2981,7 +2986,7 @@ if __name__ == "__main__":
         if AutoTrackMode == 0 and UseDBTrack == 0:
             #if autotrackmode = 0 (no autotrack creation) and no use of the track base,
             #then autotrackmode is forced to 1 (automatic autotrack creation).
-            AutoTrackMode == 1;
+            AutoTrackMode = 1;
             
         el_parms = parms.get_parms("PredictiveTimeMode")
         if "PredictiveTimeMode" in parms.params:

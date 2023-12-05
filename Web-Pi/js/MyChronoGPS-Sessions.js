@@ -102,7 +102,8 @@ function afficheListeSessions()
 		HTML += '<a ';
 		HTML += 'href="'+href2;
 		if (NomCircuit != "") {
-			HTML += 'id='+NomCircuit+'"';
+			HTML += 'id='+NomCircuit;
+			HTML += "&FL=["+Lat1+","+Lng1+","+Lat2+","+Lng2+"]\"";
 			HTML += '>'+NomCircuit;
 		}
 		else {

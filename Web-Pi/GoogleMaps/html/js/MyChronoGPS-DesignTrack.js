@@ -102,6 +102,9 @@ function isCircuitReady()
 		circuit_timer = setTimeout(isCircuitReady, 300);
 		return;
 	}
+	if (!Circuit.circuit)
+		NewCircuit = true;
+	
 	if (!map) {
 		circuit_timer = setTimeout(isCircuitReady, 100);
 		return;
@@ -906,6 +909,7 @@ function deleteLine(line) {
 				delete thisCircuit.Int2;
 				delete thisCircuit.LatInt2;
 				delete thisCircuit.LonInt2;
+				delete thisCircuit.CapInt2;
 			}
 		}
 		if (Tabint[2]) {
@@ -913,6 +917,7 @@ function deleteLine(line) {
 				delete thisCircuit.Int3;
 				delete thisCircuit.LatInt3;
 				delete thisCircuit.LonInt3;
+				delete thisCircuit.CapInt3;
 			}
 		}
 	}

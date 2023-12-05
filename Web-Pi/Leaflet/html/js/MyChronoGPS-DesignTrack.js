@@ -106,6 +106,9 @@ function isCircuitReady()
 		circuit_timer = setTimeout(isCircuitReady, 300);
 		return;
 	}
+	if (!Circuit.circuit)
+		NewCircuit = true;
+	
 	if (!map) {
 		circuit_timer = setTimeout(isCircuitReady, 100);
 		return;
