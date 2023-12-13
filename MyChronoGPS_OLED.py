@@ -7,7 +7,7 @@
 #   reads the named pipe DISPLAY, formats the message and displays it on the OLED screen
 #
 #   Since last versions :
-#       instead of using a pipe (DISPLAY) for the display, we write to a file in shared memory
+#       instead of using a pipe (DISPLAY) for the display, we read a file in shared memory
 #
 ###########################################################################
 # managed by git from VERSION 1.17

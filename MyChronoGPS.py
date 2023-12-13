@@ -29,6 +29,8 @@
 #       manages the storage of gps points at sessions for analysis purposes
 #   Class ChronoControl
 #       manages the stopwatch functions (start, stop, etc)
+#   Class DashboardControl
+#       manages the data to be displayed on a dashboard
 #
 ###########################################################################
 #
@@ -198,6 +200,18 @@ def degrees_to_decimal(data, hemisphere):
             return -output
     except:
         return ""
+        
+def getparms():
+    global UseDBTrack
+    global AutoTrackMode
+    el_parms = parms.get_parms("AutoTrackMode")
+    if "AutoTrackMode" in parms.params:
+        AutoTrackMode = el_parms
+    el_parms = parms.get_parms("UseDBTrack")
+    if "UseDBTrack" in parms.params:
+        UseDBTrack = el_parms
+    return
+        
         
 class GpsControl(threading.Thread):
     INVALID = 0
@@ -1166,7 +1180,8 @@ class IpControl(threading.Thread):
         except OSError as err:
             logger.error("cannot use cache file OS error: {0}".format(err))
             pass
-        self.getparms()
+        #self.getparms()
+        getparms()
         logger.info("IpControl init complete")
     
     def run(self):
@@ -1179,7 +1194,8 @@ class IpControl(threading.Thread):
                 self.ipadr = str(proc_retval.strip().decode())
                 loop = 0
                 parms.read_parms() # on recharge le fichier paramètre
-                self.getparms()
+                #self.getparms()
+                getparms()
                 self.writeInfos() # Infos
             loop = loop+1
             time.sleep(2) # every minute (30 loops * 2 seconds), we check if we have not changed the network
@@ -1735,7 +1751,6 @@ class ChronoControl():
         if self.chrono_begin == True:
             return True
         self.chrono_begin = True
-        self.nblap = 0
         self.nblap = 0
         self.lap = 0
         self.npoint = 0
@@ -2700,6 +2715,111 @@ class PredictiveControl(threading.Thread):
         self.__running = False
         self.active = False;
 
+
+class DashboardControl(threading.Thread):
+
+    def __init__(self,chrono):
+        self.chrono = chrono
+        self.gps = chrono.gps
+        threading.Thread.__init__(self)
+        logger.info(str(self))
+        self.ipadr = "no ip address"
+        self.cache_name = pathcache+'/DASHBOARD' 
+        self.Infos = False
+        try:
+            with open(self.cache_name, 'w') as cache: # the file is initialized
+                cache.close()
+                os.chmod(self.cache_name, 0o777)
+        except OSError as err:
+            logger.error("cannot use cache file OS error: {0}".format(err))
+            pass
+        self.dashboard = dict()
+        logger.info("DashboardControl init complete")
+    
+    def run(self):
+        self.__running = True
+        loopm = 999
+        loops = 999
+        while self.__running:   
+            if loopm > 600:
+                # affichage toutes les minutes
+                loopm = 0
+                self.dashboard["ip"] = get_ipadr()
+                parms.read_parms() # on recharge le fichier paramètre
+                getparms()
+                NomCircuit = "inconnu"
+                if self.chrono.circuit != False:
+                    if "NomCircuit" in self.chrono.circuit:
+                        NomCircuit = self.chrono.circuit["NomCircuit"]
+                self.dashboard["circuit"] = NomCircuit
+                self.dashboard["gpsfix"] = self.gps.gpsfix
+                self.dashboard["nbsats"] = self.gps.gpsnbsat
+                self.dashboard["dbtracks"] = UseDBTrack
+                self.dashboard["autotrack"] = AutoTrackMode
+                self.dashboard["startlat1"] = self.chrono.startlat1
+                self.dashboard["startlon1"] = self.chrono.startlon1
+                self.dashboard["startlat2"] = self.chrono.startlat2
+                self.dashboard["startlon2"] = self.chrono.startlon2
+                #logger.info(str(self.dashboard))
+            loopm = loopm+1
+            if loops > 10:
+                # affichage toutes les secondes
+                loops = 0
+                self.dashboard["tempcpu"] = round(get_thermal())
+                self.dashboard["volts"] = get_volts()
+                self.dashboard["lt"] = formatLocalTime(self.gps)
+                self.dashboard["distcircuit"] = round(self.chrono.neardist)
+                #logger.info(str(self.dashboard))
+            loops = loops+1
+
+            # affichage tous les 1/10 de seconde
+            self.dashboard["gpstime"] = self.gps.gpstime
+            self.dashboard["latitude"] = self.gps.latitude
+            self.dashboard["longitude"] = self.gps.longitude
+            self.dashboard["vitesse"] = self.gps.gpsvitesse
+            self.dashboard["altitude"] = self.gps.gpsaltitude
+            self.dashboard["cap"] = self.gps.gpscap
+            self.dashboard["chrono_begin"] = self.chrono.chrono_begin
+            self.dashboard["chrono_started"] = self.chrono.chrono_started
+            self.dashboard["pitin"] = self.chrono.pitin
+            self.dashboard["pitout"] = self.chrono.pitout
+            self.dashboard["nblap"] = self.chrono.nblap
+            self.dashboard["lap"] = self.chrono.lap
+            self.dashboard["temps_tour"] = formatTimeDelta(self.chrono.temps_tour)
+            self.dashboard["best_lap"] = formatTimeDelta(self.chrono.best_lap)
+            self.dashboard["temps_t"] = formatTimeDelta(self.chrono.temps_t)
+            self.dashboard["temps_en_cours"] = formatTimeDelta(self.chrono.temps_en_cours)
+            self.dashboard["temps_inter"] = formatTimeDelta(self.chrono.temps_inter)
+            self.dashboard["temps_i"] = formatTimeDelta(self.chrono.temps_i)
+            i = 0
+            temps_secteurs = []
+            while i < len(self.chrono.temps_secteurs):
+                ts = formatTimeDelta(self.chrono.temps_secteurs[i])
+                temps_secteurs.append(ts)
+                i = i+1
+            self.dashboard["sect"] = temps_secteurs
+            #logger.info(str(self.dashboard))
+
+            self.writeInfos() # Infos
+
+
+            time.sleep(0.1) # every minute (600 loops * 0.1 seconds), we check if we have not changed the network
+        logger.info("end of IpControl Thread of main program")
+        
+    def stop(self):
+        self.__running = False
+            
+    def writeInfos(self):
+        global UseDBTrack
+        global AutoTrackMode
+        try:
+            with open(self.cache_name, 'w') as cache: # the file is initialized
+                cache.write(str(self.dashboard)+'\r\n')
+                cache.close()
+        except OSError as err:
+            logger.error("cannot use cache file OS error: {0}".format(err))
+            pass
+
 ###
 # general functions
 ###
@@ -3070,6 +3190,9 @@ if __name__ == "__main__":
         if PredictiveTimeMode != 0:
             predict = PredictiveControl(chrono)
             predict.start() # does not seem to work properly.
+            
+        dashboardClass = DashboardControl(chrono)
+        dashboardClass.start()        
         
         #jfk: if we move the Tracker management to the main program, it will start here
         # tracker = TrackingControl(chrono)
@@ -3258,6 +3381,9 @@ if __name__ == "__main__":
         if ils != False:
             ils.stop()
             ils.join()
+        if dashboardClass != False:
+            dashboardClass.stop()
+            dashboardClass.join()
                 
     except KeyboardInterrupt:
         logger.info("User Cancelled (Ctrl C)")
@@ -3285,6 +3411,8 @@ if __name__ == "__main__":
             ils.stop()
         if predict != False:
             predict.stop()
+        if dashboardClass != False:
+            dashboardClass.stop()
             
     except:
         print(traceback.print_exc())
@@ -3313,6 +3441,8 @@ if __name__ == "__main__":
             ils.stop()
         if predict != False:
             predict.stop()
+        if dashboardClass != False:
+            dashboardClass.stop()
         raise
         
     finally:
