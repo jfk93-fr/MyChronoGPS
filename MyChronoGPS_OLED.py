@@ -411,14 +411,14 @@ class FIFOOLED():
             return False
 
         else:
-            print("commande invalide:",commande)
-            line1 = "invalid command:"+commande
-            self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
-            self.draw.text((self.x, self.top), line1,  font=self.font, fill=255)
-
-            # Display image.
-            self.disp.image(self.image)
-            self.disp.display()
+            logger.info("commande invalide:\"",commande+"\"")
+            #line1 = "invalid command:"+commande
+            #self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
+            #self.draw.text((self.x, self.top), line1,  font=self.font, fill=255)
+            #
+            ## Display image.
+            #self.disp.image(self.image)
+            #self.disp.display()
 
         time.sleep(0.2)
         return True

@@ -3,6 +3,7 @@ sudo cp -R $HOME/temp/MyChronoGPS/portable $HOME/MyChronoGPS/portable
 sudo cp -R $HOME/temp/MyChronoGPS/fonts $HOME/MyChronoGPS/fonts
 sudo cp -R $HOME/temp/MyChronoGPS/img $HOME/MyChronoGPS/img
 sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_TE2in13V3.py $HOME/MyChronoGPS
+sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_Nextion_Display.py $HOME/MyChronoGPS
 sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.py $HOME/MyChronoGPS
 sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS.sh $HOME/MyChronoGPS
 sudo cp $HOME/temp/MyChronoGPS/MyChronoGPS_GoogleMaps.sh $HOME/MyChronoGPS

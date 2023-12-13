@@ -25,6 +25,20 @@ pathcmd = Path.pathcmd
 pathdata = Path.pathdata
 pathlog = pathdata+'/log/'
 
+parms = ""
+from MyChronoGPS_Parms import Parms
+# we start by reading the parameters ...
+parms = Parms(Path)
+ScreenPort = "ttyUSB0"
+el_parms = parms.get_parms("ScreenPort")
+if "ScreenPort" in parms.params:
+    ScreenPort = el_parms
+ScreenRate = 9600
+el_parms = parms.get_parms("ScreenRate")
+if "ScreenRate" in parms.params:
+    ScreenRate = el_parms
+print(str(ScreenRate))
+
 #######################################################################################
 # we will use the logger to replace print
 #######################################################################################
@@ -67,13 +81,15 @@ CLEAR = "C"
 #CONTRAST = "A"
 POWER_OFF = "X"
 
-SERIAL_PORT = "/dev/ttyUSB0"
+SERIAL_PORT = "/dev/"+str(ScreenPort)
+print(str(SERIAL_PORT))
 # Connect to the Nextion screen
 try:
-    ser = serial.Serial(SERIAL_PORT, baudrate = 9600, timeout = 0.5)
+    ser = serial.Serial(SERIAL_PORT, baudrate = ScreenRate, timeout = 1)
 except:
     logger.error("Application serial error!")
     exit(1)
+print("connected to serial")
     
 class DisplayScreen():
 
