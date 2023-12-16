@@ -370,7 +370,7 @@ class DisplayScreen():
             return False
 
         else:
-            logger.info("commande invalide:\"",commande+"\"")
+            logger.info("commande invalide:\""+str(commande)+"\"")
             #line1 = "invalid command:"+commande
             #if self.page != 0:
             #    self.page = 0

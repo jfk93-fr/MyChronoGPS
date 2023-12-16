@@ -174,7 +174,8 @@ from MyChronoGPS_Parms import Parms
 LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
 LED2_GPIO_PIN = 16 # red LED associated with ILS Control
 LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
-ILS_GPIO_PIN = 23
+LED4_GPIO_PIN = 16 # blue LED associated with GPS Control
+ILS_GPIO_PIN = 23 # GPIO associated with ILS Control
 
 def send_delayed():
     global chrono
@@ -228,11 +229,18 @@ class GpsControl(threading.Thread):
     timeshift = 0
     gpscomplete = False # is True when for 1 same gps timestamp we have a $GPGGA frame and a $GPRMC frame
 
-    def __init__(self,lcd):
+    def __init__(self, lcd, led_pin): # LED is optional
         threading.Thread.__init__(self)
         logger.info(str(self))
         
         self.lcd = lcd
+
+        self.led = False
+        self.led_pin = False
+        if led_pin != False:
+            self.led_pin = led_pin
+            self.led = LedControl(led_pin)
+            self.led.start()
 
         self.gpsactiv = False
         self.fifo = pathcmd+'/pipes/GPSDATA'
@@ -244,6 +252,8 @@ class GpsControl(threading.Thread):
         self.gpscmd = pathcmd+'/pipes/GPSCMD' # pipe to send directives to the GPS
         
         self.gpsfix = self.INVALID
+        if self.led_pin != False:
+            self.led.set_led_flash()
         self.gpsline = ""
         self.gpsdict = ""
         self.gpsnbsat = 0
@@ -283,6 +293,7 @@ class GpsControl(threading.Thread):
             return
 
         self.gpsactiv = True
+
         logger.info("GpsControl init complete")
 
     def creer_fifo(self):
@@ -355,6 +366,8 @@ class GpsControl(threading.Thread):
         self.last_speed = self.gpsvitesse
         
         self.gpsfix = self.VALID
+        if self.led_pin != False:
+            self.led.set_led_on()
         if self.nbparse == 0:
             self.nbparse = self.nbparse + 1
         if "d" in self.gpsdict:
@@ -402,6 +415,8 @@ class GpsControl(threading.Thread):
         
     def stop(self):
         logger.info("gps stop request:"+str(self.gpsactiv))
+        if self.led != False:
+            self.led.stop()
 
         if self.gpsactiv == False:
             logger.info(str(self.fifo)+" gps not activ")
@@ -1253,7 +1268,7 @@ class IlsControl(threading.Thread):
     # this class is used to simulate an ILS connected to a magnetic tape chronometer (Alfano type)
     # you can then use the stopwatch screen to see the times and do without the LCD display
 
-    def __init__(self, ils_pin, led_pin): # la led est facultative
+    def __init__(self, ils_pin, led_pin): # LED is optional
         threading.Thread.__init__(self) 
         logger.info(str(self))
         self.ils_pin = ils_pin
@@ -2740,6 +2755,16 @@ class DashboardControl(threading.Thread):
         self.__running = True
         loopm = 999
         loops = 999
+#        self.gps_gpstime    = gps.gpstime
+#        self.gps_latitude   = gps.latitude
+#        self.gps_longitude  = gps.longitude
+#        self.gps_prevlat    = gps.prevlat
+#        self.gps_prevlon    = gps.prevlon
+#        self.gps_last_time  = gps.last_time
+#        self.gps_last_speed = gps.last_speed
+#        self.gps_gpsvitesse = gps.gpsvitesse
+#        self.gps_gpsaltitude = gps.gpsaltitude
+#        self.gps_gpscap      = gps.gpscap
         while self.__running:   
             if loopm > 600:
                 # affichage toutes les minutes
@@ -2765,6 +2790,8 @@ class DashboardControl(threading.Thread):
             if loops > 10:
                 # affichage toutes les secondes
                 loops = 0
+                self.dashboard["date"] = formatGpsDate(self.chrono.gps)
+                self.dashboard["time"] = formatGpsTime(self.chrono.gps)
                 self.dashboard["tempcpu"] = round(get_thermal())
                 self.dashboard["volts"] = get_volts()
                 self.dashboard["lt"] = formatLocalTime(self.gps)
@@ -2773,6 +2800,7 @@ class DashboardControl(threading.Thread):
             loops = loops+1
 
             # affichage tous les 1/10 de seconde
+            self.dashboard["gpsdate"] = self.gps.gpsdate
             self.dashboard["gpstime"] = self.gps.gpstime
             self.dashboard["latitude"] = self.gps.latitude
             self.dashboard["longitude"] = self.gps.longitude
@@ -2791,6 +2819,15 @@ class DashboardControl(threading.Thread):
             self.dashboard["temps_en_cours"] = formatTimeDelta(self.chrono.temps_en_cours)
             self.dashboard["temps_inter"] = formatTimeDelta(self.chrono.temps_inter)
             self.dashboard["temps_i"] = formatTimeDelta(self.chrono.temps_i)
+            gain = " "
+            if self.chrono.temps_tour < self.chrono.best_lap:
+                diff = self.chrono.best_lap - self.chrono.temps_tour
+                gain += "-"+formatTimeDelta(diff,"sscc")
+            else:
+                diff = self.chrono.temps_tour - self.chrono.best_lap
+                gain += "+"+formatTimeDelta(diff,"sscc")
+            self.dashboard["gain"] = gain
+            
             i = 0
             temps_secteurs = []
             while i < len(self.chrono.temps_secteurs):
@@ -2814,7 +2851,7 @@ class DashboardControl(threading.Thread):
         global AutoTrackMode
         try:
             with open(self.cache_name, 'w') as cache: # the file is initialized
-                cache.write(str(self.dashboard)+'\r\n')
+                cache.write(str(json.dumps(self.dashboard))+'\r\n')
                 cache.close()
         except OSError as err:
             logger.error("cannot use cache file OS error: {0}".format(err))
@@ -2855,6 +2892,8 @@ def distanceGPS(lat1,lon1,lat2,lon2):
 def formatGpsDate(gps):
     # receives a gps object and returns a date string from gpsdate
     datestr = str(gps.gpsdate)
+    if datestr == "":
+        return datestr
     JJ = datestr[0:2]
     MM = datestr[2:4]
     AA = datestr[4:6]
@@ -2864,6 +2903,8 @@ def formatGpsDate(gps):
 def formatGpsTime(gps):
     # receives a gps object and returns a time string from gpstime
     timestr = str(gps.gpstime)
+    if timestr == "":
+        return timestr
     hh = timestr[0:2]
     mm = timestr[2:4]
     ss = timestr[4:6]
@@ -3055,6 +3096,10 @@ if __name__ == "__main__":
         if "LED3_GPIO_PIN" in parms.params:
             LED3_GPIO_PIN = el_parms
 
+        el_parms = parms.get_parms("LED4_GPIO_PIN")
+        if "LED4_GPIO_PIN" in parms.params:
+            LED4_GPIO_PIN = el_parms
+
         el_parms = parms.get_parms("ILS_GPIO_PIN")
         if "ILS_GPIO_PIN" in parms.params:
             ILS_GPIO_PIN = el_parms
@@ -3164,7 +3209,7 @@ if __name__ == "__main__":
         lcd.set_display_time()
 
         #
-        gps = GpsControl(lcd)
+        gps = GpsControl(lcd,LED4_GPIO_PIN)
         gps.start()
         
         if UseStopwatchDisplayByILS != 0:

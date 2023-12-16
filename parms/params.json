@@ -8,7 +8,6 @@
     "ScreenPort": "ttyUSB0",
     "#ScreenRate": "Screen data transfer rate (optional)",
     "ScreenRate": "9600",
-    "ScreenRate": "115200",
     "#GPSCmd": "program name associated with GPS management",
     "GPSCmd": "MyChronoGPS_UBX",
     "#GPSRate": "GPS data refresh rate (between 1 & 10Hz, optimum 5Hz)",
@@ -76,5 +75,15 @@
 	"PredictiveTimeMode": 0,
 	"#AutoTrackMode": "Automatic determination of a start/finish line. 0=NO, 1=YES (default=1)",
 	"AutoTrackMode": 1,
+	"#LED1_GPIO_PIN": "yellow LED associated with Button1 and pitlane warning (default=4)",
+	"LED1_GPIO_PIN": 4,
+	"#LED2_GPIO_PIN": "red LED associated with ILS Control (default=16)",
+	"LED2_GPIO_PIN": 16,
+	"#LED3_GPIO_PIN": "green LED associated with Chrono Control (default=18)",
+	"LED3_GPIO_PIN": 18,
+	"#LED4_GPIO_PIN": "blue LED associated with GPS Control (default=16)",
+	"LED4_GPIO_PIN": 16,
+	"#ILS_GPIO_PIN": "GPIO associated with ILS Control (default=23)",
+	"ILS_GPIO_PIN": 23,
 	"#": "End of Parms"
 }
