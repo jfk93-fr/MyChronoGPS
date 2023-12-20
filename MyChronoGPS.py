@@ -153,6 +153,8 @@ parms = ""
 
 HillRaceMode = 0
 
+GeneralInfos = " "
+
 delayed_msg = "" # message to be sent after a certain time
 dTimer = False # timer for delayed messages
 tTimer = False # timer for delayed ils tick
@@ -183,7 +185,7 @@ def send_delayed():
     global delayed_msg
     global dTimer
     global log
-    chrono.lcd.set_display_sysmsg(delayed_msg,lcd.DISPLAY_BIG,20)
+    chrono.lcd.set_display_sysmsg(delayed_msg,lcd.DISPLAY_BIG,30)
     delayed_msg = ""
     dTimer = False
     
@@ -287,7 +289,7 @@ class GpsControl(threading.Thread):
         if get_baudrate(self.gpsport) < 0:
             logger.error("communication with the gps cannot be established. Check the gps connection.")
             time.sleep(10)
-            self.lcd.set_display_sysmsg(" //Check Gps//Not Connected",lcd.DISPLAY_BIG,4)
+            self.lcd.set_display_sysmsg(" //Check Gps//Not Connected",lcd.DISPLAY_BIG,6)
             time.sleep(5)
             self.stop()
             return
@@ -681,6 +683,7 @@ class LedControl(threading.Thread):
         self.__running = False
     
 class DisplayControl(threading.Thread):
+    global GeneralInfos
     DATE_TIME = 1 # date time display in line 1 + info carousel in line 2
     MSG_TIME = 2 # 
     MSG_READY = 3 # 
@@ -787,7 +790,7 @@ class DisplayControl(threading.Thread):
         logger.info("DisplayControl init complete")
         self.sysloop = 0 # system message display loop
         self.set_contrast(self.contrast)       
-        self.set_display_sysmsg("DisplayControl//init complete",self.DISPLAY,1)
+        self.set_display_sysmsg("DisplayControl//init complete",self.DISPLAY,5)
 
         self.PitMaxSpeed = PitMaxSpeed
         self.localTime = False
@@ -801,6 +804,7 @@ class DisplayControl(threading.Thread):
         
     def run(self):
         global gps
+        global GeneralInfos
         self.__running = True
         self.carousel = 0
         self.maxcarr = 9 # max nb for the carousel
@@ -814,12 +818,15 @@ class DisplayControl(threading.Thread):
         self.cpttest = 0
         self.cpttest2 = 0
         while self.__running:
+            #logger.info(str(GeneralInfos))
+            GeneralInfos = " "
             if self.sysloop > 0:
                 self.sysloop = self.sysloop - 1
                 self.buff1 = ""
                 self.buff2 = ""
                 self.displayBig = False
                 self.displaySmall = False
+                GeneralInfos = self.sys_message
                 if CharacterSize == BIG_CHARACTER and self.displaySysBig == True:
                     # message is writen in large letters
                     self.buff1 = self.sys_message
@@ -842,6 +849,8 @@ class DisplayControl(threading.Thread):
                         self.displaySmall = True
                         gps.gpsfix = gps.INVALID
                         self.waiting_time = 1; # delay 1 second
+                        GeneralInfos = self.buff1
+                        #logger.info(str(GeneralInfos))
                     #else:
                         #logger.debug("gpsline:["+gps.gpsline+"]")
                     if gps.gpsfix == gps.VALID:
@@ -945,6 +954,8 @@ class DisplayControl(threading.Thread):
                         gpsport = el_parms
                     self.buff1 += "//"+gpsport
                     self.buff1 += "//Verify GPS connection // "
+                    GeneralInfos = self.buff1
+                    #logger.info(str(GeneralInfos))
                     self.displaySmall = True
                     self.waiting_time = 1; # delay 1 second
                         
@@ -1361,7 +1372,7 @@ class SessionControl():
             NomCircuit = ""
             if chrono.circuit != "" and chrono.circuit != False:
                 NomCircuit = chrono.circuit["NomCircuit"]
-                chrono.lcd.set_display_sysmsg("Circuit://"+NomCircuit,chrono.lcd.DISPLAY,3)
+                chrono.lcd.set_display_sysmsg("Circuit://"+NomCircuit,chrono.lcd.DISPLAY,5)
             line += NomCircuit+";"
             line += str(chrono.startlat1)+";"
             line += str(chrono.startlon1)+";"
@@ -1618,6 +1629,7 @@ class ChronoControl():
     temps_i = timedelta(seconds=0)
     temps_secteurs = []
     best_lap = timedelta(seconds=0)
+    gain = ""
     circuit = False
     in_pitlane = False # indicates if we are in the pitlane
     predict_time = False
@@ -1746,7 +1758,7 @@ class ChronoControl():
         self.lcd.set_chrono(chrono) # so that the DisplayControl class knows about ChronoControl
 
         logger.info("ChronoControl init complete")
-        self.lcd.set_display_sysmsg("ChronoControl//init complete",self.lcd.DISPLAY,2)
+        self.lcd.set_display_sysmsg("ChronoControl//init complete",self.lcd.DISPLAY,5)
         
         self.fileTime = False # time associated with files (name sync)
 
@@ -1778,6 +1790,7 @@ class ChronoControl():
         self.dDprev = 0
         self.temps_tour = timedelta(seconds=0)
         self.best_lap = timedelta(seconds=0)
+        self.gain = ""
         self.temps_t = timedelta(seconds=0)
         self.temps_en_cours = timedelta(seconds=0)
         self.nbFreeze = 0
@@ -1936,7 +1949,7 @@ class ChronoControl():
                             self.lineCut = self.is_lineCut(self.pitin.lat1,self.pitin.lon1,self.pitin.lat2,self.pitin.lon2,self.gps_latitude,self.gps_longitude,self.gps_prevlat,self.gps_prevlon)
                             if self.lineCut == True:
                                 self.in_pitlane = True # we enter the pitlane
-                                self.lcd.set_display_sysmsg(" //Pit In",lcd.DISPLAY_BIG,20)
+                                self.lcd.set_display_sysmsg(" //Pit In",lcd.DISPLAY_BIG,30)
                                 # here, we will make a yellow LED blink as long as we are in the pitlane
                                 self.main_led.set_led_off()
                                 self.main_led.set_led_slow_flash()
@@ -1946,7 +1959,7 @@ class ChronoControl():
                             self.lineCut = self.is_oneLineCut()
                             if self.lineCut == True:
                                 self.in_pitlane = False # we leave the pitlane
-                                self.lcd.set_display_sysmsg(" //Pit Out",lcd.DISPLAY_BIG,20)
+                                self.lcd.set_display_sysmsg(" //Pit Out",lcd.DISPLAY_BIG,30)
                                 # here, we will turn off the yellow LED associated with the pitlane
                                 self.main_led.set_led_off()
                             
@@ -2020,12 +2033,14 @@ class ChronoControl():
                                 msg = formatTimeDelta(self.temps_tour)+'//'
                                 if self.temps_tour < self.best_lap:
                                     diff = self.best_lap - self.temps_tour
-                                    msg += "-"+formatTimeDelta(diff,"sscc")
+                                    self.gain = "-"+formatTimeDelta(diff,"sscc")
+                                    msg += self.gain
                                     self.best_lap = self.temps_tour
                                     self.led.set_led_fast_flash(2)
                                 else:
                                     diff = self.temps_tour - self.best_lap
-                                    msg += "+"+formatTimeDelta(diff,"sscc")
+                                    self.gain = "+"+formatTimeDelta(diff,"sscc")
+                                    msg += self.gain
                                 # we will display the gain or loss within 3 seconds
                                 delayed_msg = msg
                             # we write in the sessions file
@@ -2038,7 +2053,7 @@ class ChronoControl():
                                self.temps_secteurs = [] # the times of the sectors are erased
 
                             if self.nblap == 0:
-                                self.lcd.set_display_sysmsg("Start-Finish//Line",lcd.DISPLAY,2)
+                                self.lcd.set_display_sysmsg("Start-Finish//Line",lcd.DISPLAY,5)
                             else:
                                 self.main_led.set_led_off()
 
@@ -2046,7 +2061,7 @@ class ChronoControl():
                                 buff1 = t+" Lap "+str(self.nblap)+"//"
                                 buff1 = buff1+t+"//"
                                 buff1 = buff1+lcd.localTime+" "+formatVitesse(self.gps_gpsvitesse)
-                                self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,20)
+                                self.lcd.set_display_sysmsg(buff1,lcd.DISPLAY_BIG,30)
                             
                             self.nblap += 1
 
@@ -2086,9 +2101,9 @@ class ChronoControl():
                                 
                                 self.temps_secteurs.append(self.temps_inter)
                                 if self.nblap > 0:
-                                    self.lcd.set_display_sysmsg("Secteur "+str(i+1)+"//"+formatTimeDelta(self.temps_inter)+"//"+formatLocalTime(gps),lcd.DISPLAY_BIG,20)
+                                    self.lcd.set_display_sysmsg("Secteur "+str(i+1)+"//"+formatTimeDelta(self.temps_inter)+"//"+formatLocalTime(gps),lcd.DISPLAY_BIG,30)
                                 else:
-                                    self.lcd.set_display_sysmsg(formatLocalTime(gps)+"//Sect. "+str(i+1),lcd.DISPLAY_BIG,20)
+                                    self.lcd.set_display_sysmsg(formatLocalTime(gps)+"//Sect. "+str(i+1),lcd.DISPLAY_BIG,30)
     
                                
                         self.temps_en_cours = temps - self.temps_t
@@ -2180,7 +2195,7 @@ class ChronoControl():
                 self.define_start_wcap(self.gps_latitude,self.gps_longitude,self.gps_gpscap)
                 # creation of the self-defined track
                 self.create_sfTrack()
-                self.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
+                self.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,5)
             if GpsChronoMode > 0:
                 self.neardist = 999999
                 self.neartrack = ""
@@ -2239,7 +2254,7 @@ class ChronoControl():
                                             acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
                                     self.getGpsData(); # to have access to GPS data with refresh protection during calculations
 
-                                    self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,2)
+                                    self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,5)
                                     self.define_start_wcoord(lat1, lon1, lat2, lon2)
                                     self.circuit = circuits[track]
                                     self.begin()
@@ -2578,7 +2593,7 @@ class AcqControl(threading.Thread):
             logger.info("AcqControl aborted")
         if self.__cancel == False: #the thread, has not been aborted
             # we have just crossed the line that has just been defined  !
-            self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,2)
+            self.chrono.lcd.set_display_sysmsg("Line//Defined",lcd.DISPLAY,5)
         self.active = False;
         logger.info("AcqControl ended")
                 
@@ -2732,6 +2747,7 @@ class PredictiveControl(threading.Thread):
 
 
 class DashboardControl(threading.Thread):
+    global GeneralInfos
 
     def __init__(self,chrono):
         self.chrono = chrono
@@ -2749,9 +2765,13 @@ class DashboardControl(threading.Thread):
             logger.error("cannot use cache file OS error: {0}".format(err))
             pass
         self.dashboard = dict()
+        self.dashboard["running"] = True
+        logger.info(str(self.dashboard["running"]))
+        self.writeInfos() # Infos
         logger.info("DashboardControl init complete")
     
     def run(self):
+        global GeneralInfos
         self.__running = True
         loopm = 999
         loops = 999
@@ -2796,7 +2816,10 @@ class DashboardControl(threading.Thread):
                 self.dashboard["volts"] = get_volts()
                 self.dashboard["lt"] = formatLocalTime(self.gps)
                 self.dashboard["distcircuit"] = round(self.chrono.neardist)
-                #logger.info(str(self.dashboard))
+                #logger.info("["+str(GeneralInfos)+"]")
+                self.dashboard["infos"] = GeneralInfos
+                #if self.dashboard["infos"] != " ":
+                #    logger.info(str(self.dashboard["infos"]))
             loops = loops+1
 
             # affichage tous les 1/10 de seconde
@@ -2809,8 +2832,7 @@ class DashboardControl(threading.Thread):
             self.dashboard["cap"] = self.gps.gpscap
             self.dashboard["chrono_begin"] = self.chrono.chrono_begin
             self.dashboard["chrono_started"] = self.chrono.chrono_started
-            self.dashboard["pitin"] = self.chrono.pitin
-            self.dashboard["pitout"] = self.chrono.pitout
+            self.dashboard["pit"] = self.chrono.in_pitlane
             self.dashboard["nblap"] = self.chrono.nblap
             self.dashboard["lap"] = self.chrono.lap
             self.dashboard["temps_tour"] = formatTimeDelta(self.chrono.temps_tour)
@@ -2819,14 +2841,14 @@ class DashboardControl(threading.Thread):
             self.dashboard["temps_en_cours"] = formatTimeDelta(self.chrono.temps_en_cours)
             self.dashboard["temps_inter"] = formatTimeDelta(self.chrono.temps_inter)
             self.dashboard["temps_i"] = formatTimeDelta(self.chrono.temps_i)
-            gain = " "
-            if self.chrono.temps_tour < self.chrono.best_lap:
-                diff = self.chrono.best_lap - self.chrono.temps_tour
-                gain += "-"+formatTimeDelta(diff,"sscc")
-            else:
-                diff = self.chrono.temps_tour - self.chrono.best_lap
-                gain += "+"+formatTimeDelta(diff,"sscc")
-            self.dashboard["gain"] = gain
+            #gain = " "
+            #if self.chrono.temps_tour < self.chrono.best_lap:
+            #    diff = self.chrono.best_lap - self.chrono.temps_tour
+            #    gain += "-"+formatTimeDelta(diff,"sscc")
+            #else:
+            #    diff = self.chrono.temps_tour - self.chrono.best_lap
+            #    gain += "+"+formatTimeDelta(diff,"sscc")
+            self.dashboard["gain"] = self.chrono.gain
             
             i = 0
             temps_secteurs = []
@@ -2837,6 +2859,8 @@ class DashboardControl(threading.Thread):
             self.dashboard["sect"] = temps_secteurs
             #logger.info(str(self.dashboard))
 
+            self.dashboard["running"] = self.__running
+            #logger.info(str(self.dashboard["running"]))
             self.writeInfos() # Infos
 
 
@@ -2845,12 +2869,19 @@ class DashboardControl(threading.Thread):
         
     def stop(self):
         self.__running = False
+        self.dashboard["running"] = self.__running
+        self.writeInfos() # Infos
             
     def writeInfos(self):
         global UseDBTrack
         global AutoTrackMode
         try:
             with open(self.cache_name, 'w') as cache: # the file is initialized
+                #try:
+                #    cache.write(str(json.dumps(self.dashboard))+'\r\n')
+                #except:
+                #    logger.error("cannot json dump dashboard:"+str(self.dashboard))
+                #    pass
                 cache.write(str(json.dumps(self.dashboard))+'\r\n')
                 cache.close()
         except OSError as err:
@@ -3052,6 +3083,17 @@ def get_baudrate(device):
            return baudrate
        except:
            return -1
+           
+def clear_cache(cachefile):
+    cache_name = pathcache+'/'+cachefile
+    try:
+        with open(cache_name, 'w') as cache: # the file is initialized
+            cache.close()
+            os.chmod(cache_name, 0o777)
+    except OSError as err:
+        logger.error("cannot use cache file OS error: {0}".format(err))
+        return False
+    return True
 
 started = False    
 logger.info("waiting for button action !")
@@ -3202,13 +3244,13 @@ if __name__ == "__main__":
         el_parms = parms.get_parms("CharacterSize")
         if "CharacterSize" in parms.params:
             CharacterSize = el_parms
+
+        clear_cache('DASHBOARD')
         
         lcd = DisplayControl()
         lcd.start()
-
         lcd.set_display_time()
 
-        #
         gps = GpsControl(lcd,LED4_GPIO_PIN)
         gps.start()
         

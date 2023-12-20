@@ -14,6 +14,7 @@ Path = Paths();
 
 import os
 import time
+#from datetime import timedelta, datetime, tzinfo
 import sys
 import threading
 from threading import Timer
@@ -42,6 +43,9 @@ el_parms = parms.get_parms("ScreenRate")
 if "ScreenRate" in parms.params:
     ScreenRate = el_parms
 print(str(ScreenRate))
+
+bTimer = False # timer for blink
+dTimer = False
 
 #######################################################################################
 # we will use the logger to replace print
@@ -101,13 +105,18 @@ class ScrollControl(threading.Thread):
         self.scroll = 0
         self.max = max
         self.infos = " "
-        #self.infos = " "
+        self.blink = 0
+        self.light = 1
     def run(self):
         self.__running = True
         while self.__running:
             if self.scroll > self.max:
                 self.scroll = 0
             self.scroll = self.scroll + 1
+            #if self.blink == 1:
+            #    self.light = self.light * -1
+            #else:
+            #    self.light = 1
             time.sleep(0.5)
     def stop(self):
         self.__running = False
@@ -116,9 +125,27 @@ class ScrollControl(threading.Thread):
             self.scroll = 0
         self.infos = infos
         #logger.info(str(self.scroll)+"/"+str(self.max)+" "+self.infos)
-        scroll_info = self.infos+"... "+self.infos+"... "+self.infos
+        scroll_info = self.infos+" "+self.infos+" "+self.infos
         scroll_info = scroll_info[self.scroll:self.scroll+self.max]
         return scroll_info
+
+    def set_blink(self,blink):
+        self.blink = blink
+    
+    def get_light(self):
+        if self.light == 1:
+            return 0
+        else:
+            return 65535
+            
+    def set_light(self):
+        global bTimer
+        if self.blink == 1:
+            self.light = self.light * -1
+        else:
+            self.light = 1
+        #logger.info("light:"+str(self.light)+" blink:"+str(self.blink))
+        bTimer = False
     
 class DisplayScreen():
 
@@ -144,6 +171,9 @@ class DisplayScreen():
         self.gain = " "
         self.vitesse = " "
         self.infos = " "
+        self.blink = 0
+        self.light = 0
+        self.delay = 0
         
         self.loopm = 999
         self.loops = 999
@@ -151,7 +181,7 @@ class DisplayScreen():
         self.display("ip.txt=\""+self.ip+"\"")
         self.display("date.txt=\""+self.date+"\"")
         self.display("time.txt=\""+self.time+"\"")
-        self.display("nbsats.val=8*"+str(self.nbsats)+"/12")
+        self.display("nbsats.val=8*"+str(self.nbsats)+"/20")
         self.display("tempcpu.val="+str(self.tempcpu))
         self.display("circuit.txt=\""+self.circuit+"\"")
         self.display("t0.txt=\""+self.t0+"\"")
@@ -165,20 +195,31 @@ class DisplayScreen():
         self.display("infos.txt=\""+self.infos+"\"")
 
     def lire_cache(self):
+        global bTimer
+        global dTimer
         if os.path.exists(self.cache) == False:
             time.sleep(0.2)
             #return False
             return True
         with open(self.cache, 'r') as cache:
-            logger.debug("read cache")
             message = cache.read()
         try:
             mydict = json.loads(message)
         except:
-            logger.debug("error json load ["+str(message)+"]")
+            #logger.debug("error json load ["+str(message)+"]")
             pass
             return True
-        #logger.debug(str(mydict))
+
+        logger.debug(str(mydict["running"]))
+        if mydict["running"] == False:
+            return False
+            
+        if "lt" in mydict:
+            lt = mydict["lt"]
+        else:
+            time.sleep(1)
+            return True
+            
         if self.loopm > 600:
             # affichage toutes les minutes
             logger.debug(str(mydict))
@@ -211,12 +252,24 @@ class DisplayScreen():
                 
             # afficher les infos
             self.previnfos = self.infos
-            if mydict["pitin"] == "true":
+            #logger.info(str(mydict["infos"]))
+            if mydict["infos"] != " ":
+                self.infos = mydict["infos"].replace("//","  ")
+                if mydict["infos"].find('//') > 0:
+                    buffer = mydict["infos"].split('//')
+                    if "Secteur" in buffer[0] or "Lap" in buffer[0]:
+                        self.infos = buffer[0]+" "+buffer[1]
+            elif mydict["pit"] == True:
                 self.infos = "pitlane drive carefully"
+                self.scr.set_blink(1)
             elif mydict["lap"] < 2:
-                    self.infos = "first few laps, drive carefully"
+                self.infos = "first few laps, drive carefully"
+                self.scr.set_blink(1)
             else:
                 self.infos = " "
+                self.scr.set_blink(0)
+            #if self.infos != " " and self.infos != self.previnfos:
+            #    logger.info(str(self.infos))
             if self.infos == " " and self.infos != self.previnfos:
                 self.display("infos.txt=\" \"")
             elif self.infos != " ":
@@ -224,26 +277,38 @@ class DisplayScreen():
              
             self.loops = 0
         self.loops = self.loops+1
+
+        if bTimer == False:
+            bTimer = Timer(0.8, self.scr.set_light)
+            bTimer.start()  # after 0.8 second, the blink is done
+        self.do_blink(scr)
         
         # affichage tous les 1/10
         if self.lap != mydict["lap"]:
-            if self.t0 == " ":
-                self.t0 = "Lap"
-                self.display("t0.txt=\""+self.t0+"\"")
+            #if self.t0 == " ":
+            #    self.t0 = "Lap"
+            #    self.display("t0.txt=\""+self.t0+"\"")
             self.lap = mydict["lap"]
-            self.display("lap.txt=\""+str(self.lap)+"\"")
-        if self.tt != mydict["temps_tour"]:
+            self.display("lap.txt=\"L"+str(self.lap)+"\"")
+        if self.tt != mydict["temps_tour"] and mydict["temps_tour"] != "00:00.00":
             self.tt = mydict["temps_tour"]
             self.display("tt.txt=\""+self.tt+"\"")
-        if self.best != mydict["best_lap"]:
-            if self.t1 == " ":
-                self.t1 = "Best"
-                self.display("t1.txt=\""+self.t1+"\"")
+            self.delay = 1
+            self.display("tec.txt=\""+self.tt+"\"")
+
+        if dTimer == False and self.delay == 1:
+            dTimer = Timer(3.0, self.clear_delay)
+            dTimer.start()  # after 0.8 second, the blink is done
+            
+        if self.best != mydict["best_lap"] and mydict["best_lap"] != "00:00.00":
+            #if self.t1 == " ":
+            #    self.t1 = "Best"
+            #    self.display("t1.txt=\""+self.t1+"\"")
             self.best = mydict["best_lap"]
-            self.display("best.txt=\""+self.best+"\"")
-        if self.tec != mydict["temps_en_cours"]:
+            self.display("best.txt=\"B:"+self.best+"\"")
+        if self.tec != mydict["temps_en_cours"] and self.delay == 0:
             self.tec = mydict["temps_en_cours"]
-            self.display("tec.txt=\""+self.tec+"\"")
+            self.display("tec.txt=\""+self.tec[0:5]+":00\"")
         if self.gain != mydict["gain"]:
             self.gain = mydict["gain"]
             self.display("gain.txt=\""+self.gain+"\"")
@@ -263,10 +328,32 @@ class DisplayScreen():
         ser.write(k)    
 
     def boucle(self):
-        running = True
-        while running == True:
-            running = self.lire_cache()
+        self.__running = True
+        while self.__running == True:
+            self.__running = self.lire_cache()
 
+    def do_blink(self,scr):
+        light = scr.get_light()
+        #logger.info("light:"+str(light)+" blink:"+str(scr.blink))
+        if scr.blink == 1:
+            if light == 0:
+                self.display("infos.bco=0")
+                self.display("infos.pco=65535")
+            else:
+                self.display("infos.bco=65535")
+                self.display("infos.pco=0")
+        else:
+            self.display("infos.bco=0")
+            self.display("infos.pco=65535")
+            
+    def clear_delay(self):
+        global dTimer
+        self.delay = 0
+        dTimer = False
+            
+    def stop(self):
+        self.__running = False
+1
 if __name__ == '__main__':
     scr = ScrollControl(30)
     scr.start()
@@ -284,7 +371,7 @@ if __name__ == '__main__':
         scr.stop()
         scr.join()
         print("END")
-#{"ip": "192.168.1.93", "circuit": "Pau Arnos", "gpsfix": 1, "nbsats": 10, "dbtracks": 1, "autotrack": 1, "startlat1": 43.447024761764254, "startlon1": -0.5327625930348194, "startlat2": 43.4471440287655, "startlon2": -0.5324297233377511, "date": "06/07/2012", "time": "08:57:38", "tempcpu": 49, "volts": "volt=1.3000V", "lt": "09:57:38", "distcircuit": 7, "gpsdate": "060712", "gpstime": "085738.800", "latitude": 43.4450673, "longitude": -0.5297469333333333, "vitesse": 12.386176, "altitude": 209.655, "cap": 30.507706, "chrono_begin": true, "chrono_started": true, "pitin": false, "pitout": false, "nblap": 11, "lap": 11, "temps_tour": "01:26.80", "best_lap": "01:26.80", "temps_t": "14:54.76", "temps_en_cours": "02:28.43", "temps_inter": "00:29.09", "temps_i": "15:59.69", "sect": ["00:13.61", "00:22.21", "00:29.09"]}
+#{"ip": "192.168.1.93", "circuit": "Pau Arnos", "gpsfix": 1, "nbsats": 10, "dbtracks": 1, "autotrack": 1, "startlat1": 43.447024761764254, "startlon1": -0.5327625930348194, "startlat2": 43.4471440287655, "startlon2": -0.5324297233377511, "date": "06/07/2012", "time": "08:57:38", "tempcpu": 49, "volts": "volt=1.3000V", "lt": "09:57:38", "distcircuit": 7, "gpsdate": "060712", "gpstime": "085738.800", "latitude": 43.4450673, "longitude": -0.5297469333333333, "vitesse": 12.386176, "altitude": 209.655, "cap": 30.507706, "chrono_begin": true, "chrono_started": true, "pit": false, "nblap": 11, "lap": 11, "temps_tour": "01:26.80", "best_lap": "01:26.80", "temps_t": "14:54.76", "temps_en_cours": "02:28.43", "temps_inter": "00:29.09", "temps_i": "15:59.69", "sect": ["00:13.61", "00:22.21", "00:29.09"]}
 
 # page 3
 # date.txt="15/12/2023"
