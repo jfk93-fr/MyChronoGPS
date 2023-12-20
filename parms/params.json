@@ -85,5 +85,7 @@
 	"LED4_GPIO_PIN": 16,
 	"#ILS_GPIO_PIN": "GPIO associated with ILS Control (default=23)",
 	"ILS_GPIO_PIN": 23,
+	"#SpeedInMiles": "0 => KM/H or 1 => M/H",
+	"SpeedInMiles": 1,
 	"#": "End of Parms"
 }

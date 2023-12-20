@@ -30,6 +30,9 @@ pathcmd = Path.pathcmd
 pathdata = Path.pathdata
 pathlog = pathdata+'/log/'
 
+MILES_KM = 1.609344 # 1 mile = 1609.344 m
+MpH = 0 # 1=speed in miles per hour or 1=speed in kilometer per hour
+
 parms = ""
 from MyChronoGPS_Parms import Parms
 # we start by reading the parameters ...
@@ -43,6 +46,10 @@ el_parms = parms.get_parms("ScreenRate")
 if "ScreenRate" in parms.params:
     ScreenRate = el_parms
 print(str(ScreenRate))
+MpH = 0
+el_parms = parms.get_parms("SpeedInMiles")
+if "SpeedInMiles" in parms.params:
+    MpH = int(el_parms)
 
 bTimer = False # timer for blink
 dTimer = False
@@ -75,7 +82,7 @@ def get_logger(logger_name):
 
 logger = get_logger(__name__)
 logger.setLevel(logging.INFO)
-logger.info('debut de '+cmdgps)
+logger.info(cmdgps+' begin')
 
 #######################################################################################
 
@@ -117,7 +124,7 @@ class ScrollControl(threading.Thread):
             #    self.light = self.light * -1
             #else:
             #    self.light = 1
-            time.sleep(0.5)
+            time.sleep(0.3)
     def stop(self):
         self.__running = False
     def get_scroll(self,infos):
@@ -220,8 +227,8 @@ class DisplayScreen():
             time.sleep(1)
             return True
             
-        if self.loopm > 600:
-            # affichage toutes les minutes
+        if self.loopm > 100:
+            # affichage toutes les 10 secondes
             logger.debug(str(mydict))
             self.loopm = 0
             if self.date != mydict["lt"]:
@@ -314,10 +321,13 @@ class DisplayScreen():
             self.display("gain.txt=\""+self.gain+"\"")
         if self.vitesse != mydict["vitesse"]:
             self.vitesse = mydict["vitesse"]
-            self.display("vitesse.txt=\""+str(round(self.vitesse))+"km/h\"")
- 
+            if MpH == 1:
+                miph = self.vitesse/MILES_KM
+                self.display("vitesse.txt=\""+str(round(miph))+"mi/h\"")
+            else:
+                self.display("vitesse.txt=\""+str(round(self.vitesse))+"km/h\"")
 
-        time.sleep(0.1)
+        time.sleep(0.09)
         return True
 
     def display(self,command):
@@ -331,6 +341,12 @@ class DisplayScreen():
         self.__running = True
         while self.__running == True:
             self.__running = self.lire_cache()
+        self.display("page 0")
+        self.display("L1.txt=\"end of\"")
+        self.display("L2.txt=\"MyChronoGPS\"")
+        time.sleep(5)
+        self.display("L1.txt=\"\"")
+        self.display("L2.txt=\"\"")
 
     def do_blink(self,scr):
         light = scr.get_light()
@@ -352,6 +368,7 @@ class DisplayScreen():
         dTimer = False
             
     def stop(self):
+        logger.info('stop of '+cmdgps)
         self.__running = False
 1
 if __name__ == '__main__':

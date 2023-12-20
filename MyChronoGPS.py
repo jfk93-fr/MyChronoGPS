@@ -140,6 +140,8 @@ GpsChronoMode = 2 # default stopwatch mode: automatic
 
 
 NOEUD_KM = 1.852 # 1 nautical mile = 1852 m
+MILES_KM = 1.609344 # 1 mile = 1609.344 m
+MpH = 0 # 1=speed in miles per hour or 1=speed in kilometer per hour
 
 RT = 6378137.0 # radius of the earth in metres (to calculate distances)
 TrackWidth = 15 # by default the width of the track is 15 m
@@ -3004,13 +3006,20 @@ def formatTimeDelta(t,format="mmsscc"):
     return retour
 
 def formatVitesse(vitesse):
+    global MpH
+    speed = vitesse
     retour = ""
-    v = int(abs(vitesse))
+    v = int(abs(speed))
+    unit = "km/h "
+    if MpH == 1:
+        speed = vitesse/MILES_KM
+        unit = "mi/h "
     if v < 10:
         retour = retour+" "
     if v < 100:
         retour = retour+" "
-    retour = retour+str(v)+"km/h "
+    
+    retour = retour+str(v)+str(unit)
     return retour
     
 def getMicroseconds(timed):
@@ -3297,6 +3306,11 @@ if __name__ == "__main__":
         el_parms = parms.get_parms("SimuCmd")
         if "SimuCmd" in parms.params:
             cmdsimu = el_parms
+
+        MpH = 0
+        el_parms = parms.get_parms("SpeedInMiles")
+        if "SpeedInMiles" in parms.params:
+            MpH = int(el_parms)
 
         speedometer = 0
         el_parms = parms.get_parms("SpeedOmeter")
