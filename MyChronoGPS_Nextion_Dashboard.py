@@ -37,15 +37,26 @@ parms = ""
 from MyChronoGPS_Parms import Parms
 # we start by reading the parameters ...
 parms = Parms(Path)
-ScreenPort = "ttyUSB0"
-el_parms = parms.get_parms("ScreenPort")
-if "ScreenPort" in parms.params:
-    ScreenPort = el_parms
+
+lg = len(sys.argv)
+numport = 1
+if lg >= 2:
+    numport = sys.argv[1]
+
+SerialPort = "ttyUSB0"
+if numport == 1:
+    el_parms = parms.get_parms("ScreenPort")
+    if "ScreenPort" in parms.params:
+        SerialPort = el_parms
+elif numport == 2:
+    el_parms = parms.get_parms("ScreenPort2")
+    if "ScreenPort2" in parms.params:
+        SerialPort = el_parms
 ScreenRate = 9600
-el_parms = parms.get_parms("ScreenRate")
-if "ScreenRate" in parms.params:
-    ScreenRate = el_parms
-print(str(ScreenRate))
+#el_parms = parms.get_parms("ScreenRate")
+#if "ScreenRate" in parms.params:
+#    ScreenRate = el_parms
+#print(str(ScreenRate))
 MpH = 0
 el_parms = parms.get_parms("SpeedInMiles")
 if "SpeedInMiles" in parms.params:
@@ -96,7 +107,7 @@ CLEAR = "C"
 #CONTRAST = "A"
 POWER_OFF = "X"
 
-SERIAL_PORT = "/dev/"+str(ScreenPort)
+SERIAL_PORT = "/dev/"+str(SerialPort)
 print(str(SERIAL_PORT))
 # Connect to the Nextion screen
 try:
@@ -160,7 +171,7 @@ class DisplayScreen():
         self.scr = scr
         
         self.cache = pathdata+'/cache/DASHBOARD'
-        logger.debug("cache file:"+self.cache)
+        #logger.debug("cache file:"+self.cache)
         self.page = 3
         self.display("page 3")
         self.ip = " "
@@ -217,7 +228,7 @@ class DisplayScreen():
             pass
             return True
 
-        logger.debug(str(mydict["running"]))
+        #logger.debug(str(mydict["running"]))
         if mydict["running"] == False:
             return False
             
@@ -229,7 +240,7 @@ class DisplayScreen():
             
         if self.loopm > 100:
             # affichage toutes les 10 secondes
-            logger.debug(str(mydict))
+            #logger.debug(str(mydict))
             self.loopm = 0
             if self.date != mydict["lt"]:
                 self.date = mydict["lt"]
@@ -249,7 +260,17 @@ class DisplayScreen():
             # affichage toutes les secondes
             if self.nbsats != mydict["nbsats"]:
                 self.nbsats = mydict["nbsats"]
-                self.display("nbsats.val=8*"+str(self.nbsats)+"/12")
+                #logger.debug("nb sats:"+str(self.nbsats))
+                nbsats = self.nbsats
+                if nbsats > 12:
+                    nbsats = 12
+                level = str(round((nbsats/12)*100))
+                #logger.debug("["+str(level)+"]")
+                dmsg="nbsats.val="+str(level)
+                #self.display("nbsats.val=8*"+str(self.nbsats)+"/12")
+                #dmsg="nbsats.val=8*"+str(self.nbsats)+"/12"
+                #logger.debug("["+str(dmsg)+"]")
+                self.display(dmsg)
             if self.tempcpu != mydict["tempcpu"]:
                 self.tempcpu = mydict["tempcpu"]
                 self.display("tempcpu.val="+str(round(self.tempcpu)))
@@ -331,7 +352,7 @@ class DisplayScreen():
         return True
 
     def display(self,command):
-        logger.debug(str(command))
+        #logger.debug(str(command))
         ser.write(command.encode())
         ser.write(k)
         ser.write(k)

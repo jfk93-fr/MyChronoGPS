@@ -178,7 +178,7 @@ from MyChronoGPS_Parms import Parms
 LED1_GPIO_PIN = 4 # yellow LED associated with Button1 and pitlane warning
 LED2_GPIO_PIN = 16 # red LED associated with ILS Control
 LED3_GPIO_PIN = 18 # green LED associated with Chrono Control
-LED4_GPIO_PIN = 16 # blue LED associated with GPS Control
+LED4_GPIO_PIN = 20 # blue LED associated with GPS Control
 ILS_GPIO_PIN = 23 # GPIO associated with ILS Control
 
 def send_delayed():
@@ -235,7 +235,7 @@ class GpsControl(threading.Thread):
 
     def __init__(self, lcd, led_pin): # LED is optional
         threading.Thread.__init__(self)
-        logger.info(str(self))
+        logger.info(str(self)+'led '+str(led_pin))
         
         self.lcd = lcd
 
@@ -570,7 +570,8 @@ class LedControl(threading.Thread):
         
     def __init__(self, gpio_pin):
         threading.Thread.__init__(self)
-        logger.info(str(self))
+        logger.info(str(gpio_pin)+' gpio pin:'+str(gpio_pin))
+
         self.gpio_pin = gpio_pin
         GPIO.setup(self.gpio_pin, GPIO.OUT) #Active le contrôle du GPIO
         #jfk: we'll write to the cache instead and another program will take care of managing the leds if needed.
@@ -1091,16 +1092,15 @@ class DisplayControl(threading.Thread):
             
     def start_screen(self):
         self.clear()
+        numscreen = 1
         el_parms = parms.get_parms("ScreenCmd")
         if "ScreenCmd" in parms.params:
             cmdscreen = el_parms
-        #cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
-        #print(cmdos)
         
-        module = cmdscreen
-        cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py &"
+        #module = cmdscreen
+        cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py "+str(numscreen)+" &"
         print(cmdos)
-        isModule = get_module(module)
+        isModule = get_module(cmdscreen)
         if isModule == False:
             try:
                 os.system(cmdos)
@@ -1108,6 +1108,21 @@ class DisplayControl(threading.Thread):
                 running = False
             time.sleep(2)
         print('verify if %s started' % (cmdscreen))
+        # start second screen if present
+        el_parms = parms.get_parms("ScreenCmd2")
+        if "ScreenCmd2" in parms.params:
+            numscreen = 2
+            cmdscreen = el_parms
+            cmdos = python_bin+" "+pathcmd+"/"+cmdscreen+".py "+str(numscreen)+" &"
+            isModule = get_module(cmdscreen)
+            if isModule == False:
+                try:
+                    os.system(cmdos)
+                except:
+                    running = False
+                time.sleep(2)
+            print('verify if %s started' % (cmdscreen))
+        
             
     def display(self,str):
         if self.displayBig == True:
@@ -3008,12 +3023,12 @@ def formatTimeDelta(t,format="mmsscc"):
 def formatVitesse(vitesse):
     global MpH
     speed = vitesse
-    retour = ""
-    v = int(abs(speed))
     unit = "km/h "
     if MpH == 1:
         speed = vitesse/MILES_KM
         unit = "mi/h "
+    retour = ""
+    v = int(abs(speed))
     if v < 10:
         retour = retour+" "
     if v < 100:

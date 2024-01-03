@@ -411,7 +411,7 @@ class FIFOOLED():
             return False
 
         else:
-            logger.info("commande invalide:\"",commande+"\"")
+            logger.info("commande invalide:\""+str(commande)+"\"")
             #line1 = "invalid command:"+commande
             #self.draw.rectangle((0,0,self.width,self.height), outline=0, fill=0)
             #self.draw.text((self.x, self.top), line1,  font=self.font, fill=255)
