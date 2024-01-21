@@ -38,33 +38,6 @@ from MyChronoGPS_Parms import Parms
 # we start by reading the parameters ...
 parms = Parms(Path)
 
-lg = len(sys.argv)
-numport = 1
-if lg >= 2:
-    numport = sys.argv[1]
-
-SerialPort = "ttyUSB0"
-if numport == 1:
-    el_parms = parms.get_parms("ScreenPort")
-    if "ScreenPort" in parms.params:
-        SerialPort = el_parms
-elif numport == 2:
-    el_parms = parms.get_parms("ScreenPort2")
-    if "ScreenPort2" in parms.params:
-        SerialPort = el_parms
-ScreenRate = 9600
-#el_parms = parms.get_parms("ScreenRate")
-#if "ScreenRate" in parms.params:
-#    ScreenRate = el_parms
-#print(str(ScreenRate))
-MpH = 0
-el_parms = parms.get_parms("SpeedInMiles")
-if "SpeedInMiles" in parms.params:
-    MpH = int(el_parms)
-
-bTimer = False # timer for blink
-dTimer = False
-
 #######################################################################################
 # we will use the logger to replace print
 #######################################################################################
@@ -97,6 +70,33 @@ logger.info(cmdgps+' begin')
 
 #######################################################################################
 
+lg = len(sys.argv)
+numport = 1
+if lg >= 2:
+    numport = int(sys.argv[1])
+
+SerialPort = "ttyUSB0"
+if numport == 1:
+    el_parms = parms.get_parms("ScreenPort")
+    if "ScreenPort" in parms.params:
+        SerialPort = el_parms
+elif numport == 2:
+    el_parms = parms.get_parms("ScreenPort2")
+    if "ScreenPort2" in parms.params:
+        SerialPort = el_parms
+ScreenRate = 9600
+#el_parms = parms.get_parms("ScreenRate")
+#if "ScreenRate" in parms.params:
+#    ScreenRate = el_parms
+#print(str(ScreenRate))
+MpH = 0
+el_parms = parms.get_parms("SpeedInMiles")
+if "SpeedInMiles" in parms.params:
+    MpH = int(el_parms)
+
+bTimer = False # timer for blink
+dTimer = False
+
 # list of commands
 DISPLAY = "D"
 DISPLAY_BIG = "H"
@@ -113,7 +113,7 @@ print(str(SERIAL_PORT))
 try:
     ser = serial.Serial(SERIAL_PORT, baudrate = ScreenRate, timeout = 1)
 except:
-    logger.error("Application serial error!")
+    logger.error("Application serial error! "+str(SerialPort))
     exit(1)
 print("connected to serial")
 
@@ -242,9 +242,6 @@ class DisplayScreen():
             # affichage toutes les 10 secondes
             #logger.debug(str(mydict))
             self.loopm = 0
-            if self.date != mydict["lt"]:
-                self.date = mydict["lt"]
-                self.display("date.txt=\""+self.date+"\"")
             if self.ip != mydict["ip"]:
                 self.ip = mydict["ip"]
                 self.display("ip.txt=\""+self.ip+"\"")

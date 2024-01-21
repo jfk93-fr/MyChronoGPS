@@ -664,6 +664,8 @@ class Screen():
         self.epd.ReadBusy()
 
         time.sleep(0.2)
+        if commande == POWER_OFF: # a stop to the programm is requested
+            return False
         return True
 
     def boucle(self):

@@ -97,6 +97,7 @@ class GpsControl(threading.Thread):
         global BAUDRATE
         threading.Thread.__init__(self)
         self.parms = Parms(Path)
+        logger.debug('parms:'+str(self.parms))
         self.gpsport = PORT
         if "GPSPort" in self.parms.params:
             self.gpsport = self.parms.params["GPSPort"]
@@ -106,6 +107,10 @@ class GpsControl(threading.Thread):
         self.GPSRate = 1 # original frequency = 1hz
         if "GPSRate" in self.parms.params:
             self.GPSRate = self.parms.params["GPSRate"]
+            
+        logger.info('GPSPort:'+str(self.gpsport))
+        logger.info('SerialRate:'+str(BAUDRATE))
+        logger.info('GPSRate:'+str(self.GPSRate))
 
         self.nmea = NmeaControl()
         self.serialGps = serial.Serial()
