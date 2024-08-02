@@ -197,6 +197,20 @@ class GpsControl(threading.Thread):
         self.disable()
         self.serialGps.close()
         
+    def readline(self):
+        busy = 1
+        strline = ''
+        while busy==1:
+            try:
+                x=self.serialGps.read().decode()
+                strline += str(x)
+                #print(strline)
+                if str(x) == '\n':
+                    busy = 0
+            except:
+                busy = 0
+        return strline
+        
     def run(self):
         self.__running = True
         cpt = 0
@@ -209,15 +223,19 @@ class GpsControl(threading.Thread):
                 cpt = cpt + 1
                 time.sleep(0.01)
             if self.buffstate == FREE:
-                gpsline = self.serialGps.readline()
+                logger.debug("readline:"+str(self.serialGps.inWaiting()))
+                #gpsline = self.serialGps.readline()
+                gpsline = self.readline()
+                #gpsline = self.serialGps.read()
                 logger.debug(str(gpsline))
                 self.gpsline = str(gpsline)
 
                 try:
                     self.gpsline = gpsline.decode()
                 except: # si la fonction decode n'a pas marché, c'est que le gps a envoyé une séquence en binaire
-                    logger.info("decode failed")
+                    #logger.info("decode failed")
                     self.gspline = str(gpsline)
+                    pass
                 
                 self.nmea.tracker.write(self.gpsline) # write sentence in trace file
 

@@ -283,18 +283,43 @@ class GpsControl(threading.Thread):
                 self.timeshift = int(el_parms)
         else:
             self.timeshift = utc2loc
+
+        self.bluetooth = 0
+        el_parms = parms.get_parms("GPSBlueTooth")
+        if "GPSBlueTooth" in parms.params:
+            self.bluetooth = el_parms
+
+        self.GPSMacAddress = ""
+        el_parms = parms.get_parms("GPSMacAddress")
+        if "GPSMacAddress" in parms.params:
+            self.GPSMacAddress = el_parms
         
         self.buffer = [] # we create an array that serves as a queue
         self.gpsaltitude = 0.
         self.nbparse = 0
         # check the GPS connection
-        if get_baudrate(self.gpsport) < 0:
-            logger.error("communication with the gps cannot be established. Check the gps connection.")
-            time.sleep(10)
-            self.lcd.set_display_sysmsg(" //Check Gps//Not Connected",lcd.DISPLAY_BIG,6)
-            time.sleep(5)
-            self.stop()
-            return
+        if get_baudrate(self.gpsport) < 0 and self.bluetooth == 1:
+            # try to connect with bluetooth
+            command = 'sudo rfcomm connect hci0 {0}'.format(self.GPSMacAddress)
+            try:
+                proc_retval = subprocess.check_output(shlex.split(command))
+                logger.info(str(proc_retval))
+                time.sleep(5)
+            except:
+                logger.error("communication with the bluetooth gps cannot be established. Check the bluetooth gps connection.")
+                time.sleep(10)
+                self.lcd.set_display_sysmsg(" //Bluetooth Gps//Not Connected",lcd.DISPLAY_BIG,6)
+                time.sleep(5)
+                self.stop()
+                return
+        else:
+            if get_baudrate(self.gpsport) < 0:
+                logger.error("communication with the gps cannot be established. Check the gps connection.")
+                time.sleep(10)
+                self.lcd.set_display_sysmsg(" //Check Gps//Not Connected",lcd.DISPLAY_BIG,6)
+                time.sleep(5)
+                self.stop()
+                return
 
         self.gpsactiv = True
 
@@ -3384,7 +3409,8 @@ if __name__ == "__main__":
             if (gps.gpscomplete == True):
                 if (gps.gpsfix == gps.VALID):
                     if GpsChronoMode > 0: # automatic or semi-automatic operation
-                        chrono.auto_start_line()
+                        if chrono.start_line == False: # the line is not defined, we try to determine it.                               
+                            chrono.auto_start_line()
                         if GpsChronoMode == 2:  # fully automatic operation
                             if (current_state != RUNNING): # we don't time
                                 if current_state == STOP:
