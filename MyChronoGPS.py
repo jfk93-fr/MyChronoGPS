@@ -1893,6 +1893,9 @@ class ChronoControl():
             i = i+1            
 
         line += '}'
+        # on ajoute tout de suite la piste dans le tableau des pistes
+        circuits["Autotrack"] = json.loads(line)
+        
         self.track = pathdata+'/tracks/Autotrack.trk' # location of the Autotrack track file
         try:
             with open(self.track, 'w') as track: # the data is overwritten with more recent data
@@ -2275,13 +2278,13 @@ class ChronoControl():
                         self.neardist = distcir
                         if distcir < TrackProximity: # we are within x m of the circuit read in parameter
                             self.neartrack = circuits[track]["NomCircuit"]
-                            if UseDBTrack == 1:
-                                # if the automatic definition of the line is in progress, it is stopped
-                                if acq != False:
-                                    if acq.active == True:
-                                        logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
-                                        logger.info('track='+str(self.neartrack)+' UseDBTrack='+str(UseDBTrack)+' TrackProximity='+str(TrackProximity))
-                                        acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
+                            #if UseDBTrack == 1:
+                            #    # if the automatic definition of the line is in progress, it is stopped
+                            #    if acq != False:
+                            #        if acq.active == True:
+                            #            logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
+                            #            logger.info('track='+str(self.neartrack)+' UseDBTrack='+str(UseDBTrack)+' TrackProximity='+str(TrackProximity))
+                            #            acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
 
                             # we'll look to see if we've cut the starting line of the circuit nearby
                             # was the start/finish line cut ?
@@ -2571,55 +2574,55 @@ class AcqControl(threading.Thread):
                                     # creation of the self-defined track
                                     self.chrono.create_sfTrack()
                                     
-                                    self.chrono.dD = 0 # no need for distance correction
-                                    self.chrono.dD = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
-                                    
-                                    self.chrono.begin()
-                                    self.chrono.nblap = 1 # we start with the first lap
-                                    
-                                    self.chrono.chrono_started = True
-                                    
-                                    dt0 = self.chrono.getTime(self.acqlines[k]["time"])
-                                    dt1 = self.chrono.getTime(self.acqlines[j]["time"])
-                                    
-                                    # calculation of the distance between the previous point and the start-finish line
-                                    dDp0 = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[k]["lat"],self.acqlines[k]["lon"])
-                                    # calculation of the distance between the current point and the start-finish line
-                                    dDp1 = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
-                                    
-                                    corrtime = dt1 - dt0;
-                                    
-                                    v0 = self.acqlines[k]["vit"] # speed at the previous point
-                                    v1 = self.acqlines[j]["vit"] # speed at current point
-                                    vmoy = (v0+v1)/2 # average speed to travel the straight line segment
-
-                                    dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
-                                    dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
-                                #
-                                    corrtime = corrtime * (dc0/(dc0+dc1));
-                                    corrmic = getMicroseconds(corrtime)
-                                    
-                                    temps = timedelta(microseconds=corrmic)
-                                    
-                                    dt0mic = getMicroseconds(dt0)
-                                    dt1mic = getMicroseconds(dt1)
-
-                                    self.chrono.chronoStartTime = dt0
-                                    
-                                    self.chrono.temps_t = temps #
-                                    self.chrono.temps_i = temps #
-                                    
-                                    self.chrono.lat0   = self.acqlines[k]["lat"]
-                                    self.chrono.lon0   = self.acqlines[k]["lon"]
-                                    self.chrono.time0  = self.acqlines[k]["time"]
-                                    self.chrono.speed0 = self.acqlines[k]["vit"]
-                                    self.chrono.alt0   = self.acqlines[k]["alt"]
-                                    self.chrono.cap0   = self.acqlines[k]["cap"]
-                                    
-                                    fanalys.writePoint()
-                                                                      
-                                    i = -1 # to exit the loop
-                                    self.stop();
+                                    #self.chrono.dD = 0 # no need for distance correction
+                                    #self.chrono.dD = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
+                                    #
+                                    #self.chrono.begin()
+                                    #self.chrono.nblap = 1 # we start with the first lap
+                                    #
+                                    #self.chrono.chrono_started = True
+                                    #
+                                    #dt0 = self.chrono.getTime(self.acqlines[k]["time"])
+                                    #dt1 = self.chrono.getTime(self.acqlines[j]["time"])
+                                    #
+                                    ## calculation of the distance between the previous point and the start-finish line
+                                    #dDp0 = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[k]["lat"],self.acqlines[k]["lon"])
+                                    ## calculation of the distance between the current point and the start-finish line
+                                    #dDp1 = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
+                                    #
+                                    #corrtime = dt1 - dt0;
+                                    #
+                                    #v0 = self.acqlines[k]["vit"] # speed at the previous point
+                                    #v1 = self.acqlines[j]["vit"] # speed at current point
+                                    #vmoy = (v0+v1)/2 # average speed to travel the straight line segment
+                                    #
+                                    #dc0 = dDp0*(v1/vmoy) # compensated distance before crossing the line
+                                    #dc1 = dDp1*(v0/vmoy) # compensated distance after crossing the line
+                                    ##
+                                    #corrtime = corrtime * (dc0/(dc0+dc1));
+                                    #corrmic = getMicroseconds(corrtime)
+                                    #
+                                    #temps = timedelta(microseconds=corrmic)
+                                    #
+                                    #dt0mic = getMicroseconds(dt0)
+                                    #dt1mic = getMicroseconds(dt1)
+                                    #
+                                    #self.chrono.chronoStartTime = dt0
+                                    #
+                                    #self.chrono.temps_t = temps #
+                                    #self.chrono.temps_i = temps #
+                                    #
+                                    #self.chrono.lat0   = self.acqlines[k]["lat"]
+                                    #self.chrono.lon0   = self.acqlines[k]["lon"]
+                                    #self.chrono.time0  = self.acqlines[k]["time"]
+                                    #self.chrono.speed0 = self.acqlines[k]["vit"]
+                                    #self.chrono.alt0   = self.acqlines[k]["alt"]
+                                    #self.chrono.cap0   = self.acqlines[k]["cap"]
+                                    #
+                                    #fanalys.writePoint()
+                                    #                                  
+                                    #i = -1 # to exit the loop
+                                    #self.stop();
                         i = i - 1
                     if self.cut != True:
                         self.sleep = 1
@@ -3266,21 +3269,30 @@ if __name__ == "__main__":
             dirlist = os.listdir(dirtracks)
             circuits = {}
                 
-            if UseDBTrack == 0:
-                #logger.info("dirlist:"+str(dirlist))
-                if "Autotrack.trk" in dirlist:
-                    TFD = open(dirtracks+"/Autotrack.trk", 'r')
-                    circuits["Autotrack"] = json.loads(TFD.read())
-                    TFD.close()
-            else:
-                i = 0
-                for el in dirlist:
-                    TFD = open(dirtracks+"/"+el, 'r')
-                    Num = el.split(".trk")
-                    #logger.info('Num circuit:'+str(Num))
-                    Id = Num[0]
-                    circuits[Id] = json.loads(TFD.read())
-                    TFD.close()
+            #if UseDBTrack == 0:
+            #    #logger.info("dirlist:"+str(dirlist))
+            #    if "Autotrack.trk" in dirlist:
+            #        TFD = open(dirtracks+"/Autotrack.trk", 'r')
+            #        circuits["Autotrack"] = json.loads(TFD.read())
+            #        TFD.close()
+            #else:
+            #    i = 0
+            #    for el in dirlist:
+            #        TFD = open(dirtracks+"/"+el, 'r')
+            #        Num = el.split(".trk")
+            #        #logger.info('Num circuit:'+str(Num))
+            #        Id = Num[0]
+            #        circuits[Id] = json.loads(TFD.read())
+            #        TFD.close()
+
+            i = 0
+            for el in dirlist:
+                TFD = open(dirtracks+"/"+el, 'r')
+                Num = el.split(".trk")
+                #logger.info('Num circuit:'+str(Num))
+                Id = Num[0]
+                circuits[Id] = json.loads(TFD.read())
+                TFD.close()
 
         led1 = LedControl(LED1_GPIO_PIN) # LED 1 (yellow) is associated to many processes
         led1.start()
