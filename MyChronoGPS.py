@@ -2507,12 +2507,21 @@ class AcqControl(threading.Thread):
 
                                     #
                                     # creation of 3 intermediate lines
+                                    
+                                    #logger.info(str(self.acqlines))
+                                    #xi = 0
+                                    #while xi < len(self.acqlines):
+                                    #    logger.info(str(self.acqlines[xi]))
+                                    #    xi = xi+1
+                                    
                                     ii = i
                                     li = len(self.acqlines)-1
                                     hh=int(self.acqlines[i]["time"][0:2])
                                     mm=int(self.acqlines[i]["time"][2:4])
                                     ss=int(self.acqlines[i]["time"][4:6])
                                     td = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    #logger.info('td:'+str(td))
+                                    
                                     hh=int(self.acqlines[li]["time"][0:2])
                                     mm=int(self.acqlines[li]["time"][2:4])
                                     ss=int(self.acqlines[li]["time"][4:6])
@@ -2522,6 +2531,8 @@ class AcqControl(threading.Thread):
                                     
                                     # creation of intermediate line 1
                                     ti1 = td+timedelta(seconds=ts)
+                                    #logger.info('ti1:'+str(ti1))
+
                                     tr = td
                                     while ti1 > tr:
                                         ii0 = ii
@@ -2530,6 +2541,9 @@ class AcqControl(threading.Thread):
                                         mm=int(self.acqlines[ii]["time"][2:4])
                                         ss=int(self.acqlines[ii]["time"][4:6])
                                         tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                        #logger.info(str(self.acqlines[ii]))
+                                    #logger.info(str(tr))
+
                                     self.chrono.intline.append("")
                                     self.chrono.intline[0] = self.chrono.ChronoData()
                                     self.chrono.intline[0].lat1 =  self.acqlines[ii0]["lat1"]
@@ -2547,6 +2561,8 @@ class AcqControl(threading.Thread):
                                         mm=int(self.acqlines[ii]["time"][2:4])
                                         ss=int(self.acqlines[ii]["time"][4:6])
                                         tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    #logger.info(str(tr))
+
                                     self.chrono.intline.append("")
                                     self.chrono.intline[1] = self.chrono.ChronoData()
                                     self.chrono.intline[1].lat1 =  self.acqlines[ii0]["lat1"]
@@ -2564,6 +2580,8 @@ class AcqControl(threading.Thread):
                                         mm=int(self.acqlines[ii]["time"][2:4])
                                         ss=int(self.acqlines[ii]["time"][4:6])
                                         tr = timedelta(hours=hh,minutes=mm,seconds=ss)
+                                    #logger.info(str(tr))
+
                                     self.chrono.intline.append("")
                                     self.chrono.intline[2] = self.chrono.ChronoData()
                                     self.chrono.intline[2].lat1 =  self.acqlines[ii0]["lat1"]
@@ -2625,11 +2643,13 @@ class AcqControl(threading.Thread):
                                     #self.stop();
                         i = i - 1
                     if self.cut != True:
-                        self.sleep = 1
-                        if self.vit > 0:
-                            self.sleep = self.pulse/self.vit
-                        if self.sleep > self.maxsleep:
-                            self.sleep = self.maxsleep
+                        #self.sleep = 1
+                        #if self.vit > 0:
+                        #    self.sleep = self.pulse/self.vit
+                        #if self.sleep > self.maxsleep:
+                        #    self.sleep = self.maxsleep
+                        #logger.info('sleep:'+str(self.sleep))                            
+                        self.sleep = 2
                         time.sleep(self.sleep)
                 else:
                     self.sleep = 1
