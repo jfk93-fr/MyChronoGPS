@@ -26,6 +26,7 @@ var objPitOut = new Object(); // Tableau des coordonnées de la sortie de la pit
 
 var Track = new Object(); // Objet recueillant toutes les données pour la piste à écrire ou à copier dans le presse papier
 var fname_save = 'ajax/save_circuit.php';
+var fname_delete = 'ajax/delete_circuit.php';
 var dataPost = false; // Objet recueillant le formulaire à passer à la procédure ajax d'écriture de la piste
 
 // Rayon de la terre en mètres (sphère IAG-GRS80)
@@ -1248,6 +1249,27 @@ function saveTrack(parm) {
 	}
 	
 	upLoadCircuitAjax(fname_save);
+	
+	document.getElementById("zone-info").innerHTML = 'Les données du circuit sont en cours de sauvegarde';
+}
+
+function deleteTrack(parm) {	
+	// on copy tous les input et on crée le fichier JSON de la piste
+	createNewTrack();
+
+	dataPost = new FormData();
+	
+	for (property in Track) {		
+		var valuePost = Track[property];
+		if (Array.isArray(Track[property])) {
+			valuePost = '['+Track[property]+']';
+		}
+		dataPost.append(property, valuePost);
+	}
+	if (!confirm("vous êtes sur le point de supprimer le circuit "+thisCircuit.NomCircuit+", voulez-vous continuer ?"))
+		return;
+1	
+	upLoadCircuitAjax(fname_delete);
 	
 	document.getElementById("zone-info").innerHTML = 'Les données du circuit sont en cours de sauvegarde';
 }
