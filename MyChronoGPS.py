@@ -1894,6 +1894,9 @@ class ChronoControl():
 
         line += '}'
         # on ajoute tout de suite la piste dans le tableau des pistes
+        logger.info(str(line))
+        if "Autotrack" in circuits:
+            del circuits["Autotrack"]
         circuits["Autotrack"] = json.loads(line)
         
         self.track = pathdata+'/tracks/Autotrack.trk' # location of the Autotrack track file
@@ -2036,6 +2039,13 @@ class ChronoControl():
                             
                         # is the start-finish line crossed ?
                         if self.startLineCut == True:
+                            if acq != False:
+                                # if the GPS point acquisition thread is running, it is stopped
+                                if acq.active != False:
+                                    logger.info('startLineCut acq stop request:'+str(startLineCut))
+                                    acq.stop()
+
+
                             dDp0 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_prevlat,self.gps_prevlon)
                             # calculation of the distance between the current point and the start-finish line
                             dDp1 = self.calculDistances(self.startlat1,self.startlon1,self.startlat2,self.startlon2,self.gps_latitude,self.gps_longitude)
@@ -2292,20 +2302,22 @@ class ChronoControl():
                                 cut = self.is_lineCut(lat1,lon1,lat2,lon2,self.gps.latitude,self.gps.longitude,self.gps.prevlat,self.gps.prevlon)
                                 
                                 if cut == True:
-                                    # if the automatic definition of the line is in progress, it is stopped
-                                    if acq != False:
-                                        if acq.active == True:
-                                            logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
-                                            acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
-                                    self.getGpsData(); # to have access to GPS data with refresh protection during calculations
+                                    ## if the automatic definition of the line is in progress, it is stopped
+                                    #if acq != False:
+                                    #    if acq.active == True:
+                                    #        logger.info('AcqControl to be canceled. distcir='+str(distcir)+' near='+str(self.neardist)+' is acq:'+str(acq))
+                                    #        acq.cancel() # the thread for automatic acquisition of the start-finish line is abandoned                  
+                                    #self.getGpsData(); # to have access to GPS data with refresh protection during calculations
 
                                     self.lcd.set_display_sysmsg("Start Line//Cut",lcd.DISPLAY,5)
+                                    #logger.info('track:'+str(circuits[track]))
                                     self.define_start_wcoord(lat1, lon1, lat2, lon2)
                                     self.circuit = circuits[track]
                                     self.begin()
                                     self.nblap = 1 # we start with the first lap
                                     self.chrono_started = True
                                     
+                                    self.getGpsData();
                                     dt0 = self.getTime(self.gps_last_time)
                                     dt1 = self.getTime(self.gps_gpstime)
                                     
@@ -2503,8 +2515,8 @@ class AcqControl(threading.Thread):
                                     self.chrono.getGpsData()
                                     # we cut a line, we will draw the line from the calculated coordinates
                                     # instead of drawing the line, we could indicate that we are ready to draw it
+                                    
                                     self.chrono.define_start_wcap(self.acqlines[i]["lat"], self.acqlines[i]["lon"], self.acqlines[i]["cap"])
-
                                     #
                                     # creation of 3 intermediate lines
                                     
@@ -2591,6 +2603,8 @@ class AcqControl(threading.Thread):
 
                                     # creation of the self-defined track
                                     self.chrono.create_sfTrack()
+                                    self.chrono.auto_start_line()
+#################JFK######chrono.auto_start_line()
                                     
                                     #self.chrono.dD = 0 # no need for distance correction
                                     #self.chrono.dD = self.chrono.calculDistances(self.chrono.startlat1,self.chrono.startlon1,self.chrono.startlat2,self.chrono.startlon2,self.acqlines[j]["lat"],self.acqlines[j]["lon"])
@@ -2639,8 +2653,10 @@ class AcqControl(threading.Thread):
                                     #
                                     #fanalys.writePoint()
                                     #                                  
-                                    #i = -1 # to exit the loop
-                                    #self.stop();
+                                    i = -1 # to exit the loop
+                                    self.lat = False
+                                    self.acqlines = [] # table of lines to be checked
+                                    #self.restart();
                         i = i - 1
                     if self.cut != True:
                         #self.sleep = 1
@@ -2687,13 +2703,22 @@ class AcqControl(threading.Thread):
         self.acqline["lon2"]  = lon2
     
     def stop(self):
+        logger.info("AcqControl receive stop request")
         if self.__running != True:
             logger.info("AcqControl already stopped")
             return
         self.__running = False
         self.active = False;
+    
+#    def restart(self):
+#        logger.info("AcqControl receive restart request")
+#        self.stop()
+#        self.acqline = dict({"time":"","lat":False,"lon":False,"cap":False,"vit":False,"lat1":False,"lon1":False,"lat2":False,"lon2":False})
+#        self.acqlines = [] # table of lines to be checked
+#        self.run()
                 
     def cancel(self):
+        logger.info("AcqControl receive cancel request")
         self.__cancel = True
         self.stop()
         
@@ -3467,10 +3492,11 @@ if __name__ == "__main__":
                                                 acq = AcqControl(chrono) # automatic definition of the start-finish line
                                                 acq.start()
                                 else:
-                                    if acq != False:
-                                        # if the GPS point acquisition thread is running, it is stopped
-                                        if acq.active != False:
-                                            acq.stop()
+                                    #if acq != False:
+                                    #    # if the GPS point acquisition thread is running, it is stopped
+                                    #    if acq.active != False:
+                                    #        logger.info('acq stop request:'+str(current_state))
+                                    #        acq.stop()
                                     if gps.gpsvitesse > speedometer:
                                         if chrono.circuit != False:
                                             menu.running_state = RUNNING
